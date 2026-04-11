@@ -43,16 +43,15 @@ class LLMManager:
     # -------------------------------------------------------------------------
 
     def _init_clients(self) -> None:
-        # 1. PRIMARY: Gemini (FORCED as primary)
-        if self.settings.gemini_api_key:
-            try:
-                from luna.ai.gemini import GeminiClient
-                client = GeminiClient(api_key=self.settings.gemini_api_key)
-                self._clients["gemini"] = client
-                self._primary = client
-                logger.info("[LLMManager] Gemini initialized (PRIMARY - FORCED)")
-            except Exception as e:
-                logger.error("[LLMManager] Gemini init failed: %s", e)
+        # 1. PRIMARY: Gemini (FORCED as primary, using Vertex AI with ADC)
+        try:
+            from luna.ai.gemini import GeminiClient
+            client = GeminiClient()
+            self._clients["gemini"] = client
+            self._primary = client
+            logger.info("[LLMManager] Gemini initialized (PRIMARY - FORCED)")
+        except Exception as e:
+            logger.error("[LLMManager] Gemini init failed: %s", e)
 
         # 2. FALLBACK: Kimi/Moonshot
         if self.settings.moonshot_api_key:

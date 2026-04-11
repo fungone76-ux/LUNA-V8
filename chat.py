@@ -1,19 +1,50 @@
-from google import genai
+import asyncio
+from luna.core.engine import GameEngine
 
-# Configura il client con la tua chiave
-client = genai.Client(api_key="AIzaSyC_NmECWo-Z4jYgOpQ_e8JKW7yC5gHVQqo") # Metti la tua chiave qui
+async def main():
+    print("--- Inizializzazione Luna RPG Engine ---")
+    
+    # Sostituisci "default_world" e "Luna" con gli ID reali del tuo mondo e companion
+    world_id = "default_world" 
+    companion = "Luna"
+    
+    # Inizializza l'engine (disabilitiamo i media per una chat testuale veloce)
+    engine = GameEngine(world_id=world_id, companion=companion, no_media=True)
+    
+    try:
+        await engine.initialize()
+        print(f"Motore avviato. Mondo: {world_id}, Companion: {companion}")
+        
+        # Genera l'introduzione opzionale
+        intro_result = await engine.generate_intro()
+        if intro_result and intro_result.text:
+            print(f"\nGioco: {intro_result.text}\n")
+            
+    except Exception as e:
+        print(f"Errore durante l'inizializzazione: {e}")
+        return
 
-print("--- Gemini CLI Chat (Digita 'fine' per chiudere) ---")
+    print("--- Chat Iniziata (Digita 'fine' per chiudere) ---")
 
-while True:
-    messaggio = input("Tu: ")
-    if messaggio.lower() in ["fine", "exit", "stop"]:
-        break
+    while True:
+        messaggio = input("Tu: ")
+        if messaggio.lower() in ["fine", "exit", "stop"]:
+            break
 
-    # Generazione della risposta
-    response = client.models.generate_content(
-        model="gemini-3.1-pro-preview",
-        contents=messaggio
-    )
+        if not messaggio.strip():
+            continue
 
-    print(f"\nGemini: {response.text}\n")
+        # Passa l'input all'engine che lo delegherà al TurnOrchestrator
+        try:
+            result = await engine.process_turn(messaggio)
+            print(f"\nGioco: {result.text}\n")
+        except Exception as e:
+            print(f"\n[Errore durante il turno]: {e}\n")
+
+    # Chiusura pulita
+    print("Salvataggio e chiusura in corso...")
+    await engine.shutdown()
+    print("Chiusura completata.")
+
+if __name__ == "__main__":
+    asyncio.run(main())

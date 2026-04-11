@@ -79,13 +79,15 @@ class GeminiClient(BaseLLMClient):
         max_tokens: Optional[int] = None,
         **kwargs: Any,
     ) -> None:
-        # Try to load from models.yaml, fall back to defaults
-        primary, fallbacks = self._load_model_config()
+        print("[DEBUG] Sto provando a caricare Vertex AI...")
+        
+        # Imposta il modello FISSO su gemini-1.5-flash per emergenza
+        fixed_model = "gemini-1.5-flash"
 
-        super().__init__(model or primary, **kwargs)
+        super().__init__(fixed_model, **kwargs)
         self.temperature  = temperature if temperature is not None else self.TEMPERATURE
         self.max_tokens   = max_tokens  if max_tokens  is not None else self.MAX_TOKENS
-        self._fallbacks   = fallbacks
+        self._fallbacks   = []  # Disabilitiamo i fallback per forzare l'uso esclusivo di 1.5-flash
         self._init_client()
 
     @property

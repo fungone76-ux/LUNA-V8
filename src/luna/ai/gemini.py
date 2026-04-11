@@ -63,9 +63,10 @@ class GeminiClient(BaseLLMClient):
     """
 
     # Modelli Gemini disponibili (da lista API aggiornata):
-    DEFAULT_MODEL    = "gemini-3.1"                 # Primo tentativo
+    DEFAULT_MODEL    = "gemini-2.5-flash"           # Primo tentativo
     FALLBACK_MODELS  = [
-        "gemini-1.5-flash-001",                     # Secondo tentativo
+        "gemini-2.0-flash-001",                     # Secondo tentativo
+        "gemini-2.5-pro",                           # Terzo tentativo
     ]
     TEMPERATURE      = 0.95
     MAX_TOKENS       = 2048

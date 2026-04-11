@@ -74,7 +74,6 @@ class GeminiClient(BaseLLMClient):
 
     def __init__(
         self,
-        api_key: Optional[str] = None,  # Kept for signature compatibility, but unused
         model: Optional[str] = None,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
@@ -111,7 +110,7 @@ class GeminiClient(BaseLLMClient):
             logger.error("[Gemini] google-cloud-aiplatform not installed: pip install google-cloud-aiplatform")
             return
         try:
-            # Initialize Vertex AI with specific project and location
+            # Initialize Vertex AI with specific project and location using ADC
             vertexai.init(project='gen-lang-client-0617760675', location='us-central1')
             self._initialized = True
             logger.info("[Gemini] Initialized Vertex AI — model: %s", self.model)

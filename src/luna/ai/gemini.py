@@ -63,11 +63,9 @@ class GeminiClient(BaseLLMClient):
     """
 
     # Modelli Gemini disponibili (da lista API aggiornata):
-    DEFAULT_MODEL    = "gemini-2.5-flash"           # Miglior rapporto qualità/velocità
+    DEFAULT_MODEL    = "gemini-3.1"                 # Primo tentativo
     FALLBACK_MODELS  = [
-        "gemini-1.5-pro",                           # Più potente, più lento
-        "gemini-2.0-flash",                         # Veloce e affidabile
-        "gemini-1.0-pro",                           # Fallback stabile
+        "gemini-1.5-flash-001",                     # Secondo tentativo
     ]
     TEMPERATURE      = 0.95
     MAX_TOKENS       = 2048
@@ -81,13 +79,13 @@ class GeminiClient(BaseLLMClient):
     ) -> None:
         print("[DEBUG] Sto provando a caricare Vertex AI...")
         
-        # Imposta il modello FISSO su gemini-1.5-flash per emergenza
-        fixed_model = "gemini-1.5-flash"
+        # Try to load from models.yaml, fall back to defaults
+        primary, fallbacks = self._load_model_config()
 
-        super().__init__(fixed_model, **kwargs)
+        super().__init__(model or primary, **kwargs)
         self.temperature  = temperature if temperature is not None else self.TEMPERATURE
         self.max_tokens   = max_tokens  if max_tokens  is not None else self.MAX_TOKENS
-        self._fallbacks   = []  # Disabilitiamo i fallback per forzare l'uso esclusivo di 1.5-flash
+        self._fallbacks   = fallbacks
         self._init_client()
 
     @property
@@ -161,7 +159,7 @@ class GeminiClient(BaseLLMClient):
                 logger.warning("[Gemini] %s failed: %s", model_name, e)
                 continue
 
-        logger.error("[Gemini] All models failed")
+        logger.error("[Gemini] All models failed. Project ID in use: gen-lang-client-0617760675")
         return self._create_error_response("All Gemini models failed")
 
     async def _generate_with_model(

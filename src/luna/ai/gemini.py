@@ -1,4 +1,4 @@
-"""Luna RPG v6 - Google Gemini LLM Client."""
+"""Luna RPG v6 - Google Gemini LLM Client (Vertex AI)."""
 from __future__ import annotations
 
 import logging
@@ -13,8 +13,15 @@ from luna.core.models import LLMResponse, StateUpdate
 logger = logging.getLogger(__name__)
 
 try:
-    from google import genai
-    from google.genai import types
+    import vertexai
+    from vertexai.generative_models import (
+        GenerativeModel,
+        Part,
+        Content,
+        SafetySetting,
+        HarmCategory,
+        HarmBlockThreshold,
+    )
     GEMINI_AVAILABLE = True
 except ImportError:
     GEMINI_AVAILABLE = False
@@ -49,15 +56,13 @@ class _ResponseSchema(BaseModel):
 
 
 class GeminiClient(BaseLLMClient):
-    """Google Gemini provider.
+    """Google Gemini provider via Vertex AI.
 
     Primary LLM for Luna RPG v6.
     Loads model list from config/models.yaml.
     """
 
     # Modelli Gemini disponibili (da lista API aggiornata):
-    # ✅ Per generateContent (testo): gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash
-    # ❌ Non supportati: gemini-3-*, gemini-*-tts, imagen-*, veo-*, embedding-*, lyria-*, aqa
     DEFAULT_MODEL    = "gemini-2.5-flash"           # Miglior rapporto qualità/velocità
     FALLBACK_MODELS  = [
         "gemini-2.5-pro",                           # Più potente, più lento
@@ -67,17 +72,9 @@ class GeminiClient(BaseLLMClient):
     TEMPERATURE      = 0.95
     MAX_TOKENS       = 2048
 
-    # Safety: allow all categories (content filtered by game logic)
-    SAFETY_SETTINGS = [
-        {"category": "HARM_CATEGORY_HARASSMENT",        "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_HATE_SPEECH",       "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-    ]
-
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: Optional[str] = None,  # Kept for signature compatibility, but unused
         model: Optional[str] = None,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
@@ -87,11 +84,9 @@ class GeminiClient(BaseLLMClient):
         primary, fallbacks = self._load_model_config()
 
         super().__init__(model or primary, **kwargs)
-        self.api_key      = api_key
         self.temperature  = temperature if temperature is not None else self.TEMPERATURE
         self.max_tokens   = max_tokens  if max_tokens  is not None else self.MAX_TOKENS
         self._fallbacks   = fallbacks
-        self._client: Optional[Any] = None
         self._init_client()
 
     @property
@@ -113,15 +108,13 @@ class GeminiClient(BaseLLMClient):
 
     def _init_client(self) -> None:
         if not GEMINI_AVAILABLE:
-            logger.error("[Gemini] google-genai not installed: pip install google-genai")
-            return
-        if not self.api_key:
-            logger.warning("[Gemini] No API key provided")
+            logger.error("[Gemini] google-cloud-aiplatform not installed: pip install google-cloud-aiplatform")
             return
         try:
-            self._client = genai.Client(api_key=self.api_key)
+            # Initialize Vertex AI with specific project and location
+            vertexai.init(project='gen-lang-client-0617760675', location='us-central1')
             self._initialized = True
-            logger.info("[Gemini] Initialized — model: %s", self.model)
+            logger.info("[Gemini] Initialized Vertex AI — model: %s", self.model)
         except Exception as e:
             logger.error("[Gemini] Init failed: %s", e)
 
@@ -130,14 +123,11 @@ class GeminiClient(BaseLLMClient):
     # -------------------------------------------------------------------------
 
     async def health_check(self) -> bool:
-        if not self._initialized or not self._client:
+        if not self._initialized:
             return False
         try:
-            resp = self._client.models.generate_content(
-                model=self.model,
-                contents="ping",
-                config=types.GenerateContentConfig(max_output_tokens=5),
-            )
+            model = GenerativeModel(self.model)
+            resp = await model.generate_content_async("ping")
             return resp.text is not None
         except Exception:
             return False
@@ -153,21 +143,21 @@ class GeminiClient(BaseLLMClient):
         history: List[Dict[str, str]],
         json_mode: bool = True,
     ) -> LLMResponse:
-        if not self._client:
-            return self._create_error_response("Gemini client not initialized")
+        if not self._initialized:
+            return self._create_error_response("Vertex AI client not initialized")
 
         contents = self._build_gemini_contents(history, user_input)
         models_to_try = [self.model] + self._fallbacks
 
-        for model in models_to_try:
+        for model_name in models_to_try:
             try:
                 result = await self._generate_with_model(
-                    model, system_prompt, contents, json_mode
+                    model_name, system_prompt, contents, json_mode
                 )
                 if result:
                     return result
             except Exception as e:
-                logger.warning("[Gemini] %s failed: %s", model, e)
+                logger.warning("[Gemini] %s failed: %s", model_name, e)
                 continue
 
         logger.error("[Gemini] All models failed")
@@ -175,39 +165,60 @@ class GeminiClient(BaseLLMClient):
 
     async def _generate_with_model(
         self,
-        model: str,
+        model_name: str,
         system_prompt: str,
         contents: Any,
         json_mode: bool,
     ) -> Optional[LLMResponse]:
         """Try generation with a specific model."""
-        safety = [
-            types.SafetySetting(category=s["category"], threshold=s["threshold"])
-            for s in self.SAFETY_SETTINGS
+        
+        # Safety settings for Vertex AI
+        safety_settings = [
+            SafetySetting(
+                category=HarmCategory.HARM_CATEGORY_HARASSMENT,
+                threshold=HarmBlockThreshold.BLOCK_NONE
+            ),
+            SafetySetting(
+                category=HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                threshold=HarmBlockThreshold.BLOCK_NONE
+            ),
+            SafetySetting(
+                category=HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                threshold=HarmBlockThreshold.BLOCK_NONE
+            ),
+            SafetySetting(
+                category=HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                threshold=HarmBlockThreshold.BLOCK_NONE
+            ),
         ]
-        config = types.GenerateContentConfig(
-            system_instruction=system_prompt,
-            temperature=self.temperature,
-            top_p=0.98,
-            top_k=40,
-            max_output_tokens=self.max_tokens,
-            safety_settings=safety,
-        )
+        
+        generation_config = {
+            "temperature": self.temperature,
+            "top_p": 0.98,
+            "top_k": 40,
+            "max_output_tokens": self.max_tokens,
+        }
+        
         if json_mode:
-            config.response_mime_type = "application/json"
+            generation_config["response_mime_type"] = "application/json"
 
-        response = self._client.models.generate_content(
-            model=model,
+        model_instance = GenerativeModel(
+            model_name=model_name,
+            system_instruction=system_prompt
+        )
+
+        response = await model_instance.generate_content_async(
             contents=contents,
-            config=config,
+            generation_config=generation_config,
+            safety_settings=safety_settings,
         )
 
         raw = response.text
         if not raw:
-            logger.warning("[Gemini] %s returned empty response", model)
+            logger.warning("[Gemini] %s returned empty response", model_name)
             return None
 
-        return self._parse(raw, model)
+        return self._parse(raw, model_name)
 
     def _parse(self, raw: str, model: str) -> Optional[LLMResponse]:
         """Parse raw LLM output into LLMResponse using repair pipeline."""
@@ -261,20 +272,20 @@ class GeminiClient(BaseLLMClient):
         history: List[Dict[str, str]],
         user_input: str,
     ) -> List[Any]:
-        """Build Gemini-format content list."""
+        """Build Vertex AI format content list."""
         contents = []
         for msg in history:
             role = "user" if msg.get("role") == "user" else "model"
             contents.append(
-                types.Content(
+                Content(
                     role=role,
-                    parts=[types.Part.from_text(text=msg.get("content", ""))],
+                    parts=[Part.from_text(msg.get("content", ""))],
                 )
             )
         contents.append(
-            types.Content(
+            Content(
                 role="user",
-                parts=[types.Part.from_text(text=user_input)],
+                parts=[Part.from_text(user_input)],
             )
         )
         return contents

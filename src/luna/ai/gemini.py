@@ -63,11 +63,11 @@ class GeminiClient(BaseLLMClient):
     """
 
     # Modelli Gemini disponibili (da lista API aggiornata):
-    DEFAULT_MODEL    = "gemini-2.5-flash"           # Miglior rapporto qualità/velocità
+    DEFAULT_MODEL    = "gemini-1.5-flash"           # Miglior rapporto qualità/velocità
     FALLBACK_MODELS  = [
-        "gemini-2.5-pro",                           # Più potente, più lento
+        "gemini-1.5-pro",                           # Più potente, più lento
         "gemini-2.0-flash",                         # Veloce e affidabile
-        "gemini-flash-latest",                      # Alias sempre aggiornato
+        "gemini-1.0-pro",                           # Fallback stabile
     ]
     TEMPERATURE      = 0.95
     MAX_TOKENS       = 2048

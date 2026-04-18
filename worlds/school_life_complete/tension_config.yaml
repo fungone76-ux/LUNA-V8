@@ -1,0 +1,101 @@
+# ============================================================
+# TENSION CONFIG - School Life Complete
+# Assi di tensione narrativa per il TensionTracker v7
+#
+# Ogni asse cresce nel tempo e produce:
+# - foreshadowing (hint sottili)
+# - buildup (segnali più forti)
+# - trigger (evento che scatta)
+#
+# growth_rate: quanto cresce per turno (0.01 = lento, 0.05 = veloce)
+# decay_rate: quanto scende dopo che l'evento scatta
+# foreshadow_at: livello per iniziare gli hint (0.0 - 1.0)
+# threshold: livello per scatenare l'evento
+# ============================================================
+
+tension_axes:
+  
+  romantic:
+    growth_rate: 0.025
+    decay_rate: 0.15
+    foreshadow_at: 0.35
+    threshold: 0.75
+    cooldown: 15
+    foreshadow_hints:
+      - "Gli sguardi tra voi durano un po' troppo"
+      - "Un silenzio carico di tensione riempie la stanza"
+      - "{companion} distoglie lo sguardo un attimo troppo tardi"
+    buildup_hints:
+      - "L'aria tra voi è carica di qualcosa di non detto"
+      - "Ogni contatto accidentale sembra elettrico"
+      - "{companion} si morde il labbro, pensierosa"
+    events:
+      - "alone_classroom"
+
+  environmental:
+    growth_rate: 0.015
+    decay_rate: 0.25
+    foreshadow_at: 0.3
+    threshold: 0.7
+    cooldown: 20
+    foreshadow_hints:
+      - "Il cielo fuori si è scurito"
+      - "Un colpo di vento fa sbattere una finestra"
+      - "L'aria si è fatta pesante, umida"
+    buildup_hints:
+      - "Le finestre vibrano per il vento"
+      - "Si sentono tuoni in lontananza"
+      - "Le luci sfarfallano per un istante"
+    events:
+      - "rainstorm"
+      - "blackout"
+
+  authority:
+    growth_rate: 0.012
+    decay_rate: 0.2
+    foreshadow_at: 0.45
+    threshold: 0.8
+    cooldown: 25
+    foreshadow_hints:
+      - "Il preside è stato visto aggirarsi per i corridoi"
+      - "La segretaria sembra nervosa oggi"
+      - "Un annuncio dall'altoparlante interrompe il silenzio"
+    buildup_hints:
+      - "Si mormora di un'ispezione imminente"
+      - "Il preside ha convocato una riunione urgente"
+      - "La segretaria ti guarda con un'aria che non promette nulla di buono"
+    events:
+      - "luna_discipline"
+
+  social:
+    growth_rate: 0.018
+    decay_rate: 0.12
+    foreshadow_at: 0.4
+    threshold: 0.75
+    cooldown: 15
+    foreshadow_hints:
+      - "Noti sguardi curiosi da parte degli studenti"
+      - "Qualcuno mormora qualcosa al tuo passaggio"
+      - "Un gruppo di ragazze ridacchia guardandoti"
+    buildup_hints:
+      - "Il gossip sulla tua vicinanza con lei si sta diffondendo"
+      - "Stella ti lancia un'occhiata carica di significato"
+      - "Senti il tuo nome pronunciato da qualcuno in corridoio"
+    events:
+      - "stella_entourage"
+
+  routine_break:
+    growth_rate: 0.03
+    decay_rate: 0.3
+    foreshadow_at: 0.5
+    threshold: 0.85
+    cooldown: 12
+    foreshadow_hints:
+      - "La giornata sembra scorrere come tutte le altre"
+      - "Un silenzio innaturale nel corridoio"
+    buildup_hints:
+      - "Un rumore insolito dal corridoio"
+      - "Qualcuno bussa alla porta inaspettatamente"
+      - "Si sente trambusto dalle scale"
+    events:
+      - "maria_cleaning"

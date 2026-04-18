@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 import random
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Dict, List, Optional, Set
 
 if TYPE_CHECKING:
@@ -378,7 +378,7 @@ class NpcGoalEvaluator:
                 if player_loc and spawn_locs and player_loc in spawn_locs:
                     # Auto-set the flag so future check sees it done
                     if completion_flag:
-                        game_state.flags[completion_flag] = True
+                        game_state.flags[str(completion_flag)] = True
                         logger.info(
                             "[GoalEvaluator] Location-based completion: %s visited %s → %s",
                             npc_id, player_loc, completion_flag,

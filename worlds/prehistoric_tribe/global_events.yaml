@@ -1,0 +1,462 @@
+# ============================================================
+# GLOBAL EVENTS - Terra degli Antenati
+# Eventi ambientali e narrativi che accadono indipendentemente
+# ============================================================
+
+global_events:
+  # ============================================================
+  # NATURALI / AMBIENTALI
+  # ============================================================
+  tempesta:
+    meta:
+      title: "Tempesta Violenta"
+      description: "Un temporale violento si abbatte sulla valle con fulmini e pioggia torrenziale"
+      icon: "⛈️"
+    narrative_prompt: |
+      A violent storm rages across the valley. Lightning tears through the sky,
+      torrential rain reduces visibility to zero. Terrified beasts run everywhere.
+      It is dangerous to move. Better find shelter.
+    trigger:
+      type: "random"
+      chance: 0.15
+      cooldown_turns: 10
+    conditions:
+      location_not: ["caverna", "tenda_capo"]
+    effects:
+      duration: 3
+      atmosphere_change: "dangerous, chaotic, tense"
+      visual_tags: ["storm", "lightning", "heavy_rain", "dark_clouds"]
+      on_start:
+        - type: "temporary_danger"
+          location: "current"
+          danger: "fulmini"
+        - type: "temporary_danger"
+          location: "giungla"
+          danger: "allagamento"
+        - type: "modify_stat"
+          stat: "energy"
+          value: -10
+        - type: "set_environment_flag"
+          flag: "storm_active"
+          duration: 3
+    ambient_sounds:
+      - "tuoni assordanti"
+      - "pioggia torrenziale"
+      - "vento urlante"
+
+  terremoto:
+    meta:
+      title: "Terremoto"
+      description: "La terra trema violentemente, alberi cadono e rocce rotolano"
+      icon: "🌍"
+    narrative_prompt: |
+      The earth shakes violently! Trees fall, rocks roll down the hills.
+      Is it the spite of the gods or something more ancient awakening?
+      Terror reigns supreme.
+    trigger:
+      type: "random"
+      chance: 0.05
+      cooldown_turns: 20
+    conditions:
+      location_not: []
+    effects:
+      duration: 2
+      atmosphere_change: "terrifying, chaotic, apocalyptic"
+      visual_tags: ["earthquake", "falling_rocks", "cracking_ground", "dust"]
+      on_start:
+        - type: "temporary_danger"
+          location: "caverna"
+          danger: "crollo_imminente"
+        - type: "modify_stat"
+          stat: "energy"
+          value: -15
+        - type: "damage_all"
+          amount: 5
+    ambient_sounds:
+      - "rombo della terra"
+      - "alberi che si spezzano"
+      - "grida di terrore"
+
+  nebbia_spiritica:
+    meta:
+      title: "Nebbia Spiritica"
+      description: "Una nebbia innaturale e densa avvolge tutto, quasi viva"
+      icon: "🌫️"
+    narrative_prompt: |
+      An unnatural fog envelops everything. It is not normal vapor... it is dense, almost alive.
+      Kara would say it is the veil between worlds thinning.
+      Distant voices are heard. Footsteps. Something watches from the dark.
+    trigger:
+      type: "random"
+      chance: 0.1
+      cooldown_turns: 8
+    conditions:
+      location: ["giungla", "fiume", "caverna"]
+      time: ["Night", "Evening"]
+    effects:
+      duration: 5
+      atmosphere_change: "mysterious, eerie, supernatural"
+      visual_tags: ["thick_fog", "mist", "spirit_world", "glowing_eyes"]
+      on_start:
+        - type: "temporary_danger"
+          location: "current"
+          danger: "spiriti_vaganti"
+        - type: "modify_stat"
+          stat: "mind"
+          value: -5
+        - type: "set_environment_flag"
+          flag: "spirit_world_near"
+          duration: 5
+    ambient_sounds:
+      - "sussurri incomprensibili"
+      - "risa lontane"
+      - "passi nell'oscurità"
+
+  # ============================================================
+  # EVENTI TRIBALI / SOCIALI
+  # ============================================================
+  banchetto_caccia:
+    meta:
+      title: "Banchetto di Caccia"
+      description: "I cacciatori tornano con preda abbondante, tutto il villaggio celebra"
+      icon: "🔥"
+    narrative_prompt: |
+      The hunters have returned with enormous prey! The whole village gathers
+      for the celebration feast. High fires, drum music, dances,
+      cooking meat. It is a moment of joy and abundance.
+      Naya is at the center of celebrations, glorious.
+    trigger:
+      type: "random"
+      chance: 0.2
+      cooldown_turns: 15
+    conditions:
+      location: ["villaggio"]
+      time: ["Evening"]
+    effects:
+      duration: 2
+      atmosphere_change: "joyful, festive, communal"
+      visual_tags: ["bonfire", "feast", "dancing", "tribal_celebration"]
+      on_start:
+        - type: "restore_stat"
+          stat: "food"
+          value: 50
+        - type: "restore_stat"
+          stat: "energy"
+          value: 20
+        - type: "modify_affinity"
+          character: "Naya"
+          value: 5
+        - type: "set_environment_flag"
+          flag: "feast_active"
+          duration: 2
+    npc_present:
+      - Naya
+      - Zara
+
+  rituale_luna_piena:
+    meta:
+      title: "Rituale della Luna Piena"
+      description: "Kara guida il rituale sacro nella notte di luna piena"
+      icon: "🌕"
+    narrative_prompt: |
+      It is the night of the Full Moon. Kara guides the sacred ritual in the village square.
+      Everyone wears their finest clothes. Ancestral chants, ritual dances,
+      offerings to spirits. Magic is palpable in the air.
+    trigger:
+      type: "cycle"
+      every_turns: 20
+    conditions:
+      time: ["Night"]
+    effects:
+      duration: 1
+      atmosphere_change: "mystical, spiritual, sacred"
+      visual_tags: ["full_moon", "ritual_fire", "shaman", "tribal_ceremony"]
+      on_start:
+        - type: "modify_affinity"
+          character: "Kara"
+          value: 10
+        - type: "set_environment_flag"
+          flag: "full_moon_ritual"
+          duration: 1
+    npc_present:
+      - Kara
+    ambient_sounds:
+      - "canti rituali"
+      - "tamburi sciamanici"
+      - "urla di trance"
+
+  consiglio_tribale:
+    meta:
+      title: "Consiglio Tribale"
+      description: "Il Capo ha convocato il Consiglio per questioni importanti"
+      icon: "👑"
+    narrative_prompt: |
+      The Chief has convened the Tribal Council. Warriors, elders and notables
+      gather to discuss important matters. Politics, alliances, wars.
+      Zara presides with authority. Decisions made today will change the future.
+    trigger:
+      type: "random"
+      chance: 0.15
+      cooldown_turns: 12
+    conditions:
+      location: ["tenda_capo", "villaggio"]
+      time: ["Morning", "Afternoon"]
+    effects:
+      duration: 2
+      atmosphere_change: "political, tense, formal"
+      visual_tags: ["tribal_council", "elders", "serious_discussion", "tent"]
+      on_start:
+        - type: "set_environment_flag"
+          flag: "council_in_session"
+          duration: 2
+    npc_present:
+      - Zara
+
+  # ============================================================
+  # EVENTI DI PERICOLO
+  # ============================================================
+  attacco_bestia:
+    meta:
+      title: "Attacco di Bestia"
+      description: "Una tigre dai denti a sciabola o creatura pericolosa attacca!"
+      icon: "🐅"
+    narrative_prompt: |
+      A roar tears through the air! A saber-toothed tiger, or perhaps something worse,
+      emerges from the vegetation. Yellow eyes, long fangs, tense muscles.
+      It is hunt or be hunted. Fight or die!
+    trigger:
+      type: "random"
+      chance: 0.12
+      cooldown_turns: 8
+    conditions:
+      location: ["giungla", "fiume", "confine_tribale"]
+    effects:
+      duration: 1
+      atmosphere_change: "dangerous, intense, combat"
+      visual_tags: ["saber_tiger", "combat", "jungle", "beast_attack"]
+      on_start:
+        - type: "start_combat"
+          enemy: "tigre_sciabola"
+        - type: "modify_stat"
+          stat: "energy"
+          value: -20
+    ambient_sounds:
+      - "ruggito assordante"
+      - "fruscio di foglie"
+      - "ringhio gutturale"
+
+  imboscata_tribale:
+    meta:
+      title: "Imboscata Tribale"
+      description: "Guerrieri di una tribù nemica tendono un'imboscata!"
+      icon: "🏹"
+    narrative_prompt: |
+      Arrows whiz from above! Warriors of an enemy tribe have ambushed you.
+      War paint on their faces, battle cries. It is an ambush!
+      They must be the Black Wolves... the eternal enemies.
+    trigger:
+      type: "random"
+      chance: 0.08
+      cooldown_turns: 15
+    conditions:
+      location: ["giungla", "confine_tribale"]
+    effects:
+      duration: 1
+      atmosphere_change: "hostile, violent, war"
+      visual_tags: ["ambush", "warriors", "combat", "jungle_war"]
+      on_start:
+        - type: "start_combat"
+          enemy: "guerrieri_lupi_neri"
+        - type: "modify_stat"
+          stat: "health"
+          value: -15
+    ambient_sounds:
+      - "urla di guerra"
+      - "frecce che sibilano"
+      - "passi veloci"
+
+  # ============================================================
+  # EVENTI PERSONAGGIO-SPECIFICI
+  # ============================================================
+  visione_kara:
+    meta:
+      title: "Visione di Kara"
+      description: "Kara riceve una visione dagli antenati che coinvolge il protagonista"
+      icon: "🔮"
+    narrative_prompt: |
+      Kara grabs you by the shoulders. Her eyes are different... white, out of focus.
+      "The ancestors speak!" she exclaims with a voice that is not hers.
+      A vision overwhelms you: fire, blood, a choice that will change everything.
+      Then silence. Kara collapses in your arms.
+    trigger:
+      type: "affinity"
+      character: "Kara"
+      threshold: 60
+    conditions:
+      location: ["caverna", "villaggio"]
+    effects:
+      duration: 1
+      atmosphere_change: "mystical, prophetic, intense"
+      visual_tags: ["vision", "shaman", "white_eyes", "spiritual"]
+      on_start:
+        - type: "reveal_quest"
+          quest: "prova_spirito"
+        - type: "set_flag"
+          flag: "kara_vision_received"
+        - type: "modify_affinity"
+          character: "Kara"
+          value: 10
+
+  sfida_naya:
+    meta:
+      title: "Sfida di Naya"
+      description: "Naya sfida il protagonista a una gara di caccia"
+      icon: "🏃"
+    narrative_prompt: |
+      Naya blocks your path with her staff. A wild smile on her face.
+      "You are good at talking. But here one survives with strength."
+      She challenges you to a race: who reaches the hidden waterfall first?
+      If you win... well, she has never lost before.
+    trigger:
+      type: "affinity"
+      character: "Naya"
+      threshold: 40
+    conditions:
+      location: ["giungla", "fiume"]
+    effects:
+      duration: 1
+      atmosphere_change: "competitive, playful, challenging"
+      visual_tags: ["race", "jungle", "hunter", "challenge"]
+      on_start:
+        - type: "start_minigame"
+          game: "caccia_corsa"
+        - type: "set_flag"
+          flag: "naya_challenge_active"
+
+  intrigo_zara:
+    meta:
+      title: "Intrigo di Zara"
+      description: "Zara confida i suoi timori e intrighi politici al protagonista"
+      icon: "💜"
+    narrative_prompt: |
+      Zara closes you in her private chamber. She is different here... vulnerable.
+      "Everyone sees me as a trophy. A piece of power to conquer."
+      She confides her fears. Political intrigues, unwanted suitors,
+      the weight of the crown. For the first time, she is not the Chief's Daughter.
+      She is just Zara. And she has chosen to trust you.
+    trigger:
+      type: "affinity"
+      character: "Zara"
+      threshold: 50
+    conditions:
+      location: ["tenda_capo"]
+    effects:
+      duration: 1
+      atmosphere_change: "intimate, vulnerable, trusting"
+      visual_tags: ["private_chamber", "intimate", "tribal_princess", "emotional"]
+      on_start:
+        - type: "modify_affinity"
+          character: "Zara"
+          value: 15
+        - type: "set_flag"
+          flag: "zara_trust_earned"
+
+  # ============================================================
+  # EVENTI PROGRESSO STORIA
+  # ============================================================
+  messaggio_tribu_alleata:
+    meta:
+      title: "Messaggio dalla Tribù Alleata"
+      description: "Un corriere porta notizie urgenti dal villaggio d'origine"
+      icon: "📜"
+    narrative_prompt: |
+      A courier arrives bloodied from your home village.
+      He brings news: your tribe is under attack. They need you.
+      But the 3 Trials are not complete. What will you do?
+      Abandon honor to save your people, or betray blood for your destiny?
+    trigger:
+      type: "turn_count"
+      value: 5
+    conditions:
+      location: ["villaggio"]
+    effects:
+      duration: 5
+      atmosphere_change: "dramatic, torn, conflicted"
+      visual_tags: ["bloody_courier", "urgent_message", "tribal_dilemma"]
+      on_start:
+        - type: "set_flag"
+          flag: "tribal_dilemma_presented"
+        - type: "offer_choice"
+          choices:
+            - "Lascia le Prove e torna a casa"
+            - "Rimani e completa le Prove"
+
+  # ============================================================
+  # RANDOM FLAVOR EVENTS
+  # ============================================================
+  uccello_messaggero:
+    meta:
+      title: "Uccello Messaggero"
+      description: "Un uccello con un messaggio misterioso si posa vicino"
+      icon: "🦜"
+    narrative_prompt: |
+      A large colorful bird lands near you. It has a small container tied to its leg.
+      Inside is a message... in a language you do not know. Strange symbols.
+      Kara might know how to decipher it. Or maybe it is a trap?
+    trigger:
+      type: "random"
+      chance: 0.1
+    conditions: {}
+    effects:
+      duration: 1
+      atmosphere_change: "mysterious, curious"
+      visual_tags: ["messenger_bird", "mysterious_message", "colorful_bird"]
+      on_start:
+        - type: "add_item"
+          item: "messaggio_misterioso"
+
+  scoperta_rupestre:
+    meta:
+      title: "Scoperta Rupestre"
+      description: "Scopri un antico dipinto rupestre con una mappa"
+      icon: "🗿"
+    narrative_prompt: |
+      Among the rocks you discover an ancient cave painting. Human figures, beasts,
+      a map? It points to a place... something precious hidden?
+      Perhaps a legendary weapon, or a treasure forgotten by the ancestors.
+    trigger:
+      type: "random"
+      chance: 0.08
+    conditions:
+      location: ["caverna", "giungla"]
+    effects:
+      duration: 1
+      atmosphere_change: "mysterious, ancient, adventurous"
+      visual_tags: ["cave_painting", "ancient_art", "treasure_map", "ruins"]
+      on_start:
+        - type: "reveal_location"
+          location: "tesoro_ancestrale"
+        - type: "add_item"
+          item: "mappa_rupestre"
+
+  erbe_rare:
+    meta:
+      title: "Erbe Rare"
+      description: "Trovi erbe curative rare che brillano debolmente"
+      icon: "🌿"
+    narrative_prompt: |
+      You find a rare root that glows faintly in the dark. Kara has spoken of these...
+      Powerful healing herbs, or deadly poisons. Depends on how you use them.
+      Nature gives and nature kills.
+    trigger:
+      type: "random"
+      chance: 0.15
+    conditions:
+      location: ["giungla", "fiume"]
+    effects:
+      duration: 1
+      atmosphere_change: "mysterious, natural, curious"
+      visual_tags: ["glowing_herb", "rare_plant", "jungle", "magic_plant"]
+      on_start:
+        - type: "add_item"
+          item: "erba_luminosa"

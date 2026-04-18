@@ -1,13 +1,14 @@
-"""Luna RPG v6 - LLM Manager.
+"""Luna RPG v8 - LLM Manager.
 
-Coordinates LLM providers with automatic fallback chain:
-  Gemini (primary) → Kimi/Moonshot (2nd) → Claude (3rd)
+Chain configurabile via LLM_PROVIDER nel .env:
+  LLM_PROVIDER=ollama  -> Ollama (primary) -> Gemini -> Moonshot
+  LLM_PROVIDER=gemini  -> Gemini (primary) -> Moonshot -> Claude
 
-Key v6 improvement: when JSON parsing fails, retries with
-correction hint before moving to next provider.
+Timeout dinamico: 120s per Ollama, 30s per cloud API.
 """
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Dict, List, Optional, Tuple
 
@@ -19,22 +20,16 @@ logger = logging.getLogger(__name__)
 
 
 class LLMManager:
-    """Manages LLM providers with fallback and retry.
-
-    Priority chain: Gemini → Claude → Moonshot
-    Each provider gets MAX_RETRIES attempts before
-    falling back to the next.
-    On complete failure returns a guaranteed minimal response.
-    """
+    """Manages LLM providers with fallback and retry."""
 
     MAX_RETRIES = 3
 
     def __init__(self) -> None:
         from luna.core.config import get_settings
         self.settings    = get_settings()
-        self._primary:   Optional[BaseLLMClient] = None  # Gemini
-        self._fallback:  Optional[BaseLLMClient] = None  # Claude
-        self._fallback2: Optional[BaseLLMClient] = None  # Moonshot
+        self._primary:   Optional[BaseLLMClient] = None
+        self._fallback:  Optional[BaseLLMClient] = None
+        self._fallback2: Optional[BaseLLMClient] = None
         self._clients:   Dict[str, BaseLLMClient] = {}
         self._init_clients()
 
@@ -43,26 +38,80 @@ class LLMManager:
     # -------------------------------------------------------------------------
 
     def _init_clients(self) -> None:
-        # 1. PRIMARY: Gemini (FORCED as primary, using Vertex AI with ADC)
+        """Inizializza provider in base a LLM_PROVIDER nel .env."""
+        provider = self.settings.llm_provider.lower()
+        logger.info("[LLMManager] Provider configurato: %s", provider)
+
+        if provider == "ollama":
+            self._init_ollama_chain()
+        else:
+            self._init_gemini_chain()
+
+        if not self._primary and not self._fallback and not self._fallback2:
+            logger.critical(
+                "[LLMManager] Nessun provider disponibile! LLM_PROVIDER=%s", provider
+            )
+
+    def _init_ollama_chain(self) -> None:
+        """Ollama (primary) -> Gemini (fallback) -> Moonshot (fallback2)."""
+
+        # 1. PRIMARY: Ollama
+        try:
+            from luna.ai.ollama_client import OllamaClient
+            client = OllamaClient()
+            self._clients["ollama"] = client
+            self._primary = client
+            logger.info(
+                "[LLMManager] Ollama inizializzato (PRIMARY) — model: %s  url: %s",
+                client.model, client.base_url,
+            )
+        except Exception as e:
+            logger.error("[LLMManager] Ollama init failed: %s", e)
+
+        # 2. FALLBACK: Gemini
+        try:
+            from luna.ai.gemini import GeminiClient
+            client = GeminiClient()
+            self._clients["gemini"] = client
+            self._fallback = client
+            logger.info("[LLMManager] Gemini inizializzato (FALLBACK)")
+        except Exception as e:
+            logger.warning("[LLMManager] Gemini non disponibile: %s", e)
+
+        # 3. FALLBACK 2: Moonshot
+        if self.settings.moonshot_api_key:
+            try:
+                from luna.ai.moonshot import MoonshotClient
+                client = MoonshotClient(api_key=self.settings.moonshot_api_key)
+                self._clients["moonshot"] = client
+                self._fallback2 = client
+                logger.info("[LLMManager] Moonshot inizializzato (FALLBACK 2)")
+            except Exception as e:
+                logger.warning("[LLMManager] Moonshot non disponibile: %s", e)
+
+    def _init_gemini_chain(self) -> None:
+        """Gemini (primary) -> Moonshot (fallback) -> Claude (fallback2)."""
+
+        # 1. PRIMARY: Gemini
         try:
             from luna.ai.gemini import GeminiClient
             client = GeminiClient()
             self._clients["gemini"] = client
             self._primary = client
-            logger.info("[LLMManager] Gemini initialized (PRIMARY - FORCED)")
+            logger.info("[LLMManager] Gemini inizializzato (PRIMARY)")
         except Exception as e:
             logger.error("[LLMManager] Gemini init failed: %s", e)
 
-        # 2. FALLBACK: Kimi/Moonshot
+        # 2. FALLBACK: Moonshot
         if self.settings.moonshot_api_key:
             try:
                 from luna.ai.moonshot import MoonshotClient
                 client = MoonshotClient(api_key=self.settings.moonshot_api_key)
                 self._clients["moonshot"] = client
                 self._fallback = client
-                logger.info("[LLMManager] Kimi/Moonshot initialized (FALLBACK 2nd)")
+                logger.info("[LLMManager] Moonshot inizializzato (FALLBACK)")
             except Exception as e:
-                logger.error("[LLMManager] Kimi/Moonshot init failed: %s", e)
+                logger.error("[LLMManager] Moonshot init failed: %s", e)
 
         # 3. FALLBACK 2: Claude
         if self.settings.anthropic_api_key:
@@ -71,12 +120,9 @@ class LLMManager:
                 client = ClaudeClient(api_key=self.settings.anthropic_api_key)
                 self._clients["claude"] = client
                 self._fallback2 = client
-                logger.info("[LLMManager] Claude initialized (FALLBACK 3rd)")
+                logger.info("[LLMManager] Claude inizializzato (FALLBACK 2)")
             except Exception as e:
                 logger.error("[LLMManager] Claude init failed: %s", e)
-
-        if not self._primary and not self._fallback and not self._fallback2:
-            logger.critical("[LLMManager] No LLM provider available — check API keys in .env")
 
     # -------------------------------------------------------------------------
     # Public API
@@ -113,7 +159,6 @@ class LLMManager:
                 logger.debug("[LLMManager] Success via %s (%s)", client.provider_name, label)
                 return result, provider
 
-        # All providers failed — guaranteed fallback
         logger.error("[LLMManager] All providers failed — using base fallback")
         return self._guaranteed_fallback(companion_name), "fallback_base"
 
@@ -151,19 +196,32 @@ class LLMManager:
     ) -> Tuple[Optional[LLMResponse], str]:
         """Try a provider up to MAX_RETRIES times.
 
-        On JSON failure, appends a correction hint to the next attempt.
-        Returns (response, provider_name) or (None, "") on failure.
+        Timeout dinamico: 120s per Ollama (carica il modello),
+        30s per API cloud (Gemini, Claude, Moonshot).
         """
         extra_hint = ""
 
+        # Ollama locale e' piu' lento al primo avvio (carica il modello in VRAM)
+        TIMEOUT = 300.0 if client.provider_name == "ollama" else 30.0
+
         for attempt in range(1, self.MAX_RETRIES + 1):
             try:
-                response = await client.generate(
-                    system_prompt=system_prompt + extra_hint,
-                    user_input=user_input,
-                    history=history,
-                    json_mode=json_mode,
+                response = await asyncio.wait_for(
+                    client.generate(
+                        system_prompt=system_prompt + extra_hint,
+                        user_input=user_input,
+                        history=history,
+                        json_mode=json_mode,
+                    ),
+                    timeout=TIMEOUT,
                 )
+            except asyncio.TimeoutError:
+                logger.warning(
+                    "[LLMManager] %s attempt %d/%d: timeout after %.0fs",
+                    client.provider_name, attempt, self.MAX_RETRIES, TIMEOUT,
+                )
+                extra_hint = _parse_hint()
+                continue
             except Exception as e:
                 logger.warning(
                     "[LLMManager] %s attempt %d/%d exception: %s",
@@ -201,9 +259,7 @@ class LLMManager:
     # -------------------------------------------------------------------------
 
     def _guaranteed_fallback(self, companion_name: str) -> LLMResponse:
-        """Always returns a valid, natural-looking response.
-        Player never sees a technical error message.
-        """
+        """Always returns a valid, natural-looking response."""
         client = self._primary or self._fallback or self._fallback2
         if client:
             return client._create_fallback_response(companion_name)

@@ -1,0 +1,92 @@
+# ============================================================
+# COMPANION SCHEDULES - Routine giornaliere personaggi principali (V4.2)
+#
+# NOTA IMPORTANTE:
+# Questo file definisce le routine giornaliere per i COMPANION
+# (personaggi principali con cui il giocatore interagisce
+# regolarmente: Luna, Stella, Maria, ecc.).
+#
+# NON include NPC secondari/generici (es. segretaria, preside,
+# bibliotecaria) che sono definiti in npc_templates.yaml e
+# appaiono solo quando specificamente incontrati.
+#
+# Struttura:
+# - Ogni companion ha 4 slot: morning, afternoon, evening, night
+# - Ogni slot definisce: location, activity, outfit
+# ============================================================
+
+npc_schedules:
+  # ============================================================
+  # LUNA - Insegnante (28 anni)
+  # Passa le giornate tra classe e ufficio
+  # ============================================================
+  Luna:
+    morning:
+      location: "school_classroom"
+      activity: "Insegna matematica alla classe, spiega equazioni alla lavagna"
+      outfit: "teacher_suit"
+    
+    afternoon:
+      location: "school_office_luna"
+      activity: "Corregge compiti nel suo ufficio, prepara lezioni"
+      outfit: "teacher_suit"
+    
+    evening:
+      location: "school_office_luna"
+      activity: "Prepara lezioni per domani, organizza il materiale"
+      outfit: "casual"  # Più rilassata
+    
+    night:
+      location: "luna_home"  # Luna è a casa sua di notte
+      activity: "Riposa a casa sua, legge prima di dormire"
+      outfit: "nightwear"
+
+  # ============================================================
+  # STELLA - Studentessa (22 anni)  
+  # Passa il tempo tra scuola, sport e vita sociale
+  # ============================================================
+  Stella:
+    morning:
+      location: "school_classroom"
+      activity: "Segue lezioni in classe, prende appunti"
+      outfit: "uniform_mod"
+    
+    afternoon:
+      location: "school_gym"
+      activity: "Allenamento basket in palestra, corre e salta"
+      outfit: "sport"
+    
+    evening:
+      location: "bar_town"
+      activity: "Si rilassa al bar con amici dopo l'allenamento"
+      outfit: "casual"
+    
+    night:
+      location: "stella_home"
+      activity: "A casa, studia o guarda TV prima di dormire"
+      outfit: "nightwear"
+
+  # ============================================================
+  # MARIA - Bidella (45 anni)
+  # Lavora nella scuola, pulisce e mantiene
+  # ============================================================
+  Maria:
+    morning:
+      location: "school_bathroom_male"
+      activity: "Pulisce il bagno maschile, lava i pavimenti e i sanitari"
+      outfit: "cleaning_uniform"
+    
+    afternoon:
+      location: "school_gym"
+      activity: "Pulisce la palestra dopo l'allenamento degli studenti"
+      outfit: "cleaning_uniform"
+    
+    evening:
+      location: "town_center"
+      activity: "Fa spese in centro, compra cibo per cena"
+      outfit: "casual"
+    
+    night:
+      location: "maria_home"
+      activity: "Cena e riposa a casa, guarda la TV"
+      outfit: "nightwear"

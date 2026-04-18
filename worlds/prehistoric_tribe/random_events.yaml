@@ -1,0 +1,514 @@
+# ============================================================
+# RANDOM EVENTS - Terra degli Antenati
+# Eventi esplorativi casuali e RIPETIBILI
+# Possono accadere multiple volte in diverse circostanze
+# ============================================================
+
+events:
+  # ============================================================
+  # EVENTI VILLAGGIO (Ripetibili)
+  # ============================================================
+  
+  bambini_giocano:
+    location: "villaggio"
+    repeatable: true
+    cooldown: 3
+    weight: 15
+    narrative: |
+      Un gruppo di bambini ti circonda, incuriositi dal nuovo arrivato.
+      "Sei il cacciatore che deve fare le Prove?" "Sei forte?"
+      Ti sfidano a una gara di corse. Ridono, ti tirano per i vestiti.
+      Sono innocenti... per ora. La tribù li cresce duri.
+    choices:
+      - text: "Gioca con loro"
+        effect: { energy: -5, affinity_all: 2 }
+        followup: "I bambini adorano le tue storie. Ti portano un regalino: una conchiglia rara."
+      - text: "Ignorali"
+        effect: { affinity_all: -1 }
+        followup: "Se ne vanno delusi. La parola si sparge: il nuovo è arrogante."
+      - text: "Insegna loro qualcosa"
+        effect: { energy: -10, reputation: 5 }
+        followup: "Mostri loro come legare un nodo. Rimangono a bocca aperta. 'Wow!'"
+
+  guerriero_sbronzo:
+    location: "villaggio"
+    repeatable: true
+    cooldown: 5
+    weight: 10
+    conditions:
+      time: ["Evening", "Night"]
+    narrative: |
+      Un guerriero barcollante ti blocca la strada. Ha gli occhi rossi e l'alito
+      che puzza di fermentato. "Tu... tu vuoi rubarmi la donna!" balbetta.
+      Vuole combattere. È chiaramente ubriaco e confuso, ma pericoloso.
+    choices:
+      - text: "Cerca di calmarlo"
+        check: { stat: "charisma", difficulty: 12 }
+        success: "Lo convinci a sedersi. Piange, racconta di un amore perduto."
+        failure: "Ti prende a pugni! Doloroso, ma eviti il peggio."
+        effect_success: { energy: -5 }
+        effect_failure: { energy: -15 }
+      - text: "Battilo"
+        check: { stat: "strength", difficulty: 10 }
+        success: "Un pugno preciso. Crolla come un sacco. Gli altri ridono."
+        failure: "Lotta confusa. Entrambi sanguinanti ma nessun vincitore."
+      - text: "Chiama aiuto"
+        followup: "Altri guerrieri lo trascinano via. Ti guardano con disprezzo. 'Non sai difenderti?'"
+
+  mercante_conchiglie:
+    location: "villaggio"
+    repeatable: true
+    cooldown: 8
+    weight: 12
+    narrative: |
+      Un mercante ambulante dispiega le sue merci. Conchiglie rare, pietre lucide,
+      ossa intagliate. "Per te, prezzo speciale!" sorride sdentato.
+      Ha cose interessanti... se hai da barattare.
+    choices:
+      - text: "Compra un amuleto (10 conchiglie)"
+        condition: { item: "conchiglie", quantity: 10 }
+        effect: { add_item: "amuleto_protezione", remove_item: "conchiglie:10" }
+      - text: "Vendi pellicce"
+        condition: { item: "pellicce" }
+        effect: { remove_item: "pellicce", add_item: "conchiglie:20" }
+      - text: "Baratta informazioni"
+        check: { stat: "mind", difficulty: 11 }
+        success: "Gli racconti di dove trovare miele. Ti dà una mappa stropicciata."
+        reward: { add_item: "mappa_tesoro" }
+
+  anziano_storie:
+    location: "villaggio"
+    repeatable: true
+    cooldown: 4
+    weight: 10
+    narrative: |
+      Un anziano con centinaia di rughe ti chiama vicino al fuoco.
+      "Nuovo, vieni. Ti racconto come era il mondo prima..."
+      Ha visto guerre, carestie, grandi cacciatori cadere.
+      Le sue storie sono lunghe, ma custodiscono segreti.
+    choices:
+      - text: "Ascolta attentamente"
+        effect: { time: +2, knowledge: 10 }
+        followup: |
+          Parla della Caverna degli Antenati. "Kara non è sempre stata sciamana...
+          una volta era come te. Poi ha bevuto qualcosa."
+          Svela: { reveal_flag: "kara_past_hint" }
+      - text: "Chiedi delle Prove"
+        followup: |
+          "Ah, le 3 Prove..." sputa nel fuoco. "Tanti hanno provato. Tanti sono morti.
+          O peggio, sono scappati col cuore spezzato."
+          Svela debolezze: { reveal_hint: "boss_weaknesses" }
+      - text: "Offrigli cibo"
+        condition: { item: "cibo" }
+        followup: "Mangia con gusto. 'Hai buon cuore. Verrà utile con quelle tre...'"
+        effect: { reputation: 10, affinity_all: 3 }
+
+  # ============================================================
+  # EVENTI GIUNGLA (Ripetibili)
+  # ============================================================
+
+  trappola_cacciatori:
+    location: "giungla"
+    repeatable: true
+    cooldown: 6
+    weight: 12
+    narrative: |
+      *SNAP!* Una corda ti afferra la caviglia! Stai venendo sollevato...
+      Trappola per bestie. O per intrusi. Ora sei appeso a testa in giù,
+      oscillando tra gli alberi. E senti qualcuno avvicinarsi.
+    choices:
+      - text: "Taglia la corda (se hai coltello)"
+        condition: { item: "coltello" }
+        check: { stat: "mind", difficulty: 10 }
+        success: "Cadi agilmente. Rotoli e ti rialzi. La trappola è tua ora."
+        failure: "Cadi male! Caviglia slogata, ma libero."
+      - text: "Aspetta chi viene"
+        followup: |
+          Appare Naya con arco in mano. "Hmm, non sei una bestia. Ma sei caduto
+          nella MIA trappola. Devi pagare... o lavorare per me."
+          Effect: { affinity_naya: +5 } o inizia mini-quest
+      - text: "Gridare aiuto"
+        followup: |
+          Qualcuno ti sente... ma non è amico. Lupi neri! Ora sei in trappola E
+          sotto attacco! { start_combat: "lupi_neri" }
+
+  pianta_carnivora:
+    location: "giungla"
+    repeatable: true
+    cooldown: 5
+    weight: 8
+    narrative: |
+      Un fiore bellissimo... troppo bellissimo. Appena ti avvicini, le foglie
+      si chiudono come fauci! Una pianta carnivora gigante ti ha intrappolato!
+      I petali ti stringono. Gli acidi iniziano a bruciare.
+    choices:
+      - text: "Lotta con forza"
+        check: { stat: "strength", difficulty: 14 }
+        success: "Strappi le foglie! La pianta urla un liquido vischioso e muore."
+        failure: "Troppo forte! Viene qualcuno ad aiutarti... per un prezzo."
+        effect_failure: { health: -20, energy: -20, flag: "debt_owed" }
+      - text: "Usa il fuoco"
+        condition: { item: "torcia" }
+        followup: "La paura del fuoco! Si apre immediatamente. Le piante hanno memoria..."
+      - text: "Chiama Kara (se conosciuta)"
+        condition: { affinity_kara: 30 }
+        followup: |
+          Kara emerge dall'ombra, ridendo. "Anche le piante ti vogliono, eh?"
+          Sussurra alla pianta. Si apre immediatamente, sottomessa.
+          Effect: { affinity_kara: +3 }
+
+  sentiero_sconosciuto:
+    location: "giungla"
+    repeatable: true
+    cooldown: 4
+    weight: 15
+    narrative: |
+      Trovi un sentiero che non avevi notato. Segni freschi di passaggio.
+      Porta verso... non lo sai. Potrebbe essere un accorciatoia,
+      o una trappola. La giungla è piena di sorprese.
+    choices:
+      - text: "Seguilo"
+        random_outcome:
+          - chance: 40
+            result: "Tesoro! Un albero cavo pieno di miele selvatico!"
+            effect: { add_item: "miele_selvatico:3" }
+          - chance: 30
+            result: "Accorciatoia! Arrivi alla destinazione più veloce."
+            effect: { time: -2 }
+          - chance: 20
+            result: "Imboscata! Lupi neri ti attendevano..."
+            effect: { start_combat: "lupi_scout" }
+          - chance: 10
+            result: "Luogo sacro. Statue di pietra ti osservano. Cosa sono?"
+            effect: { set_flag: "ancient_shrine_found" }
+      - text: "Ignoralo"
+        followup: "Meglio non rischiare. Continui per la tua strada."
+
+  animale_ferito:
+    location: "giungla"
+    repeatable: true
+    cooldown: 7
+    weight: 10
+    narrative: |
+      Un lupo giovane, ferito, intrappolato in rovi. Ti guarda con occhi
+      pieni di dolore. Mugola piano. La madre potrebbe essere vicina...
+      Eppure è solo una bestia innocente. Cosa fai?
+    choices:
+      - text: "Liberalo e cura"
+        check: { stat: "mind", difficulty: 10 }
+        success: |
+          Lavori con cura. Il lupo ti lecca la mano, poi scappa.
+          Quella notte, senti ululati... protettivi?
+        effect: { karma: 10, set_flag: "wolf_friend" }
+        failure: "Ti morde! Difesa istintiva. Ferito ma vivo."
+      - text: "Uccidilo per pelliccia"
+        followup: "Pelliccia di qualità. Ma quella notte sogni di lupi che ti inseguono..."
+        effect: { add_item: "pelliccia_lupo", karma: -10 }
+      - text: "Lascialo"
+        followup: "La natura è crudele. Non è affar tuo."
+
+  cacciatore_sconosciuto:
+    location: "giungla"
+    repeatable: true
+    cooldown: 6
+    weight: 8
+    narrative: |
+      Incontri un altro cacciatore, non della tua tribù. Ha cicatrici,
+      occhi duri. Vi osservate. Potrebbe attaccare, scappare, o parlare.
+      Il silenzio è pesante. Chi farà la prima mossa?
+    choices:
+      - text: "Offri pace (conchiglia)"
+        condition: { item: "conchiglia" }
+        followup: |
+          Accetta il dono. "Non sei come i Lupi Neri." Ti insegna una trappola speciale.
+          Effect: { learn_skill: "trappola_avanzata", reputation: 5 }
+      - text: "Minaccialo"
+        check: { stat: "strength", difficulty: 12 }
+        success: "Indietreggia. 'Va bene, va bene. Stavo solo passando.' Sparisce."
+        failure: "Riduce. 'Piccolo.' Ti disarma facilmente. Ti ruba metà roba!"
+        effect_failure: { lose_items_random: 3 }
+      - text: "Ignoralo e prosegui"
+        followup: "Si ferma a guardarti andare. Forse vi rincontrerete."
+
+  # ============================================================
+  # EVENTI FIUME (Ripetibili)
+  # ============================================================
+
+  donne_lavano:
+    location: "fiume"
+    repeatable: true
+    cooldown: 3
+    weight: 12
+    conditions:
+      time: ["Morning"]
+    narrative: |
+      Gruppo di donne alla riva, lavano vesti e raccolgono acqua.
+      Chiacchiere, risate, occhi curiosi su di te. Una ti chiama:
+      "Ehi nuovo! Vieni, ti mostriamo dove pescare!"
+      Sono amichevoli... o ti stanno mettendo alla prova?
+    choices:
+      - text: "Unisciti a loro"
+        effect: { energy: -5, affinity_all: 5 }
+        followup: |
+          Ti rilassi. Bevi acqua fresca. Raccontano pettegolezzi su Zara, Kara e Naya.
+          Informazioni preziose: { reveal_hints: ["zara_weakness", "kara_ritual_time", "naya_challenge"] }
+      - text: "Pesca da solo"
+        check: { stat: "mind", difficulty: 10 }
+        success: "Pesche enorme! Le donne applaudono impressionate."
+        effect: { add_item: "pesce_gigante", reputation: 5 }
+        failure: "Scivoli nel fango. Ridono di te. Imbarazzante."
+      - text: "Ignora e procedi"
+        followup: "Sussurri tra loro. 'Arrogante.' 'O timido?'"
+
+  coccodrillo_approda:
+    location: "fiume"
+    repeatable: true
+    cooldown: 5
+    weight: 10
+    narrative: |
+      *SPLASH!* Un coccodrillo preistorico enorme esce dall'acqua!
+      Non ti ha visto... ancora. Ma sta bloccando la tua via di fuga.
+      Rimani immobile. Non fare rumore. O combatti se osi.
+    choices:
+      - text: "Immobilità totale"
+        check: { stat: "mind", difficulty: 12 }
+        success: "Passa vicinissimo. Il fiato puzza di carne putrefatta. Poi se ne va."
+        failure: "Ti muovi per un tic! Ti nota! { start_combat: 'coccodrillo_preistorico' }"
+      - text: "Fuggi nel fiume"
+        followup: "Nuoti disperatamente. Lui ti insegue ma sei più veloce. Esausto."
+        effect: { energy: -25, health: -10 }
+      - text: "Usa esca (se hai carne)"
+        condition: { item: "carne" }
+        followup: "Lanci la carne lontano. Lui la insegue. Sei salvo."
+        effect: { remove_item: "carne" }
+
+  naufrago_misterioso:
+    location: "fiume"
+    repeatable: true
+    cooldown: 10
+    weight: 5
+    narrative: |
+      Qualcosa galleggia... è un uomo! Trascinato dalla corrente, ancora vivo.
+      Ha vesti strane, non della tribù. Un esploratore? Un fuggitivo?
+      Sta annegando. Devi agire ora!
+    choices:
+      - text: "Salvalo"
+        check: { stat: "strength", difficulty: 11 }
+        success: |
+          Lo tiri a riva. Tosse acqua, ti ringrazia in una lingua strana.
+          Poi vede dove è e impallidisce. 'Non... non dovrei essere qui.'
+          Effect: { karma: 15, set_flag: "mysterious_stranger" }
+        failure: "Troppo pesante! Quasi anneghi anche tu. Lui sparisce nella corrente."
+      - text: "Lascialo andare"
+        followup: "Scompare sotto la superficie. Gli dei del fiume hanno deciso."
+        effect: { karma: -10 }
+
+  # ============================================================
+  # EVENTI CAVERNA (Ripetibili)
+  # ============================================================
+
+  eco_strani:
+    location: "caverna"
+    repeatable: true
+    cooldown: 3
+    weight: 12
+    narrative: |
+      Le tue parole tornano indietro... sbagliate. Dici 'ciao' e l'eco risponde
+      'aiuto'. O forse è solo la tua mente? Kara dice che la caverna
+      'ascolta'. Forse anche 'risponde'.
+    choices:
+      - text: "Parla con l'eco"
+        followup: |
+          Rispondi alle voci. È strano, ma... ottieni risposte. Informazioni frammentarie.
+          "Le tre... aspettano... chi sarà degno..."
+          Effect: { set_flag: "cave_whispers_heard" }
+      - text: "Ignora e cammina più forte"
+        followup: "Le voci si riducono. Forse era solo vento. O forse no."
+      - text: "Canta un canto tribale"
+        condition: { flag: "tribal_knowledge" }
+        followup: |
+          L'eco cambia. Armoniosa. Una luce fioca appare, mostrando un passaggio nascosto.
+          Effect: { reveal_path: "secret_chamber", affinity_kara: 5 }
+
+  pozza_riflettente:
+    location: "caverna"
+    repeatable: true
+    cooldown: 5
+    weight: 10
+    narrative: |
+      Una pozza d'acqua limpida, così calma che è uno specchio perfetto.
+      Ma quando ti guardi... vedi qualcosa di diverso. Un altro te?
+      O un possibile te? Il futuro? Il passato? L'acqua ribolle leggermente.
+    choices:
+      - text: "Tocca l'acqua"
+        random_outcome:
+          - chance: 30
+            result: "Visione del futuro! Vedi te stesso trionfante... o morente?"
+            effect: { set_flag: "future_vision", mind: -5 }
+          - chance: 30
+            result: "Visione del passato. Vedi tuo padre, la tua tribù, casa..."
+            effect: { set_flag: "past_vision", energy: +10 }
+          - chance: 20
+            result: "L'acqua è velenosa! Brucia!"
+            effect: { health: -15 }
+          - chance: 20
+            result: "Nulla. Solo acqua fredda. Forse le visioni vengono solo a Kara."
+      - text: "Bevi (azzardo)"
+        random_outcome:
+          - chance: 50
+            result: "Acqua pura e fresca. Rigenerante."
+            effect: { water: 50, health: 10 }
+          - chance: 50
+            result: "Veleno! Stomaco in fiamme!"
+            effect: { health: -20, poisoned: true }
+      - text: "Lascia stare"
+        followup: "Alcune cose è meglio non saperle."
+
+  pipistrelli:
+    location: "caverna"
+    repeatable: true
+    cooldown: 4
+    weight: 10
+    narrative: |
+      *SCRIC!* Il tuo passo ha disturbato una colonia di pipistrelli giganti!
+      Centinaia si alzano in volo! È un tornado di ali, artigli, grida acute.
+      Devono passare. Copriti!
+    choices:
+      - text: "Corri!"
+        check: { stat: "strength", difficulty: 12 }
+        success: "Superi l'onda! Qualche graffio ma niente di grave."
+        effect: { energy: -10 }
+        failure: "Cadono su di te! Morsi, artigli, panico! { health: -20 }"
+      - text: "Sdraiati e copriti"
+        followup: "Passano sopra di te. Puzzano, è vero. Ma sei vivo."
+        effect: { energy: -5, flag: "bat_guano_covered" }
+      - text: "Usa fuoco"
+        condition: { item: "torcia" }
+        followup: "La luce li spaventa. Evitano te. Ma attirano... altro."
+        effect: { set_flag: "something_coming" }
+
+  # ============================================================
+  # EVENTI TENDA CAPO (Ripetibili)
+  # ============================================================
+
+  servitore_nervoso:
+    location: "tenda_capo"
+    repeatable: true
+    cooldown: 4
+    weight: 10
+    narrative: |
+      Un giovane servitore ti si avvicina furtivamente. Guarda in gillo,
+      sussurra: "Tu... tu interessi alla Figlia del Capo, vero?"
+      Ha informazioni. O vuole qualcosa. Gli occhi sono troppo desiderosi.
+    choices:
+      - text: "Paga per info (5 conchiglie)"
+        condition: { item: "conchiglie", quantity: 5 }
+        followup: |
+          "Zara ama le orchidee nere. Solo nella giungla profonda. E odia
+          quando qualcuno la vede come solo un trofeo."
+          Effect: { remove_item: "conchiglie:5", reveal_hint: "zara_gift_preference" }
+      - text: "Minaccialo"
+        followup: "Scappa via! 'Non ho detto nulla!' Forse sa qualcosa di pericoloso..."
+        effect: { set_flag: "servant_scared" }
+      - text: "Ignoralo"
+        followup: "Sembra deluso. Forse voleva solo un amico."
+
+  guerriero_geloso:
+    location: "tenda_capo"
+    repeatable: true
+    cooldown: 6
+    weight: 10
+    conditions:
+      affinity_zara: ">=30"
+    narrative: |
+      Un guerriero muscoloso ti blocca. Ha visto come Zara ti guarda.
+      "Lei è mia, forestiero. Me l'ha promessa suo padre."
+      Ti sfida a duello. Non puoi rifiutare senza perdere faccia.
+    choices:
+      - text: "Accetta il duello"
+        start_combat: "guerriero_rivale"
+        followup_win: "Vinci! Zara applaudì. Lui se ne va umiliato. { affinity_zara: +10 }"
+        followup_lose: "Perdi. Sei in miseria. Ma Zara ti cura personalmente... { affinity_zara: +5 }"
+      - text: "Rifiuta con diplomazia"
+        check: { stat: "charisma", difficulty: 14 }
+        success: |
+          "Lei sceglierà da sola, non con duelli." Impressionato dal tuo aplomb.
+          Il guerriero annuisce. "Forse... forse sei diverso."
+        failure: "Sembri codardo. Rido di te. Zara sembra delusa."
+        effect_failure: { affinity_zara: -10, reputation: -10 }
+      - text: "Dillo al Capo"
+        followup: "Saggio. Il Capo punisce il guerriero per insubordinazione. Ma Zara? Non ama gli spilloni."
+        effect: { affinity_zara: -5, reputation: 5 }
+
+  # ============================================================
+  # EVENTI CONFINE TRIBALE (Ripetibili)
+  # ============================================================
+
+  patuglia_nemica:
+    location: "confine_tribale"
+    repeatable: true
+    cooldown: 3
+    weight: 15
+    narrative: |
+      Passi silenzioso... ma loro ti sentono. Patuglia di Lupi Neri,
+      3 guerrieri con pitture minacciose. Vi guardate. Il primo che si muove
+      inizia la battaglia. O forse c'è altra via...
+    choices:
+      - text: "Attacca!"
+        start_combat: "patuglia_lupi_neri"
+      - text: "Nasconditi"
+        check: { stat: "mind", difficulty: 13 }
+        success: "Fango su tutto il corpo, immobile. Passano a un metro. Non ti vedono."
+        failure: "Ti scoprono! Sorpreso! { start_combat: 'patuglia_lupi_neri_surprise' }"
+      - text: "Offri tabacco/sacrificio"
+        condition: { item: "tabacco_sacred" }
+        followup: |
+          Accettano il dono. 'Rispetti i confini, forestiero. Prosegui.'
+          Effect: { remove_item: "tabacco_sacred", safe_passage: true }
+
+  campo_battaglia:
+    location: "confine_tribale"
+    repeatable: true
+    cooldown: 8
+    weight: 8
+    narrative: |
+      Un antico campo di battaglia. Ossa sparpagliate, armi arrugginite,
+      stendardi a pezzi. Gli spiriti dei guerrieri morti vagano qui.
+      Qualcosa brilla tra i resti... ma è sacrilegio depredare i morti?
+    choices:
+      - text: "Cerca tesori"
+        check: { stat: "mind", difficulty: 10 }
+        success: "Trovi un'arma di qualità! Un pugnale cerimoniale."
+        effect: { add_item: "pugnale_cerimoniale", karma: -10 }
+        failure: "Uno scheletro crolla su di te! Spavento immenso. E nessun tesoro."
+        effect_failure: { energy: -15, set_flag: "cursed_by_spirits" }
+      - text: "Onora i morti (canto)"
+        effect: { karma: 10, energy: -5 }
+        followup: |
+          Il vento si calma. Uno spirito ti sorride. 'Grazie, vivo.'
+          Effect: { set_flag: "spirits_blessing", affinity_kara: 5 }
+      - text: "Vai via velocemente"
+        followup: "Non è un posto per i vivi."
+
+  spia_catturata:
+    location: "confine_tribale"
+    repeatable: true
+    cooldown: 10
+    weight: 7
+    narrative: |
+      Trovi un uomo legato a un albero. È della tribù dei Lupi Neri,
+      ma i suoi lo hanno abbandonato. Traditore? Informatore?
+      'Aiutami' implora. 'So cose... cose che posso dirti.'
+    choices:
+      - text: "Liberalo"
+        followup: |
+          'Grazie! I Lupi Neri attaccheranno tra 3 notti! Preparatevi!'
+          Scappa. Hai informazioni preziose. O forse è una trappola?
+          Effect: { set_flag: "attack_warning", karma: 10 }
+      - text: "Portalo al villaggio (prigioniero)"
+        followup: |
+          I guerrieri lo prendono. Il Capo ti ringrazia.
+          Effect: { reputation: 15, affinity_zara: 5 }
+      - text: "Finiscilo"
+        followup: "Lo fai. Freddo. I Lupi Neri lo sapranno."
+        effect: { karma: -20, set_flag: "blood_debt_lupi_neri" }

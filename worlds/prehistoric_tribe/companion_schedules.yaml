@@ -1,0 +1,88 @@
+# ============================================================
+# COMPANION SCHEDULES - Terra degli Antenati (V4.2)
+# Routine giornaliere personaggi principali
+#
+# NOTA IMPORTANTE:
+# Questo file definisce le routine per i COMPANION (Kara, Naya, Zara).
+# NON include NPC secondari/generici della tribù.
+#
+# Struttura:
+# - 4 fasce orarie: morning, afternoon, evening, night
+# - Ogni fascia: location, activity, outfit
+# ============================================================
+
+npc_schedules:
+  # ============================================================
+  # KARA - La Sciamana (42 anni)
+  # Vive nella caverna, parla con gli spiriti, prepara pozioni
+  # ============================================================
+  Kara:
+    morning:
+      location: "caverna"
+      activity: "Prepara pozioni e unguenti nella Caverna degli Antenati"
+      outfit: "ritual_paint"
+    
+    afternoon:
+      location: "villaggio"
+      activity: "Dice il futuro ai membri della tribù vicino al Fuoco Sacro"
+      outfit: "ritual_paint"
+    
+    evening:
+      location: "caverna"
+      activity: "Cena solitaria e meditazione con gli spiriti"
+      outfit: "cave_dweller"
+    
+    night:
+      location: "caverna"
+      activity: "Dorme tra i suoi cristalli e le ossa sacre"
+      outfit: "nightwear"
+
+  # ============================================================
+  # NAYA - La Cacciatrice (24 anni)  
+  # Passa le giornate nella giungla a cacciare
+  # ============================================================
+  Naya:
+    morning:
+      location: "giungla"
+      activity: "Caccia nella Selva Sacra, segue le tracce delle bestie"
+      outfit: "huntress_gear"
+    
+    afternoon:
+      location: "giungla"
+      activity: "Continua la caccia o pulisce le sue armi nella foresta"
+      outfit: "tracking"
+    
+    evening:
+      location: "villaggio"
+      activity: "Torna al villaggio con la preda, si riposa vicino al fuoco"
+      outfit: "huntress_gear"
+    
+    night:
+      location: "villaggio"
+      activity: "Dorme nella sua capanna dopo una giornata di caccia"
+      outfit: "nightwear"
+
+  # ============================================================
+  # ZARA - Figlia del Capo (28 anni)
+  # Gestisce la tribù, riceve visitatori, mantiene l'ordine
+  # ============================================================
+  Zara:
+    morning:
+      location: "tenda_capo"
+      activity: "Riceve i membri della tribù nella Tenda del Capo, decide dispute"
+      outfit: "regal_attire"
+    
+    afternoon:
+      location: "villaggio"
+      activity: "Supervisiona i lavori del villaggio, distribuisce compiti"
+      outfit: "regal_attire"
+    
+    evening:
+      location: "tenda_capo"
+      activity: "Cena nella sua tenda con i consiglieri del padre"
+      outfit: "ceremony"
+    
+    night:
+      location: "tenda_capo"
+      activity: "Riposa nella sua tenda privata, protetta dalle guardie"
+      outfit: "private"

@@ -1,0 +1,183 @@
+# ============================================================
+# TERRA DEGLI ANTENATI - World Configuration
+# Setting: Preistoria, Tribù primitive, Ambiente giungla/deserto
+# Genere: Survival, Primitivo, Erotico (18+)
+# ============================================================
+
+meta:
+  id: "prehistoric_tribe"
+  name: "Terra degli Antenati"
+  genre: "Survival, Primitivo, Erotico (18+)"
+  version: "1.0.0"
+  description: |
+    Era della Pietra. Una tribù primitiva tra giungla e deserto.
+    Vestiti di pelle e foglie, capanne di paglia, fuoco sacro.
+    Tre donne attendono: la Sciamana mistica, la Cacciatrice selvaggia, 
+    la Figlia del Capo ambita.
+    Sopravvivi alle prove e conquista il cuore... e il corpo... delle tribù.
+    
+  lore: |
+    La Tribù del Sole vive ai confini tra la Giungla Verde e il Deserto Rosso.
+    I giovani maschi devono superare le Tre Prove per diventare membri a pieno titolo.
+    Solo allora potranno accedere alle donne della tribù e fondare famiglia.
+    
+    Le Prove sono sacre:
+    1. Prova della Selva - cacciare la bestia
+    2. Prova dello Spirito - resistere alla visione
+    3. Prova del Sangue - dimostrare lealtà
+    
+    Al centro del villaggio arde il Fuoco Sacro, mai spento da generazioni.
+    Nelle caverne risiedono gli spiriti degli antenati.
+    Oltre il fiume, le terre delle tribù nemiche.
+
+# ============================================================
+# NPC LOGIC - Detection hints for generic NPCs
+# ============================================================
+npc_logic:
+  female_hints:
+    - donna
+    - ragazza
+    - fanciulla
+    - schiava
+    - vedova
+    - guaritrice
+    - tessitrice
+    - raccoglitrice
+    - madre
+    - figlia
+  
+  male_hints:
+    - uomo
+    - ragazzo
+    - cacciatore
+    - guerriero
+    - sciamano
+    - anziano
+    - capo
+    - schiavo
+    - nemico
+    - straniero
+
+# ============================================================
+# PLAYER CHARACTER
+# ============================================================
+player_character:
+  identity:
+    name: "Giovane"
+    age: 20
+    background: "Giovane di una tribù alleata, deve superare le Tre Prove per entrare nella Tribù del Sole"
+  
+  starting_stats:
+    strength: 12
+    agility: 10
+    endurance: 10
+    charisma: 8
+
+# ============================================================
+# GAMEPLAY SYSTEMS
+# ============================================================
+gameplay_systems:
+  affinity:
+    enabled: true
+    tiers:
+      - threshold: 0
+        name: "Sconosciuto"
+        description: "Ti osservano con diffidenza"
+      - threshold: 25
+        name: "Accettato"
+        description: "Riconosciuto come degno"
+        unlocked_actions: ["chiedi", "offri"]
+      - threshold: 50
+        name: "Compagno"
+        description: "Rispetto tribale conquistato"
+        unlocked_actions: ["corta", "tocca"]
+      - threshold: 75
+        name: "Favorito"
+        description: "Privilegi esclusivi"
+        unlocked_actions: ["unisci", "possiedi"]
+      - threshold: 100
+        name: "Compagno Sacro"
+        description: "Legame eterno siglato"
+        unlocked_actions: ["sacra unione"]
+  
+  economy:
+    enabled: true
+    currency: "schegge"
+    starting_amount: 10
+    prices:
+      cibo: 2
+      erbe_mediche: 5
+      ornamento: 8
+      pelle_preziosa: 15
+
+# ============================================================
+# STORY BEATS - Prove di Iniziazione
+# ============================================================
+story_beats:
+  premise: |
+    Storia di iniziazione in un mondo primitivo.
+    Il protagonista deve superare Tre Prove per entrare nella tribù
+    e conquistare tre donne simbolo di forza, mistero e potere.
+  
+  themes:
+    - "sopravvivenza"
+    - "istinti primordiali"
+    - "comunità tribale"
+    - "natura selvaggia"
+  
+  hard_limits:
+    - "Tutti i personaggi sono adulti consenzienti (18+)"
+    - "Nessuno è forzato contro la propria volontà"
+    - "Progressione naturale basata su affinità"
+  
+  beats:
+    # === PROVA 1: NAYA ===
+    - id: "prova_selva"
+      description: "La caccia alla tigre dai denti a sciabola con Naya"
+      trigger: "naya_affinity >= 20"
+      required_elements: ["naya", "caccia", "bestia", "pericolo", "cooperazione"]
+      tone: "action_suspense"
+      once: true
+      consequence: "naya_affinity += 20, flag:prova_selva_passata = true"
+    
+    # === PROVA 2: KARA ===
+    - id: "prova_spirito"
+      description: "La notte nella caverna con le visioni di Kara"
+      trigger: "kara_affinity >= 20"
+      required_elements: ["kara", "visione", "caverna", "notte", "paura"]
+      tone: "mystical_vision"
+      once: true
+      consequence: "kara_affinity += 20, flag:prova_spirito_passata = true"
+    
+    # === PROVA 3: ZARA ===
+    - id: "prova_sangue"
+      description: "La scelta tra tradimento e lealtà con Zara"
+      trigger: "zara_affinity >= 20"
+      required_elements: ["zara", "tradimento", "lealtà", "scelta", "sacrificio"]
+      tone: "dramatic_tension"
+      once: true
+      consequence: "zara_affinity += 20, flag:prova_sangue_passata = true, flag:membro_tribu = true"
+
+# ============================================================
+# ENDGAME
+# ============================================================
+endgame:
+  description: "Completa le Tre Prove e conquista le tre donne della tribù"
+  victory_conditions:
+    - type: "companion_conquered"
+      target: "Kara"
+      requires:
+        - affinity: 100
+        - flag: "kara_sacra_unione"
+    
+    - type: "companion_conquered"
+      target: "Naya"
+      requires:
+        - affinity: 100
+        - flag: "naya_cacciatore_leggendario"
+    
+    - type: "companion_conquered"
+      target: "Zara"
+      requires:
+        - affinity: 100
+        - flag: "zara_compagno_scelto"

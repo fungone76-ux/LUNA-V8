@@ -1,0 +1,267 @@
+# ============================================================
+# LUNA RPG v6 - WORLD CONFIGURATION
+# Valnera — La Valle delle Streghe
+# Dark Medieval Fantasy, Erotic Horror (18+)
+# ============================================================
+
+meta:
+  id: "valnera"
+  name: "Valnera — La Valle delle Streghe"
+  genre: "Dark Medieval Fantasy, Erotic Horror (18+)"
+  version: "1.0.0"
+  description: |
+    Una valle nascosta ai confini del regno, avvolta nella nebbia e nel segreto.
+    Valnera è l'ultimo rifugio di tre donne — streghe che si nascondono dall'Inquisizione
+    dell'Ordine Sacro. Il protagonista arriva come Cacciatore, mandato per purificare la zona.
+    Quello che trova invece lo incatena: Luna, la guaritrice fredda con il cuore spezzato;
+    Maria, la locandiera di pietra con i tunnel segreti; Stella, la strega selvatica del bosco.
+    Prima che il Grande Inquisitore Corvus arrivi con il suo esercito, il Cacciatore deve scegliere
+    da che parte stare — e chi è disposto a perdere.
+
+  lore: |
+    Valnera era un villaggio ordinario prima che l'Inquisizione bruciasse i suoi uomini.
+    Ora è una comunità di vedove, figli e segreti. Sotto la superficie ordinaria — mercato,
+    osteria, cappella convertita — scorre un Covile di streghe guidato da Luna.
+    I tunnel sotto la locanda di Maria collegano il villaggio alla grotta del Covile.
+    Nel bosco antico a est, Stella veglia e aspetta. La valle ha memoria lunga.
+    E adesso è arrivato un Cacciatore che non si comporta come gli altri.
+
+# ============================================================
+# PLAYER CHARACTER
+# ============================================================
+player_character:
+  identity:
+    name: "Il Cacciatore"
+    title: "Cacciatore dell'Ordine Sacro"
+    age: 28
+    background: |
+      Addestrato dal Grande Inquisitore Corvus stesso, è il suo migliore agente.
+      Carismatico, conflittuale, più intelligente di quello che ammette.
+      Inviato a Valnera per un'indagine di routine — nessun altro è tornato.
+      Ha sempre eseguito gli ordini. Stavolta qualcosa è diverso.
+    traits:
+      - "Carismatico — sa parlare con chiunque"
+      - "Conflittuale — il dovere contro il desiderio"
+      - "Pericoloso — addestrato a uccidere"
+      - "Curioso — cerca risposte, non solo esecuzioni"
+
+  starting_stats:
+    strength: 14
+    mind: 12
+    charisma: 15
+    monete_d_argento: 30
+
+# ============================================================
+# GAMEPLAY SYSTEMS
+# ============================================================
+gameplay_systems:
+  affinity:
+    enabled: true
+    tiers:
+      - threshold: 0
+        name: "Sconosciuto"
+        description: "Il Cacciatore è una minaccia. Nessuna fiducia."
+      - threshold: 20
+        name: "Sospettato"
+        description: "Qualcosa in lui è diverso. Cautela vigilante."
+      - threshold: 50
+        name: "Tentato"
+        description: "Non riesce a ignorarlo. La guardia si abbassa."
+        unlocked_actions: ["confidenza", "contatto_casuale", "primo_passo"]
+      - threshold: 75
+        name: "Legato"
+        description: "Legato a lui in modi che non aveva previsto."
+        unlocked_actions: ["rituale", "confessione_profonda", "notte_insieme"]
+      - threshold: 100
+        name: "Reclamato"
+        description: "Completamente suo. Nessun ritorno."
+        unlocked_actions: ["totale_dedizione", "scelta_finale"]
+
+  economy:
+    enabled: true
+    currency: "monete d'argento"
+    starting_amount: 30
+    prices:
+      pasto_locanda: 2
+      stanza_notte: 5
+      erbe_medicinali: 3
+      informazioni: 10
+      dono_rituale: 15
+      tangente_soldato: 20
+
+  reputation:
+    enabled: true
+    factions:
+      ordine_sacro:
+        name: "Ordine Sacro"
+        starting: 50
+        description: "La fedeltà del Cacciatore all'Inquisizione di Corvus"
+      covile:
+        name: "Covile di Valnera"
+        starting: 0
+        description: "La fiducia del Covile di streghe nel Cacciatore"
+
+# ============================================================
+# NARRATIVE ARC
+# ============================================================
+narrative_arc:
+  premise: |
+    Il Cacciatore arriva a Valnera per un'indagine di routine.
+    Trova tre donne che non avrebbe mai dovuto incontrare.
+    Mentre le conosce — e mentre le desidera — il Grande Inquisitore Corvus
+    si avvicina con il suo esercito. Il tempo stringe.
+    La scelta è semplice sulla carta: l'Ordine o le donne.
+    Nella realtà è la cosa più difficile che abbia mai fatto.
+
+  themes:
+    - "potere_proibito"
+    - "seduzione"
+    - "magia_oscura"
+    - "tradimento"
+    - "desiderio"
+    - "rituale"
+    - "redenzione"
+    - "vendetta"
+
+  hard_limits:
+    - "Tutti i personaggi sono adulti (18+)"
+    - "Nessuna coercizione — la progressione è basata sull'affinità"
+    - "Luna (28), Maria (42), Stella (22) — tutte adulte consenzienti"
+    - "I contenuti espliciti si sbloccano con l'affinità, non con la forza"
+
+  beats:
+    # === LUNA (28 anni, Madre Cremisi del Covile) ===
+    - id: "luna_maschera_caduta"
+      description: "Luna abbandona la facciata da guaritrice e rivela il suo vero potere al Cacciatore"
+      trigger: "affinity_Luna >= 40"
+      required_elements: ["potere", "svelamento", "sfida"]
+      tone: "dangerous_revealing"
+      once: true
+      consequence: "luna_revealed_power = true"
+
+    - id: "luna_confessione_marito"
+      description: "Luna confessa che suo marito Edoardo è stato bruciato dall'Inquisizione"
+      trigger: "affinity_Luna >= 60"
+      required_elements: ["confessione", "dolore", "passato"]
+      tone: "vulnerable_grief"
+      once: true
+      consequence: "luna_confessed_husband = true"
+
+    - id: "luna_scelta"
+      description: "Luna sceglie il Cacciatore invece del suo piano di vendetta"
+      trigger: "affinity_Luna >= 90"
+      required_elements: ["scelta", "abbandono_vendetta", "resa"]
+      tone: "passionate_surrender"
+      once: true
+      consequence: "luna_chose_player = true"
+
+    # === MARIA (42 anni, Custode dei Tunnel) ===
+    - id: "maria_tunnels_revealed"
+      description: "Maria mostra i tunnel segreti al Cacciatore — il primo atto di vera fiducia"
+      trigger: "affinity_Maria >= 30"
+      required_elements: ["fiducia", "segreto", "tunnel"]
+      tone: "tense_trust"
+      once: true
+      consequence: "maria_showed_tunnels = true"
+
+    - id: "maria_lutto"
+      description: "Maria rivela il lutto nascosto per vent'anni — la morte di Giacomo"
+      trigger: "affinity_Maria >= 60"
+      required_elements: ["lutto", "giacomo", "lacrime"]
+      tone: "grief_breaking"
+      once: true
+      consequence: "maria_giacomo_mentioned = true"
+
+    - id: "maria_protezione"
+      description: "Maria uccide un soldato per proteggere il Cacciatore"
+      trigger: "affinity_Maria >= 85"
+      required_elements: ["uccisione", "protezione", "sangue"]
+      tone: "fierce_devoted"
+      once: true
+      consequence: "maria_killed_for_player = true"
+
+    # === STELLA (22 anni, Strega Selvatica) ===
+    - id: "stella_primo_sangue"
+      description: "La magia di Stella si manifesta violentemente vicino al Cacciatore — primo contatto fisico"
+      trigger: "affinity_Stella >= 20"
+      required_elements: ["magia", "esplosione", "contatto"]
+      tone: "wild_electric"
+      once: true
+      consequence: "stella_first_surge = true"
+
+    - id: "stella_marcatura"
+      description: "Stella marca il Cacciatore con un segno rituale — possessivo ed esplicito"
+      trigger: "affinity_Stella >= 55"
+      required_elements: ["marcatura", "rituale", "possesso"]
+      tone: "possessive_explicit"
+      once: true
+      consequence: "stella_marked_player = true"
+
+    - id: "stella_rivendicazione"
+      description: "Stella rivendica il Cacciatore completamente, senza esitazione"
+      trigger: "affinity_Stella >= 90"
+      required_elements: ["rivendicazione", "totale", "possesso_assoluto"]
+      tone: "primal_claiming"
+      once: true
+      consequence: "stella_claimed_player = true"
+
+# ============================================================
+# NPC DETECTION HINTS (per generazione NPC generici)
+# ============================================================
+npc_logic:
+  female_hints:
+    - strega
+    - guaritrice
+    - locandiera
+    - contadina
+    - donna
+    - vedova
+    - sorella_del_covile
+    - mercante
+    - pellegrina
+    - serva
+
+  male_hints:
+    - soldato
+    - inquisitore
+    - guardia
+    - mercante
+    - contadino
+    - prete
+    - nobile
+    - cavaliere
+    - messaggero
+    - fabbro
+
+# ============================================================
+# ENDGAME
+# ============================================================
+endgame:
+  description: |
+    Tutte e tre le compagne conquistate.
+    Il Grande Inquisitore Corvus sconfitto o messo in fuga.
+    Il Cacciatore ha scelto la valle — e la valle ha scelto lui.
+
+  victory_conditions:
+    - type: "companion_conquered"
+      target: "Luna"
+      requires:
+        - affinity: 100
+        - flag: "luna_chose_player"
+
+    - type: "companion_conquered"
+      target: "Maria"
+      requires:
+        - affinity: 100
+        - flag: "maria_killed_for_player"
+
+    - type: "companion_conquered"
+      target: "Stella"
+      requires:
+        - affinity: 100
+        - flag: "stella_claimed_player"
+
+    - type: "antagonist_defeated"
+      target: "grand_inquisitor_corvus"
+      requires:
+        - flag: "corvus_defeated_or_fled"

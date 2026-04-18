@@ -389,18 +389,32 @@ class MultiNPCManager:
             logger.debug("[MultiNPC DEBUG] No candidates after ruleset filter, skipping MultiNPC")
             return None
         
+        # Risolvi il display name dell'NPC attivo (usa il name dal template se disponibile)
+        def _display_name(npc_id: str) -> str:
+            if self.world:
+                tmpl = self.world.npc_templates.get(npc_id)
+                if tmpl:
+                    return (tmpl.get("name", npc_id) if isinstance(tmpl, dict)
+                            else getattr(tmpl, "name", npc_id))
+                comp = self.world.companions.get(npc_id)
+                if comp:
+                    return getattr(comp, "name", npc_id)
+            return npc_id
+
+        active_npc_label = _display_name(active_npc)
+
         # Build sequence - only take the most likely intervener (first in sorted list)
         # Max 1 intervention per sequence (total 3 turns: active, secondary, active)
         sequence = DialogueSequence(
             player_input=player_input,
             active_npc=active_npc,
         )
-        
+
         # First turn: Active NPC responds to player (foreground focus)
         sequence.add_turn(DialogueTurn(
-            speaker=active_npc,
+            speaker=active_npc_label,
             speaker_type=SpeakerType.ACTIVE_NPC,
-            focus_position="foreground",  # Active NPC in focus
+            focus_position="foreground",
         ))
         
         # Second turn: Secondary NPC intervention (if qualifies)
@@ -425,10 +439,10 @@ class MultiNPCManager:
             
             # Third turn: Active NPC responds to intervention (back to focus)
             sequence.add_turn(DialogueTurn(
-                speaker=active_npc,
+                speaker=active_npc_label,
                 speaker_type=SpeakerType.ACTIVE_NPC,
                 is_final=True,
-                focus_position="foreground",  # Back to active NPC
+                focus_position="foreground",
             ))
         
         return sequence
@@ -708,8 +722,29 @@ class MultiNPCManager:
         npc_def = None
         if self.world:
             npc_def = self.world.companions.get(turn.speaker) or self.world.npc_templates.get(turn.speaker)
-        npc_personality = getattr(npc_def, 'base_personality', '') or getattr(npc_def, 'personality', '')
-        npc_role = getattr(npc_def, 'role', '')
+
+        def _npc_val(key: str, default=""):
+            if npc_def is None:
+                return default
+            if isinstance(npc_def, dict):
+                return npc_def.get(key, default)
+            return getattr(npc_def, key, default)
+
+        npc_role = _npc_val('role')
+
+        # Per i companion (oggetti) prova prima personality_system.base_personality
+        # che è più ricca di base_personality top-level; fallback a personality
+        if not isinstance(npc_def, dict):
+            ps = getattr(npc_def, 'personality_system', None)
+            ps_personality = getattr(ps, 'base_personality', '') if ps else ''
+            npc_personality = (
+                ps_personality
+                or _npc_val('base_personality')
+                or _npc_val('personality')
+            )
+        else:
+            # npc_templates sono dict — usa 'personality' (campo completo)
+            npc_personality = _npc_val('personality') or _npc_val('base_personality')
 
         # --- Emotional state context ---
         emotional_state_block = ""
@@ -718,7 +753,7 @@ class MultiNPCManager:
             npc_state = game_state.npc_states.get(turn.speaker)
             es_key = (npc_state.emotional_state if npc_state else None) or \
                      game_state.flags.get(f"emotional_state_{turn.speaker}") or "default"
-            es_data = getattr(npc_def, 'emotional_states', {}).get(es_key, {})
+            es_data = _npc_val('emotional_states', {}).get(es_key, {})
             if es_data:
                 es_desc = es_data.get('description', '') if isinstance(es_data, dict) else getattr(es_data, 'description', '')
                 es_tone = es_data.get('dialogue_tone', '') if isinstance(es_data, dict) else getattr(es_data, 'dialogue_tone', '')
@@ -734,7 +769,7 @@ class MultiNPCManager:
         affinity_block = ""
         if npc_def and game_state:
             affinity = game_state.affinity.get(turn.speaker, 0)
-            tiers = getattr(npc_def, 'affinity_tiers', {})
+            tiers = _npc_val('affinity_tiers', {})
             current_tier = None
             for tier_range, data in sorted(tiers.items(),
                     key=lambda x: int(x[0].split("-")[0]) if "-" in x[0] else int(x[0])):
@@ -757,7 +792,7 @@ class MultiNPCManager:
         relationship_block = ""
         from luna.systems.multi_npc.dialogue_sequence import SpeakerType
         if turn.speaker_type == SpeakerType.SECONDARY_NPC and npc_def and turn.target_npc:
-            npc_rels = getattr(npc_def, 'npc_relationships', {})
+            npc_rels = _npc_val('npc_relationships', {})
             rel = npc_rels.get(turn.target_npc, {})
             if rel:
                 rel_type = rel.get('type', '') if isinstance(rel, dict) else getattr(rel, 'type', '')
@@ -787,16 +822,20 @@ class MultiNPCManager:
             character_sections.append(f"RELAZIONE:\n{relationship_block}")
         character_block = "\n\n".join(character_sections)
 
+        # Build previous-turns-only context (player input goes in user_input)
+        prev_context_lines = []
+        for prev in previous_turns:
+            if prev.text:
+                prev_context_lines.append(f"{prev.speaker}: {prev.text}")
+        prev_context = " | ".join(prev_context_lines[-4:]) if prev_context_lines else ""
+
         system_prompt = f"""Sei {turn.speaker}, {npc_role}.
 
 {character_block}
 
-CONVERSAZIONE IN CORSO:
-{recent_context}
-
 SCENA ATTUALE:
 {scene_context}
-
+{f"SCAMBI PRECEDENTI:{chr(10)}{prev_context}" if prev_context else ""}
 REGOLE:
 - Rispondi SOLO come {turn.speaker}
 - Max 2-3 frasi concise
@@ -829,11 +868,11 @@ Rispondi come {turn.speaker}:"""
             response_tuple = await asyncio.wait_for(
                 llm_manager.generate(
                     system_prompt=system_prompt,
-                    user_input="",  # Tutto nel system prompt
+                    user_input=player_input,
                     history=[],
                     json_mode=True,
                 ),
-                timeout=5.0  # Max 5s per LLM
+                timeout=15.0  # Max 15s per LLM (Vertex AI latency)
             )
             response, _ = response_tuple  # unpack (LLMResponse, provider)
 
@@ -854,7 +893,9 @@ Rispondi come {turn.speaker}:"""
                 
         except asyncio.TimeoutError:
             logger.warning(f"[MultiNPC] Timeout for {turn.speaker}, using fallback")
-            turn.text = f"*{turn.speaker} sembra assorta nei propri pensieri*"
+            _gender = getattr(npc_def, "gender", "female") if npc_def else "female"
+            _adj = "assorto" if _gender == "male" else "assorta"
+            turn.text = f"*{turn.speaker} sembra {_adj} nei propri pensieri*"
             turn.visual_en = ""
             turn.tags_en = []
             

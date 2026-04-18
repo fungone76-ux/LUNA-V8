@@ -1,0 +1,251 @@
+# ============================================================
+# RANDOM EVENTS - School Life Complete
+# Eventi esplorativi ripetibili che possono succedere esplorando
+# ============================================================
+
+events:
+  
+  # --- INCONTRI CASUALI ---
+  
+  lost_student:
+    id: "lost_student"
+    title: "Studente Perso"
+    description: "Uno studente del primo anno ti chiede indicazioni"
+    type: "exploration"
+    repeatable: true
+    
+    trigger:
+      chance: 0.25
+      min_turn: 5
+      allowed_locations: ["school_corridor", "school_entrance", "school_classroom"]
+      allowed_times: ["Morning", "Afternoon"]
+    
+    narrative: |
+      Un ragazzino del primo anno ti ferma nel corridoio.
+      "Scusi... non trovo l'aula 4B. Può aiutarmi?"
+      Ha l'aria terrorizzata, forse è il suo primo giorno.
+    
+    choices:
+      - text: "Ti accompagno io"
+        effect: "kind"
+        affinity_change: { "_global_": 1 }
+      - text: "È di là, da solo"
+        effect: "neutral"
+      - text: "Non ho tempo"
+        effect: "rude"
+        affinity_change: { "_global_": -1 }
+  
+  phone_call:
+    id: "phone_call"
+    title: "Telefono che Squilla"
+    description: "Il telefono della scuola squilla, nessuno risponde"
+    type: "opportunity"
+    repeatable: true
+    
+    trigger:
+      chance: 0.20
+      min_turn: 3
+      allowed_locations: ["school_office_luna", "school_secretary"]
+      allowed_times: ["Morning", "Afternoon", "Evening"]
+    
+    narrative: |
+      Il telefono sulla scrivania squilla insistentemente.
+      Sembra che nessuno sia in segreteria.
+      Potresti rispondere... o ignorarlo.
+    
+    choices:
+      - text: "Rispondo"
+        effect: "curious"
+        set_flags: { "answered_phone": true }
+      - text: "Ignoro"
+        effect: "neutral"
+  
+  found_item:
+    id: "found_item"
+    title: "Oggetto Trovato"
+    description: "Trovi qualcosa per terra"
+    type: "discovery"
+    repeatable: true
+    
+    trigger:
+      chance: 0.30
+      min_turn: 2
+      allowed_locations: ["school_corridor", "school_classroom", "school_gym"]
+    
+    narrative: |
+      Noti qualcosa luccicante sul pavimento.
+      Sembra essere... un portafogli? Una chiave? O forse qualcosa di più interessante?
+    
+    choices:
+      - text: "Lo prendo"
+        effect: "take"
+        set_flags: { "has_found_item": true }
+      - text: "Lascio stare"
+        effect: "ignore"
+  
+  overhear_conversation:
+    id: "overhear_conversation"
+    title: "Conversazione Soffiata"
+    description: "Senti qualcuno parlare alle tue spalle"
+    type: "discovery"
+    repeatable: true
+    
+    trigger:
+      chance: 0.35
+      min_turn: 10
+      allowed_locations: ["school_corridor", "school_bathroom", "bar_town"]
+    
+    narrative: |
+      Due studenti sussurrano dietro di te.
+      "...hai sentito di Luna? Dicono che..."
+      La voce si abbassa, ma riesci a cogliere qualcosa.
+    
+    choices:
+      - text: "Ascolto di nascosto"
+        effect: "eavesdrop"
+        set_flags: { "heard_rumors_luna": true }
+      - text: "Li ignoro"
+        effect: "ignore"
+  
+  sudden_rain:
+    id: "sudden_rain"
+    title: "Pioggia Improvvisa"
+    description: "Un temporale estivo ti sorprende"
+    type: "atmospheric"
+    repeatable: true
+    
+    trigger:
+      chance: 0.20
+      allowed_locations: ["school_entrance", "bar_town"]
+      allowed_times: ["Afternoon", "Evening"]
+    
+    narrative: |
+      Senza preavviso, il cielo si squarcia.
+      Gocce grosse iniziano a cadere, prima poche, poi a dirotto.
+      Sei bloccato qui finché non passa.
+    
+    choices:
+      - text: "Mi riparo sotto il portico"
+        effect: "wait"
+      - text: "Corro sotto la pioggia"
+        effect: "brave"
+  
+  vending_machine:
+    id: "vending_machine"
+    title: "Distributore Misterioso"
+    description: "Il distributore automatico si blocca"
+    type: "opportunity"
+    repeatable: true
+    
+    trigger:
+      chance: 0.25
+      allowed_locations: ["school_corridor"]
+    
+    narrative: |
+      Il distributore automatico emette uno strano rumore.
+      L'ultimo snack è rimasto incastrato.
+      Potresti provare a scuoterlo... o aspettare qualcuno.
+    
+    choices:
+      - text: "Scuoto il distributore"
+        effect: "risky"
+      - text: "Lascio perdere"
+        effect: "safe"
+  
+  locked_door:
+    id: "locked_door"
+    title: "Porta Socchiusa"
+    description: "Una porta che dovrebbe essere chiusa è aperta"
+    type: "mystery"
+    repeatable: false  # One-time discovery
+    
+    trigger:
+      chance: 0.15
+      min_turn: 15
+      allowed_locations: ["school_corridor"]
+      allowed_times: ["Evening", "Night"]
+    
+    narrative: |
+      Noti che la porta dello sgabuzzino delle scope è socchiusa.
+      Una luce fioca filtra dall'interno.
+      Cosa ci sarà dentro?
+    
+    choices:
+      - text: "Entro"
+        effect: "brave"
+        set_flags: { "discovered_storage_room": true }
+      - text: "Chiudo e me ne vado"
+        effect: "cautious"
+  
+  music_from_gym:
+    id: "music_from_gym"
+    title: "Musica dalla Palestra"
+    description: "Senti musica provenire dalla palestra"
+    type: "discovery"
+    repeatable: true
+    
+    trigger:
+      chance: 0.20
+      allowed_locations: ["school_corridor"]
+      allowed_times: ["Afternoon", "Evening"]
+    
+    narrative: |
+      Dalla palestra arriva del ritmo.
+      Musica dance, bassi potenti.
+      Qualcuno si sta allenando... o forse c'è una festa segreta?
+    
+    choices:
+      - text: "Vado a controllare"
+        effect: "curious"
+      - text: "Non è affar mio"
+        effect: "ignore"
+  
+  crying_girl:
+    id: "crying_girl"
+    title: "Ragazza in Lacrime"
+    description: "Trovi una studentessa che piange in bagno"
+    type: "social"
+    repeatable: true
+    
+    trigger:
+      chance: 0.18
+      min_turn: 8
+      allowed_locations: ["school_bathroom"]
+      allowed_times: ["Morning", "Afternoon"]
+    
+    narrative: |
+      In bagno, senti dei singhiozzi sommessi.
+      Una ragazza è seduta sul pavimento, il mascara colato sulle guance.
+      "Lasciami in pace..." balbetta quando ti vede.
+    
+    choices:
+      - text: "Le chiedo cosa c'è"
+        effect: "kind"
+      - text: "Lascio un fazzoletto e me ne vado"
+        effect: "tactful"
+      - text: "Me ne vado in silenzio"
+        effect: "neutral"
+  
+  teachers_lounge:
+    id: "teachers_lounge"
+    title: "Sala Professori"
+    description: "La porta della sala professori è aperta"
+    type: "opportunity"
+    repeatable: true
+    
+    trigger:
+      chance: 0.12
+      min_turn: 20
+      allowed_locations: ["school_corridor"]
+      allowed_times: ["Morning", "Afternoon"]
+    
+    narrative: |
+      La porta della sala professori è spalancata.
+      Vedi bicchieri di caffè e cartelle sparse.
+      Qualcuno ha lasciato la porta aperta... curioso.
+    
+    choices:
+      - text: "Do un'occhiata"
+        effect: "sneaky"
+      - text: "Chiudo la porta"
+        effect: "responsible"

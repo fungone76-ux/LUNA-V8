@@ -118,6 +118,7 @@ class NarrativeEngine:
         sections: List[str] = []
 
         sections += self._header()
+        sections += self._authority_scene_context(context)  # PRIORITÀ MASSIMA — sovrascrive scena default
         sections += self._world_context()
         sections += self._companion_context(companion, game_state, context)
         sections += self._situation(game_state, companion)
@@ -133,6 +134,7 @@ class NarrativeEngine:
         sections += self._gm_agenda(context)
         sections += self._activity_context(context)
         sections += self._cross_npc_hint(context)
+        sections += self._npc_presence_context(context)  # Metodo 7: stato accumulato NPC
         sections += self._npc_secret_hint(context)
         sections += self._multi_npc_context(context)
         sections += self._quest_context(context)
@@ -387,6 +389,24 @@ class NarrativeEngine:
             "",
         ]
 
+    def _npc_presence_context(self, context: Dict[str, Any]) -> List[str]:
+        """Metodo 7: inietta stato accumulato dell'NPC nel prompt.
+
+        Descrive quanto tempo è rimasto solo, il suo umore attuale,
+        cosa stava facendo. L'LLM usa questo per calibrare organicamente
+        il comportamento dell'NPC senza trigger meccanici.
+        """
+        presence = context.get("npc_presence_context", "")
+        if not presence:
+            return []
+        return [
+            "=== STATO ATTUALE DELL'NPC ===",
+            presence,
+            "Usa questo contesto per calibrare il tono e il comportamento dell'NPC.",
+            "Non citare mai esplicitamente questi dati — lascia che emergano naturalmente.",
+            "",
+        ]
+
     def _personality_context(
         self, context: Dict[str, Any], game_state: GameState
     ) -> List[str]:
@@ -478,6 +498,32 @@ class NarrativeEngine:
                 "",
             ])
         return lines
+
+    def _authority_scene_context(self, context: Dict[str, Any]) -> List[str]:
+        """Inietta il contesto della scena con authority NPC (preside, ispettore...).
+
+        Garantisce che quando si switcha da NPC → companion, il companion
+        ricordi di essere ancora nella scena e non torni allo stato default.
+        """
+        scene = context.get("active_authority_scene", "")
+        if not scene:
+            return []
+        # Usa la location specifica dell'NPC se disponibile nel contesto
+        # (viene iniettata da phase_handlers insieme alla scena)
+        npc_location = context.get("active_authority_npc_location", "")
+        location_warning = (
+            f"⚠️ La scena si svolge in: {npc_location}."
+            if npc_location
+            else "⚠️ La scena NON è in classe — segui il contesto qui sotto."
+        )
+        return [
+            "=== CONTESTO SCENA ATTIVA — PRIORITÀ ASSOLUTA ===",
+            "⚠️ IGNORA qualsiasi contesto di default (aula, studenti, lavagna, Stella, classe).",
+            location_warning,
+            scene,
+            "Il companion DEVE rispondere tenendo conto di questa scena. NON ignorarla.",
+            "",
+        ]
 
     def _scene_direction(self, context: Dict[str, Any]) -> List[str]:
         """v7: Inject DirectorAgent scene beats."""

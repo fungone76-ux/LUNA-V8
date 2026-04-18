@@ -1,0 +1,109 @@
+# ============================================================
+# COMPANION SCHEDULES - Valnera, La Valle delle Streghe
+#
+# NOTA: Questo file definisce le routine giornaliere per i COMPANION
+# principali (Luna, Maria, Stella) nel mondo di Valnera.
+#
+# NON include NPC secondari (definiti in npc_templates.yaml).
+#
+# Struttura:
+# - Ogni companion ha 4 slot: Morning, Afternoon, Evening, Night
+# - Ogni slot: location, activity, outfit
+# ============================================================
+
+npc_schedules:
+
+  # ============================================================
+  # LUNA - Erborista / Madre Cremisi (28 anni)
+  # Doppia vita: guaritrice pubblica di giorno, strega di notte
+  # ============================================================
+  Luna:
+    Morning:
+      location: "luna_apothecary"
+      activity: "Apre il negozio di erbe, serve i clienti con professionale distanza. La maschera da guaritrice è perfetta. Raccoglie informazioni sui movimenti dell'Ordine dai clienti che parlano troppo."
+      outfit: "healer_robe"
+      mood: "facade"
+
+    Afternoon:
+      location: "valnera_square"
+      activity: "Acquista forniture al mercato, osserva i soldati dell'Inquisizione. Aggiorna mentalmente la mappa dei pattugliamenti. In pubblico è niente di più di una rispettabile erborista."
+      outfit: "healer_robe"
+      mood: "facade"
+
+    Evening:
+      location: "apothecary_inner"
+      activity: "Il negozio è chiuso. Luna è nella stanza interna con la porta sprangata. Prepara pozioni, consulta i testi proibiti, conduce piccole operazioni rituali preparatorie. La facciata è sparita."
+      outfit: "crimson_witch"
+      mood: "calculating"
+      alternate_outfit: "underdress"
+
+    Night:
+      location: "stone_circle"
+      activity: "Guida i rituali del Covile al cerchio di pietra o nella grotta sotterranea. Nella magia notturna è più potente e più vera. Comunica con i poteri antichi del bosco."
+      outfit: "ritual_nude"
+      mood: "calculating"
+      alternate_location: "coven_cave"
+      alternate_outfit: "crimson_witch"
+
+  # ============================================================
+  # MARIA - Locandiera / Custode dei Tunnel (42 anni)
+  # La pietra che regge tutto
+  # ============================================================
+  Maria:
+    Morning:
+      location: "the_wayward_crow"
+      activity: "Apre la locanda, prepara la colazione, serve i pochi clienti mattutini. Raccoglie informazioni da ogni viaggiatore che passa. Osserva tutto, ricorda tutto, dice pochissimo."
+      outfit: "tavern_keeper"
+      mood: "wall"
+
+    Afternoon:
+      location: "the_wayward_crow"
+      activity: "Gestisce la locanda durante il giorno — rifornimenti, cucina, eventuali problemi. Quando può, esce alla piazza per valutare la situazione del paese e i soldati in servizio."
+      outfit: "tavern_keeper"
+      mood: "wall"
+      alternate_location: "valnera_square"
+
+    Evening:
+      location: "the_wayward_crow"
+      activity: "Chiude la locanda al pubblico. Si ritira nei suoi appartamenti privati al piano superiore. Il breve momento di relativa tranquillità della giornata — se può permetterselo."
+      outfit: "home_clothes"
+      mood: "cracking"
+
+    Night:
+      location: "hidden_tunnels"
+      activity: "Percorre i tunnel con passo sicuro — il suo giro di controllo notturno. Controlla i punti di accesso, incontra i corrieri del Covile, mantiene le vie di fuga sicure e pulite."
+      outfit: "keeper_of_tunnels"
+      mood: "wall"
+      alternate_location: "coven_cave"
+
+  # ============================================================
+  # STELLA - Strega Selvatica (22 anni)
+  # Il bosco è casa sua, il villaggio è una prigione
+  # ============================================================
+  Stella:
+    Morning:
+      location: "ancient_forest"
+      activity: "Caccia nel bosco antico, raccoglie erbe selvatiche. Parla con gli animali più di quanto parli con gli umani. Dorme molto — il bosco la sveglia all'alba, non prima."
+      outfit: "forest_huntress"
+      mood: "predatory"
+
+    Afternoon:
+      location: "forest_edge"
+      activity: "Si siede al margine del bosco e osserva il villaggio da lontano. Studia i movimenti dei soldati dell'Inquisizione — tatticamente, non per paura. Pensa. Il pomeriggio è il suo momento più quieto."
+      outfit: "forest_huntress"
+      mood: "curious"
+      alternate_location: "stone_circle"
+
+    Evening:
+      location: "stone_circle"
+      activity: "Pratica il controllo magico al cerchio di pietra. Spesso fallisce — il surge prende il sopravvento e la radura si illumina d'oro per ore. Luna a volte la trova qui e la aiuta."
+      outfit: "ritual_glow"
+      mood: "curious"
+
+    Night:
+      location: "stella_lair"
+      activity: "Nel rifugio nel bosco. Dorme, mangia, si cura. O cammina nel bosco nell'oscurità assoluta. O rimane fuori dalla stanza del Cacciatore per ore senza fare rumore. Il confine tra protezione e ossessione è sottile."
+      outfit: "intimate_wild"
+      mood: "obsessed"
+      alternate_location: "stone_circle"
+      alternate_outfit: "ritual_glow"

@@ -65,23 +65,19 @@ class EventHandler:
         tags_en: Optional[list] = None,
     ) -> None:
         """Display intermediate NPC message immediately."""
-        from PySide6.QtWidgets import QApplication
         w = self.window
         # Suppress all intermediate NPC messages during poker
         if w.engine and w.engine.state and w.engine.state.flags.get("poker_active"):
             return
         w.story_log.append_npc_message(speaker, text)
         w.story_log.scroll_to_bottom()
-        QApplication.processEvents()
 
     def on_intermediate_image(self, image_path: str) -> None:
         """Display intermediate image."""
         from pathlib import Path
-        from PySide6.QtWidgets import QApplication
         w = self.window
         if image_path and Path(image_path).exists():
             w.image_display.set_image(image_path)
-            QApplication.processEvents()
 
     # ------------------------------------------------------------------
     # Action bar

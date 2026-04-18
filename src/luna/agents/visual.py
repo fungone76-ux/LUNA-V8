@@ -163,8 +163,34 @@ class VisualDirector:
         outfit    = game_state.get_outfit(game_state.active_companion)
         secondary = narrative.secondary_characters or []
 
+        # Quando active_companion è un NPC template (non companion), il companion
+        # reale potrebbe trovarsi tra i secondari. Recuperarlo e swappare i ruoli
+        # visivi così il companion rimane il focal point dell'immagine.
+        visual_active = game_state.active_companion
+        if not companion and self.world.npc_templates.get(game_state.active_companion):
+            for sec_name in secondary:
+                sec_comp = self.world.companions.get(sec_name)
+                if sec_comp:
+                    companion = sec_comp
+                    outfit    = game_state.get_outfit(sec_name)
+                    visual_active = sec_name
+                    # NPC attivo diventa secondario se non già presente
+                    if game_state.active_companion not in secondary:
+                        secondary = [game_state.active_companion] + [
+                            s for s in secondary if s != sec_name
+                        ]
+                    else:
+                        secondary = [game_state.active_companion] + [
+                            s for s in secondary if s != sec_name and s != game_state.active_companion
+                        ]
+                    logger.info(
+                        "[VisualDirector] NPC active (%s) → swap: companion focal=%s",
+                        game_state.active_companion, sec_name,
+                    )
+                    break
+
         # DEBUG: Log outfit obtained from game_state
-        logger.info(f"[VisualDirector] Outfit for {game_state.active_companion}: style={outfit.style if outfit else 'None'}, base_sd_prompt={outfit.base_sd_prompt[:50] if outfit and outfit.base_sd_prompt else 'None'}...")
+        logger.info(f"[VisualDirector] Outfit for {visual_active}: style={outfit.style if outfit else 'None'}, base_sd_prompt={outfit.base_sd_prompt[:50] if outfit and outfit.base_sd_prompt else 'None'}...")
 
         # Dimensions
         aspect_ratio = narrative.aspect_ratio or "portrait"
@@ -182,7 +208,7 @@ class VisualDirector:
         # Use clean composition tags (no body focus conflicts)
         comp_tags = self._CLEAN_COMPOSITION_TAGS.get(composition, "cowboy shot")
         # Record composition for continuity
-        self._update_composition_history(game_state.active_companion or "_solo_", composition)
+        self._update_composition_history(visual_active or "_solo_", composition)
 
         # Extract tags directly from player input (bypasses LLM censorship)
         player_tags = self._extract_player_tags(
@@ -203,7 +229,7 @@ class VisualDirector:
             positive = self._build_location_prompt(narrative, game_state, comp_tags)
         
         # Strip forbidden tags for this companion
-        companion_name = game_state.active_companion or ""
+        companion_name = visual_active or ""
         forbidden = _COMPANION_FORBIDDEN_TAGS.get(companion_name, [])
         if forbidden:
             import re as _re

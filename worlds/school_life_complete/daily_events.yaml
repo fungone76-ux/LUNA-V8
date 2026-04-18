@@ -1,0 +1,295 @@
+# ============================================================
+# DAILY EVENTS - School Life Complete
+# Eventi routine basati sull'orario della giornata
+# Ogni fascia oraria ha i suoi eventi tipici
+# ============================================================
+
+events:
+  
+  # ============================================================
+  # MATTINA (Morning)
+  # ============================================================
+  
+  morning_bell:
+    id: "morning_bell"
+    title: "Campanella del Mattino"
+    description: "Iniziano le lezioni, la scuola si sveglia"
+    type: "routine"
+    time_slot: "Morning"
+    repeatable: true
+    priority: 8
+    
+    narrative: |
+      La campanella risuona per il primo periodo.
+      Studenti affollano i corridoi, cercando le loro aule.
+      L'aria è carica di quella strana energia del lunedì mattina.
+    
+    choices:
+      - text: "Vado in classe"
+        effect: "punctual"
+      - text: "Giro ancora un po'"
+        effect: "rebel"
+  
+  cafeteria_breakfast:
+    id: "cafeteria_breakfast"
+    title: "Colazione in Mensa"
+    description: "L'odore di caffè e cornetti dalla mensa"
+    type: "social"
+    time_slot: "Morning"
+    repeatable: true
+    priority: 5
+    
+    narrative: |
+      Dalla mensa arriva l'odore di caffè appena fatto.
+      Alcuni professori sono già lì, con le tazze fumanti.
+      Anche tu potresti fare una pausa... o andare diretto in classe.
+    
+    choices:
+      - text: "Prendo un caffè"
+        effect: "social"
+        set_flags: { "had_coffee": true }
+      - text: "Passo oltre"
+        effect: "focused"
+  
+  morning_announcements:
+    id: "morning_announcements"
+    title: "Annunci del Mattino"
+    description: "Il preside parla dall'altoparlante"
+    type: "routine"
+    time_slot: "Morning"
+    repeatable: true
+    priority: 6
+    
+    narrative: |
+      Un ronzio, poi la voce nasale del preside riempie la scuola.
+      "Buongiorno studenti, oggi vi ricordo che..."
+      Gli studenti intorno a te sospirano all'unisono.
+    
+    choices:
+      - text: "Ascolto"
+        effect: "obedient"
+      - text: "Ignoro e parlo sottovoce"
+        effect: "rebel"
+  
+  # ============================================================
+  # POMERIGGIO (Afternoon)
+  # ============================================================
+  
+  lunch_rush:
+    id: "lunch_rush"
+    title: "Ora di Pranzo"
+    description: "La scuola si svuota per la pausa pranzo"
+    type: "routine"
+    time_slot: "Afternoon"
+    repeatable: true
+    priority: 9
+    
+    narrative: |
+      La campanella del pranzo suona.
+      Un'esplosione di studenti si riversa nei corridoi.
+      Alcuni verso la mensa, altri fuori, alcuni in bagno a fumare.
+    
+    choices:
+      - text: "Vado in mensa"
+        effect: "hungry"
+      - text: "Resto in classe a studiare"
+        effect: "nerd"
+      - text: "Esco per prendere aria"
+        effect: "free_spirit"
+  
+  club_activities:
+    id: "club_activities"
+    title: "Attività Extracurriculari"
+    description: "I club iniziano le loro attività"
+    type: "social"
+    time_slot: "Afternoon"
+    repeatable: true
+    priority: 7
+    
+    narrative: |
+      Dopo le lezioni, la scuola non muore.
+      Dalla palestra arrivano i palloni da pallavolo.
+      Dal teatro, prove per la recita.
+      Dall'aula musica, accordi di chitarra stonati.
+    
+    choices:
+      - text: "Vado a vedere il club di fotografia"
+        effect: "artistic"
+      - text: "Vado in biblioteca"
+        effect: "studious"
+      - text: "Vado a casa"
+        effect: "tired"
+  
+  detention_time:
+    id: "detention_time"
+    title: "Ore di Punizione"
+    description: "Alcuni studenti sono in punizione"
+    type: "opportunity"
+    time_slot: "Afternoon"
+    repeatable: true
+    priority: 4
+    
+    narrative: |
+      Vedi alcuni studenti seduti in corridoio, facendo compiti in punizione.
+      Tra loro, una faccia familiare... o forse qualcuno che conosci solo di vista.
+      "Ehi, tu!" ti chiama uno. "Hai da fare? Portami qualcosa da mangiare?"
+    
+    choices:
+      - text: "Aiuto il compagno"
+        effect: "loyal"
+      - text: "Ignoro e vado via"
+        effect: "cautious"
+  
+  # ============================================================
+  # SERA (Evening)
+  # ============================================================
+  
+  after_school_cleaning:
+    id: "after_school_cleaning"
+    title: "Pulizie Pomeridiane"
+    description: "La scuola si svuota, inizia il lavoro di Maria"
+    type: "routine"
+    time_slot: "Evening"
+    repeatable: true
+    priority: 8
+    
+    narrative: |
+      La scuola è quasi vuota ora.
+      Senti il rumore di una scopa che raschia il pavimento.
+      Maria sta iniziando il suo turno.
+      L'atmosfera è diversa... più intima, più silenziosa.
+    
+    choices:
+      - text: "Vado a salutare Maria"
+        effect: "friendly"
+      - text: "Me ne vago in silenzio"
+        effect: "respectful"
+  
+  teacher_overtime:
+    id: "teacher_overtime"
+    title: "Professori Straordinari"
+    description: "Alcuni professori sono ancora in ufficio"
+    type: "opportunity"
+    time_slot: "Evening"
+    repeatable: true
+    priority: 6
+    
+    narrative: |
+      Non tutti i professori sono andati via.
+      Dall'ufficio di Luna filtra luce.
+      Sta correndo compiti? Preparando la lezione di domani?
+      O forse... è solo sola come te?
+    
+    choices:
+      - text: "Busso all'ufficio"
+        effect: "bold"
+      - text: "Lascio stare"
+        effect: "respectful"
+  
+  sunset_corridor:
+    id: "sunset_corridor"
+    title: "Tramonto nel Corridoio"
+    description: "La luce del tramonto colora la scuola"
+    type: "atmospheric"
+    time_slot: "Evening"
+    repeatable: true
+    priority: 5
+    
+    narrative: |
+      I raggi del tramonto entrano dalle finestre della scuola.
+      Tutto è bagnato di un'arancione dorato.
+      Per un attimo, anche il corridoio più squallido sembra magico.
+    
+    choices:
+      - text: "Mi fermo ad ammirare"
+        effect: "romantic"
+      - text: "Scatto una foto"
+        effect: "memory"
+  
+  night_prep:
+    id: "night_prep"
+    title: "Preparativi per la Notte"
+    description: "La scuola si prepara a chiudere"
+    type: "routine"
+    time_slot: "Evening"
+    repeatable: true
+    priority: 4
+    
+    narrative: |
+      L'addetto alla sicurezza inizia a chiudere i portoni.
+      "Chi è rimasto? Fuori tutti tra mezz'ora!"
+      La scuola sta per diventare un altro posto... vuota, silenziosa, segreta.
+    
+    choices:
+      - text: "Esco subito"
+        effect: "obedient"
+      - text: "Trovo un posto dove nascondermi"
+        effect: "rebel"
+  
+  # ============================================================
+  # NOTTE (Night)
+  # ============================================================
+  
+  night_school:
+    id: "night_school"
+    title: "Scuola di Notte"
+    description: "La scuola chiusa ha un'atmosfera diversa"
+    type: "mystery"
+    time_slot: "Night"
+    repeatable: true
+    priority: 10
+    
+    narrative: |
+      Le luci al neon illuminano a intermittenza.
+      Ogni rumore si amplifica: uno scricchiolio, un passo lontano.
+      La scuola di notte non è più un luogo di studio.
+      È... qualcos'altro.
+    
+    choices:
+      - text: "Esploro con cautela"
+        effect: "brave"
+      - text: "Mando un messaggio a qualcuno"
+        effect: "connected"
+  
+  night_watch:
+    id: "night_watch"
+    title: "Guardiano Notturno"
+    description: "Incontri il guardiano che fa i suoi giri"
+    type: "encounter"
+    time_slot: "Night"
+    repeatable: true
+    priority: 8
+    
+    narrative: |
+      Una torcia ti illumina in faccia.
+      "Ehi! Tu cosa ci fai qui a quest'ora?"
+      Il guardiano notturno ti squadra sospettoso.
+      Non sembra contento di vederti.
+    
+    choices:
+      - text: "Invento una scusa"
+        effect: "sneaky"
+      - text: "Dico la verità"
+        effect: "honest"
+  
+  message_notification:
+    id: "message_notification"
+    title: "Notifica sul Telefono"
+    description: "Ricevi un messaggio mentre sei a casa"
+    type: "social"
+    time_slot: "Night"
+    repeatable: true
+    priority: 7
+    required_location: "player_home"
+    
+    narrative: |
+      Il telefono vibra sul comodino.
+      Una notifica... da chi?
+      Luna? Stella? Maria? O qualcun altro?
+      La scuola di notte è chiusa, ma i telefoni sono sempre accesi.
+    
+    choices:
+      - text: "Leggo subito"
+        effect: "curious"
+      - text: "Ignoro per ora"
+        effect: "mysterious"

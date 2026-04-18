@@ -1,0 +1,147 @@
+# ============================================================
+# LOCATIONS - Terra degli Antenati
+# ============================================================
+
+locations:
+  # ============================================================
+  # VILLAGGIO (Hub principale)
+  # ============================================================
+  villaggio:
+    name: "Villaggio del Sole"
+    description: "Il cuore della tribù. Capanne di fango e legno, fuochi perenni, odore di carne che cuoce e pellicce che si asciugano."
+    atmosphere: "Vita tribale, attività costante, bambini che giocano, guerrieri che riposano"
+    dangers: []
+    connections:
+      giungla: "Sentiero verso la foresta sacra"
+      fiume: "Strada sterrata lungo l'acqua"
+      caverna: "Sentiero nascosto dietro le rocce"
+    image_prompt: "primitive tribal village, thatched huts, bonfires, animal pelts drying, stone age setting, warm lighting, community life, jungle clearing, atmospheric, cinematic"
+    ambient_sounds:
+      - "fuoco che crepita"
+      - "bambini che ridono"
+      - "suono di tamburi lontani"
+    time_descriptions:
+      Morning: "Il villaggio si sveglia. Donne accendono i fuochi, cacciatori preparano le armi."
+      Afternoon: "Attività febbrile. Mercanti scambiano conchiglie, anziani raccontano storie."
+      Evening: "Banchetti intorno ai fuochi. Musica di tamburi e ossa."
+      Night: "Sentinelle vegliano. Fuochi si abbassano. Silenzio ancestrale."
+
+  # ============================================================
+  # TENDA CAPO (Quartiere Zara)
+  # ============================================================
+  tenda_capo:
+    name: "Tenda del Capo"
+    description: "La grande tenda al centro del villaggio. Decorata con teschi di bestie, pelli pregiate, ornamenti d'oro primitivo. Qui governa il potere."
+    atmosphere: "Regale, autoritario, sacro, intimidatorio"
+    dangers: []
+    connections:
+      villaggio: "Uscita verso il villaggio"
+    image_prompt: "primitive royal tent, animal skulls, precious furs, gold ornaments, tribal chief dwelling, dramatic lighting, power symbols, rich decorations, atmospheric interior"
+    ambient_sounds:
+      - "vento che muove la tenda"
+      - "tintinnio di ornamenti"
+      - "passi pesanti fuori"
+    time_descriptions:
+      Morning: "Il capo riceve i sudditi. Consigli e decisioni importanti."
+      Afternoon: "Riunioni diplomatiche. Ambasciatori di altre tribù attendono."
+      Evening: "Banchetto rituale. Musica e danze sacre."
+      Night: "Solitudine del potere. Solo Zara veglia nelle sue stanze private."
+
+  # ============================================================
+  # GIUNGLA (Territorio Naya)
+  # ============================================================
+  giungla:
+    name: "La Selva Sacra"
+    description: "Giungla fitta e antica. Alberi giganti, liane, luce che filtra a fatica. Qui vivono le bestie e gli spiriti antichi."
+    atmosphere: "Selvaggia, pericolosa, mistica, primordiale"
+    dangers:
+      - "tigre_dai_denti_a_sciabola"
+      - "serpenti_venefici"
+      - "guerrieri_tribali_nemici"
+    connections:
+      villaggio: "Sentiero di ritorno al villaggio"
+      fiume: "Discesa verso l'acqua"
+      caverna: "Sentiero nascosto tra le rocce"
+    image_prompt: "dense prehistoric jungle, giant ferns, ancient trees, saber-toothed tiger territory, primitive atmosphere, dangerous wildlife, filtered sunlight, mist, cinematic"
+    ambient_sounds:
+      - "scimmie che urlano"
+      - "ronzio di insetti"
+      - "gridi di bestie lontane"
+    time_descriptions:
+      Morning: "La giungla si sveglia. Rumori di caccia eco ovunque."
+      Afternoon: "Calura opprimente. Bestie riposano, cacciatori più attivi."
+      Evening: "Ombre lunghe. Predatori si risvegliano. Pericolo cresce."
+      Night: "Oscurità totale. Solo occhi che brillano nel buio."
+
+  # ============================================================
+  # FIUME (Luogo neutrale)
+  # ============================================================
+  fiume:
+    name: "Il Grande Fiume"
+    description: "Il fiume che dona vita alla valle. Acque fresche, pesci abbondanti, sponde sabbiose. Luogo di riposo e incontri."
+    atmosphere: "Pacifico, rinfrescante, vitale, sociale"
+    dangers:
+      - "coccodrilli_preistorici"
+    connections:
+      villaggio: "Salita verso il villaggio"
+      giungla: "Ingresso nella selva"
+    image_prompt: "prehistoric river, pristine waters, sandy banks, prehistoric fish, jungle backdrop, peaceful atmosphere, watering hole, wildlife gathering, cinematic lighting"
+    ambient_sounds:
+      - "acqua che scorre"
+      - "grida di uccelli acquatici"
+      - "splash di animali"
+    time_descriptions:
+      Morning: "Nebbola sull'acqua. Animali vengono a bere."
+      Afternoon: "Calura. Tutti cercano refrigerio nelle acque."
+      Evening: "Specchio d'oro al tramonto. Pesca migliore."
+      Night: "Pericolo. Coccodrilli e bestie notturne."
+
+  # ============================================================
+  # CAVERNA (Territorio Kara)
+  # ============================================================
+  caverna:
+    name: "La Caverna degli Antenati"
+    description: "Grotta sacra nelle profondità della terra. Dipinti rupestri, ossa antiche, fumo di erbe rituali. Qui parlano gli spiriti."
+    atmosphere: "Mistico, spaventoso, sacro, pericoloso"
+    dangers:
+      - "crollo_rocce"
+      - "visioni_pericolose"
+      - "orsi_delle_caverne"
+    connections:
+      villaggio: "Sentiero segreto verso il villaggio"
+      giungla: "Uscita verso la selva"
+    image_prompt: "sacred prehistoric cave, ancient rock paintings, bones and skulls, ritual smoke, mystical atmosphere, torch lighting, primitive altar, spiritual setting, cinematic"
+    ambient_sounds:
+      - "gocce d'acqua"
+      - "vento che ulula"
+      - "rumori di bestie nel buio"
+    time_descriptions:
+      Morning: "Luce fioca entra. Kara prepara erbe e pozioni."
+      Afternoon: "Silenzio di tomba. Solo il fumo danza nell'aria."
+      Evening: "Riti iniziano. Tamburi lontani. Trance imminente."
+      Night: "Il velo si assottiglia. Visioni più potenti. Pericolo maggiore."
+
+  # ============================================================
+  # CONFINE TRIBALE (Area PvP/pericolo)
+  # ============================================================
+  confine_tribale:
+    name: "Il Confine dei Sangue"
+    description: "Territorio di nessuno tra tribù. Marcato da totem, ossa, segni di guerra. Qui si combatte."
+    atmosphere: "Teso, ostile, marziale, pericoloso"
+    dangers:
+      - "guerrieri_nemici"
+      - "imboscate"
+      - "bestie_selvagge"
+    connections:
+      villaggio: "Ritirata verso casa"
+      giungla: "Avanzata nella terra nemica"
+    image_prompt: "tribal border territory, totems and bones, war markers, tense atmosphere, jungle edge, primitive warfare signs, dangerous no man's land, dramatic sky"
+    ambient_sounds:
+      - "silenzio innaturale"
+      - "passi nascosti"
+      - "lontani tamburi di guerra"
+    time_descriptions:
+      Morning: "Foschia della guerra. Esploratori si muovono furtivi."
+      Afternoon: "Sole crudele. Agguati più probabili."
+      Evening: "Cambio di guardia. Momenti di massima tensione."
+      Night: "Incursioni notturne. Fuochi nemici lontani."

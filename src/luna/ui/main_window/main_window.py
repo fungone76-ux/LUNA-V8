@@ -163,16 +163,8 @@ class MainWindow(QMainWindow):
             self.lbl_status.setText("Ready")
             self.display_manager.update_event_widget()
 
-            # Start NPC initiative timer (15s interval, fires autonomous NPC turns)
-            if self._initiative_timer is None:
-                self._initiative_timer = QTimer(self)
-                self._initiative_timer.setInterval(15_000)
-                self._initiative_timer.timeout.connect(
-                    self.game_controller._on_initiative_tick
-                )
-            self._initiative_timer.start()
-            logger.debug("[MainWindow] Initiative timer started (15s)")
-
+            # Initiative timer (15s) has been removed (NPC Immersion System M2)
+            
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to initialize: {e}")
 

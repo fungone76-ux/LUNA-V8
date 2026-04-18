@@ -114,7 +114,11 @@ class PhaseHandlersMixin:
                     logger.info("[Orchestrator] NPC goal completed: %s", npc_id)
 
                 # Evaluate new goals (max 1 hint per turn)
-                goal_hint = self.engine.npc_goal_evaluator.evaluate(game_state)
+                # Block if a MultiNPC sequence is already running
+                if game_state.flags.get("_multi_npc_in_progress"):
+                    goal_hint = None
+                else:
+                    goal_hint = self.engine.npc_goal_evaluator.evaluate(game_state)
                 if goal_hint:
                     logger.info(
                         "[Orchestrator] NPC Goal: %s (%s, urgency=%.1f)",
@@ -128,16 +132,73 @@ class PhaseHandlersMixin:
                     if goal_hint.npc_id not in game_state.active_npc_actions:
                         game_state.active_npc_actions.add(goal_hint.npc_id)
 
-                    # Queue for autonomous initiative turn (timer fires in ~15s)
-                    # Max queue depth = 1 to avoid overwhelming the player
-                    # secret_keeper NPCs are pull-only: they activate when the player visits them
-                    pending = getattr(self.engine, '_pending_initiatives', None)
-                    if pending is not None and len(pending) == 0:
-                        if goal_hint.initiative_style != 'secret_keeper':
-                            pending.append(goal_hint)
-                            logger.info("[Orchestrator] Initiative queued for %s", goal_hint.npc_id)
+                    # INVECE DI METTERE IN CODA PER IL TURNO AUTONOMO,
+                    # INVIAMO UN MESSAGGIO ASINCRONO (Metodo 2: Comunicazione Asincrona)
+                    # Stili che generano messaggi: friendly (Luna/Stella → SMS),
+                    # phone_message, message, official_summons (Preside → nota formale)
+                    # secret_keeper: pull-only, non genera messaggi autonomi
+                    _MSG_STYLES = ('official_summons', 'message', 'friendly', 'phone_message')
+                    if goal_hint.initiative_style in _MSG_STYLES:
+                        # Se il giocatore è già nella stessa location dell'NPC →
+                        # il goal viene gestito organicamente dalla scena, non serve messaggio
+                        npc_loc = game_state.npc_locations.get(goal_hint.npc_id)
+                        player_loc = game_state.current_location
+                        already_present = (npc_loc and npc_loc == player_loc)
+
+                        if not already_present:
+                            try:
+                                from luna.systems.npc_message_system import NpcMessage
+
+                                # Canale e formato dipendono dallo stile
+                                if goal_hint.initiative_style == 'official_summons':
+                                    channel = "official"
+                                    icon = "📄"
+                                    label = f"CONVOCAZIONE — {goal_hint.npc_display_name}"
+                                elif goal_hint.initiative_style in ('friendly', 'phone_message'):
+                                    channel = "sms"
+                                    icon = "📱"
+                                    label = goal_hint.npc_display_name
+                                else:
+                                    channel = "sms"
+                                    icon = "📱"
+                                    label = goal_hint.npc_display_name
+
+                                msg = NpcMessage(
+                                    sender_id=goal_hint.npc_id,
+                                    text=goal_hint.goal_text,
+                                    turn_received=game_state.turn_count,
+                                    is_read=False,
+                                    urgency=goal_hint.urgency,
+                                    channel=channel,
+                                    valid_until_turn=(
+                                        game_state.turn_count + 15
+                                        if channel == "official"
+                                        else game_state.turn_count + 20
+                                    ),
+                                )
+                                # Invia alla UI tramite display_manager
+                                dm = getattr(self.engine, 'display_manager', None)
+                                if dm and hasattr(dm, '_display_npc_message'):
+                                    dm._display_npc_message(msg)
+                                elif getattr(self.engine, '_ui_intermediate_message_callback', None):
+                                    import asyncio
+                                    asyncio.ensure_future(
+                                        self.engine._ui_intermediate_message_callback(
+                                            f"{icon} {label}: {goal_hint.goal_text}",
+                                            "System", game_state.turn_count, "", []
+                                        )
+                                    )
+                                logger.info(
+                                    "[MessageSystem] Delivered %s msg from %s",
+                                    channel, goal_hint.npc_id
+                                )
+                            except Exception as e:
+                                logger.error("[MessageSystem] Failed to deliver: %s", e)
                         else:
-                            logger.info("[Orchestrator] secret_keeper %s: pull-only, not queued", goal_hint.npc_id)
+                            logger.debug(
+                                "[MessageSystem] %s already present with player — "
+                                "goal handled organically", goal_hint.npc_id
+                            )
             except Exception as e:
                 logger.warning("[Orchestrator] NPC Goal Evaluator failed: %s", e)
 
@@ -165,6 +226,21 @@ class PhaseHandlersMixin:
         ctx.switched, ctx.old_companion, ctx.is_temporary = (
             await self._handle_companion_switch(ctx.intent, game_state, text)
         )
+
+        # ── Aggiorna location ex-companion dopo switch ────────────────────────
+        # Quando si passa da Luna a Preside (o viceversa), l'ex-companion
+        # rimane nella stessa stanza — aggiorna la sua location in game_state
+        # così viene trovato come presente dal MultiNPC nei turni successivi.
+        if ctx.switched and ctx.old_companion:
+            old_comp = ctx.old_companion
+            player_loc = game_state.current_location
+            existing = game_state.npc_locations.get(old_comp)
+            if existing != player_loc:
+                game_state.set_npc_location(old_comp, player_loc)
+                logger.debug(
+                    "[Orchestrator] Ex-companion %s aggiornato a %s",
+                    old_comp, player_loc
+                )
 
         return ctx
 
@@ -259,6 +335,7 @@ class PhaseHandlersMixin:
                 present_npcs = self.engine.multi_npc_manager.get_present_npcs(
                     game_state.active_companion, game_state
                 )
+                ctx.present_npcs = present_npcs
             except Exception as e:
                 logger.warning("[Orchestrator] PresenceTracker get_present_npcs failed: %s", e)
 
@@ -337,6 +414,7 @@ class PhaseHandlersMixin:
                     if still_active
                     else "ERA PRESENTE poco fa e ha appena lasciato la stanza"
                 )
+                loc_desc = active_auth.get("npc_location_desc", "")
                 ctx.context["active_authority_scene"] = (
                     f"CONTESTO SCENA RECENTE — {active_auth['npc_display_name']} {presence}. "
                     f"Ecco il dialogo avvenuto:\n"
@@ -344,6 +422,8 @@ class PhaseHandlersMixin:
                     f"Il companion DEVE rispondere tenendo conto di questo contesto. "
                     f"Non ignorare quanto appena accaduto."
                 )
+                if loc_desc:
+                    ctx.context["active_authority_npc_location"] = loc_desc
                 logger.debug(
                     "[Orchestrator] Authority scene context injected: %s (active=%s, expires=%d)",
                     npc_id, still_active, expires_at,
@@ -436,6 +516,45 @@ class PhaseHandlersMixin:
         # ── Step 9: Save state + memory ───────────────────────────────────────
         await self._save(game_state, ctx.text, ctx.narrative, ctx.changes)
 
+        # ── Step 9.5: Witness check (Metodo 3: Reazioni a Catena) ─────────────
+        # Controlla se Maria (o altri) ha assistito a una scena intima/importante.
+        # Il risultato propaga gossip/protezione tra NPC in modo organico.
+        try:
+            witness_sys = getattr(self.engine, 'witness_system', None)
+            if witness_sys and ctx.narrative and ctx.narrative.text:
+                narrative_lower = ctx.narrative.text.lower()
+                event_type = None
+                if any(w in narrative_lower for w in [
+                    "vicini", "mano", "abbracci", "baci", "intimi",
+                    "sfiorat", "toccat", "stretti", "abbracciati"
+                ]):
+                    event_type = "intimate_moment"
+                elif any(w in narrative_lower for w in [
+                    "litigat", "arrabbiat", "urla", "sgridat", "discussione"
+                ]):
+                    event_type = "argument"
+                elif any(w in narrative_lower for w in [
+                    "piange", "lacrime", "vulnerabile", "sola", "triste", "singhiozz"
+                ]):
+                    event_type = "emotional_moment"
+
+                if event_type:
+                    witness_event = witness_sys.check_maria_witnesses(
+                        event_type=event_type,
+                        subject_npc=game_state.active_companion,
+                        location=game_state.current_location,
+                        game_state=game_state,
+                    )
+                    if witness_event:
+                        action = witness_sys.maria_decides_action(witness_event, game_state)
+                        witness_sys.propagate_gossip(witness_event, action, game_state)
+                        logger.info(
+                            "[WitnessSystem] Maria witnessed '%s' → action: %s",
+                            event_type, action
+                        )
+        except Exception as e:
+            logger.warning("[WitnessSystem] Check failed: %s", e)
+
         # ── Update active authority scene (normal turns with authority NPC) ───
         # When the active companion is an authority NPC, keep _active_authority_scene
         # current so the next turn (typically back to Luna) has full scene context.
@@ -445,7 +564,7 @@ class PhaseHandlersMixin:
                 npc_def.get("initiative_style", "") if isinstance(npc_def, dict)
                 else getattr(npc_def, "initiative_style", "")
             )
-            if style == "authority" and ctx.narrative and ctx.narrative.text:
+            if style in ("authority", "official_summons") and ctx.narrative and ctx.narrative.text:
                 prev = getattr(self.engine, "_active_authority_scene", None) or {}
                 prev_dialogue = prev.get("dialogue", "")
                 npc_name = (
@@ -453,19 +572,50 @@ class PhaseHandlersMixin:
                     if isinstance(npc_def, dict)
                     else getattr(npc_def, "name", game_state.active_companion)
                 )
+                # Ricava descrizione location dagli spawn_locations del template
+                spawn_locs = (
+                    npc_def.get("spawn_locations", []) if isinstance(npc_def, dict)
+                    else getattr(npc_def, "spawn_locations", [])
+                )
+                npc_location_desc = prev.get("npc_location_desc", "")
+                if not npc_location_desc and spawn_locs:
+                    loc_id = spawn_locs[0]
+                    world_loc = (self.engine.world.locations or {}).get(loc_id)
+                    if world_loc:
+                        npc_location_desc = getattr(world_loc, "name", loc_id)
+                    else:
+                        npc_location_desc = loc_id.replace("_", " ").title()
+                if not npc_location_desc:
+                    npc_location_desc = "ufficio"
                 new_exchange = (
                     (f"Giocatore: {ctx.text}\n" if ctx.text else "")
                     + f"{npc_name}: {ctx.narrative.text}"
                 )
                 self.engine._active_authority_scene = {
-                    "npc_id":           game_state.active_companion,
-                    "npc_display_name": npc_name,
-                    "dialogue":         (prev_dialogue + "\n" + new_exchange).strip(),
-                    "expires_at_turn":  game_state.turn_count + 2,
+                    "npc_id":              game_state.active_companion,
+                    "npc_display_name":    npc_name,
+                    "npc_location_desc":   npc_location_desc,
+                    "dialogue":            (prev_dialogue + "\n" + new_exchange).strip(),
+                    "expires_at_turn":     game_state.turn_count + 28,
                 }
-                logger.debug("[Orchestrator] Authority scene context updated: %s", game_state.active_companion)
+                logger.debug("[Orchestrator] Authority scene context updated: %s @ %s",
+                             game_state.active_companion, npc_location_desc)
 
         # ── Step 10: VisualDirector ───────────────────────────────────────────
+        # Se active è un NPC template e secondary_characters è vuoto,
+        # inietta i companion presenti nella scena così lo swap visivo funziona
+        active_is_npc_template = (
+            self.engine.world.npc_templates.get(game_state.active_companion) is not None
+            and self.engine.world.companions.get(game_state.active_companion) is None
+        )
+        if active_is_npc_template and ctx.narrative and not ctx.narrative.secondary_characters:
+            companions_present = [
+                npc for npc in ctx.present_npcs
+                if self.engine.world.companions.get(npc)
+            ]
+            if companions_present:
+                ctx.narrative.secondary_characters = companions_present
+
         ctx.narrative._user_input = ctx.text   # tag extraction per VisualDirector
         lora_enabled = (
             self.engine.lora_mapping.is_enabled()
@@ -784,6 +934,44 @@ class PhaseHandlersMixin:
             "[Orchestrator] MultiNPC expanded: %d turns", len(multi_npc_sequence.turns)
         )
 
+        # ── Aggiorna location di tutti gli NPC partecipanti alla scena ──────
+        # Se Maria è invitata a casa, se l'ispettore entra in classe, ecc.
+        # la loro location viene aggiornata a quella attuale del giocatore.
+        # Così nei turni successivi vengono trovati come presenti senza
+        # dover modificare gli YAML degli spawn_locations.
+        player_loc = game_state.current_location
+
+        # Costruisce mappa display_name → npc_id per trovare l'id corretto
+        # (il speaker nei turni può essere il display name es. "Luna" invece di "luna")
+        _name_to_id: dict = {}
+        if self.engine.world:
+            for _id, _def in self.engine.world.npc_templates.items():
+                _n = _def.get("name", _id) if isinstance(_def, dict) else getattr(_def, "name", _id)
+                _name_to_id[_n] = _id
+                _name_to_id[_id] = _id  # anche id diretto
+            for _id, _def in self.engine.world.companions.items():
+                _n = getattr(_def, "name", _id)
+                _name_to_id[_n] = _id
+                _name_to_id[_id] = _id
+
+        for turn in multi_npc_sequence.turns:
+            speaker_raw = getattr(turn, "speaker", None) or getattr(turn, "npc_id", None)
+            if not speaker_raw:
+                continue
+            # Risolvi id reale (case-insensitive fallback)
+            npc_id = (
+                _name_to_id.get(speaker_raw)
+                or _name_to_id.get(speaker_raw.lower())
+                or speaker_raw.lower()
+            )
+            current_loc = game_state.npc_locations.get(npc_id)
+            if current_loc != player_loc:
+                game_state.set_npc_location(npc_id, player_loc)
+                logger.info(
+                    "[MultiNPC] %s (%s) si sposta in %s (era: %s)",
+                    speaker_raw, npc_id, player_loc, current_loc or "sconosciuta"
+                )
+
         if hasattr(self.engine, "_show_interrupt_callback"):
             try:
                 self.engine._show_interrupt_callback(True)
@@ -841,7 +1029,13 @@ class PhaseHandlersMixin:
                     logger.warning(
                         "[Orchestrator] Guardian rejected turn from %s", turn.speaker
                     )
-                    completed_turn.text = f"*{completed_turn.speaker} sembra assorta nei propri pensieri*"
+                    _npc_def = (
+                        self.engine.world.companions.get(completed_turn.speaker)
+                        or self.engine.world.npc_templates.get(completed_turn.speaker)
+                    )
+                    _gender = getattr(_npc_def, "gender", "female") if _npc_def else "female"
+                    _adj = "assorto" if _gender == "male" else "assorta"
+                    completed_turn.text = f"*{completed_turn.speaker} sembra {_adj} nei propri pensieri*"
 
                 # 3. Salva nel database
                 if self.engine.memory_manager:
@@ -944,10 +1138,15 @@ class PhaseHandlersMixin:
 
         if result.completed_turns:
             final_turn = result.completed_turns[-1]
+            # Raccoglie tutti gli speaker della sequenza come secondary_characters
+            # così VisualDirector può usarli per lo swap companion/NPC
+            _seq_speakers = list({t.speaker for t in result.completed_turns})
+            _secondary = [s for s in _seq_speakers if s != game_state.active_companion]
             result.narrative = NarrativeOutput(
                 text=final_turn.text,
                 visual_en=final_turn.visual_en,
                 tags_en=final_turn.tags_en,
+                secondary_characters=_secondary,
                 provider_used="gemini/multi-npc",
             )
             result.skip_standard_llm = True

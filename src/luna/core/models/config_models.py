@@ -28,6 +28,8 @@ class AppConfig(LunaBaseModel):
 
     local_sd_url: str = "http://127.0.0.1:7860"
     local_comfy_url: str = "http://127.0.0.1:8188"
+    local_ollama_url: str = "http://localhost:11434"
+    ollama_model: str = "qwen2.5:32b"
     database_url: str = "sqlite+aiosqlite:///storage/saves/luna_v5.db"
     google_credentials_path: str = "google_credentials.json"
 
@@ -65,6 +67,13 @@ class AppConfig(LunaBaseModel):
         if self.is_runpod and self.runpod_id:
             return f"https://{self.runpod_id}-7860.proxy.runpod.net"
         return self.local_sd_url
+
+    @property
+    def ollama_url(self) -> str:
+        """URL Ollama — auto RunPod o localhost."""
+        if self.is_runpod and self.runpod_id:
+            return f"https://{self.runpod_id}-11434.proxy.runpod.net"
+        return self.local_ollama_url
 
 
 class DetectedTrait(BaseModel):

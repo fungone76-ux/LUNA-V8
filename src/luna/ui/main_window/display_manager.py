@@ -424,6 +424,54 @@ class DisplayManager:
     # Turn result display
     # ------------------------------------------------------------------
 
+    def _display_npc_message(self, message: "NpcMessage") -> None:
+        """Display an asynchronous NPC message in the log.
+
+        Differenzia la visualizzazione per canale:
+        - sms/phone  → 📱 stile SMS
+        - note       → 📝 stile biglietto cartaceo
+        - official   → 📄 convocazione formale
+        - gossip     → 💬 voce di corridoio
+        """
+        w = self.window
+
+        # Risolve nome display del mittente
+        sender_name = message.sender_id
+        if w.engine and w.engine.world:
+            comp_def = w.engine.world.companions.get(message.sender_id)
+            if comp_def:
+                sender_name = getattr(comp_def, "name", message.sender_id)
+            elif w.engine.world.npc_templates:
+                npc_def = w.engine.world.npc_templates.get(message.sender_id)
+                if isinstance(npc_def, dict):
+                    sender_name = npc_def.get("name", message.sender_id)
+                elif hasattr(npc_def, "name"):
+                    sender_name = getattr(npc_def, "name", message.sender_id)
+
+        channel = getattr(message, "channel", "sms")
+
+        if channel == "official":
+            text = (
+                f"📄 <b>CONVOCAZIONE — {sender_name}</b><br>"
+                f"<i>{message.text}</i>"
+            )
+        elif channel == "note":
+            text = (
+                f"📝 <i>Trovi un biglietto piegato da <b>{sender_name}</b>:</i><br>"
+                f"\"<i>{message.text}</i>\""
+            )
+        elif channel == "gossip":
+            text = (
+                f"💬 <i>Voci di corridoio su <b>{sender_name}</b>:</i> {message.text}"
+            )
+        else:  # sms / phone / default
+            text = (
+                f"📱 <b>{sender_name}</b>: <i>\"{message.text}\"</i>"
+            )
+
+        w.story_log.append_system_message(text)
+        logger.info("[DisplayManager] NPC message displayed — channel=%s sender=%s", channel, message.sender_id)
+
     def display_result(self, result: TurnResult) -> None:
         """Display turn result in the UI.
         
@@ -631,14 +679,13 @@ class DisplayManager:
 
     def build_prompt_preview(self, companion, outfit) -> str:
         """Build SD positive prompt preview for display."""
-        from luna.media.builders import BASE_PROMPTS
-        from luna.media.lora_mapping import LoraMapping
-
+        # Simple local fallback instead of missing BASE_PROMPTS
+        
         if not companion:
             return ""
 
         char_lower = companion.name.lower()
-        character_base = BASE_PROMPTS.get(char_lower, f"1girl, {companion.name}")
+        character_base = f"1girl, {companion.name}"
 
         outfit_prompt = outfit.to_sd_prompt(include_weight=False)
         prompt = f"{character_base}, {outfit_prompt}"

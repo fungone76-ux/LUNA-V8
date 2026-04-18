@@ -112,57 +112,12 @@ class GameController:
                 w.txt_input.setEnabled(True)
             w.lbl_status.setText("Ready")
 
-    def _on_initiative_tick(self) -> None:
-        """Timer callback (sync) — guard check, then schedule async turn if safe."""
-        w = self.window
-        if not w.engine or w._is_processing or w._input_blocked:
-            return
-        if w.choice_widget.is_active():
-            return
-        # Suspend all autonomous NPC initiatives during poker
-        if w.engine.state and w.engine.state.flags.get("poker_active"):
-            return
-        pending = getattr(w.engine, '_pending_initiatives', [])
-        if not pending:
-            return
-        asyncio.ensure_future(self._run_initiative_turn())
+    def _process_choice_turn(self, choice_text: str) -> None:
+        """Sync wrapper for choice selection turn."""
+        import asyncio
+        asyncio.ensure_future(self.process_choice_turn_async(choice_text))
 
-    async def _run_initiative_turn(self) -> None:
-        """Async body of the initiative turn, scheduled only when safe."""
-        w = self.window
-        # Double-check guards (state may have changed between scheduling and execution)
-        if not w.engine or w._is_processing or w._input_blocked:
-            return
-        if w.choice_widget.is_active():
-            return
-        # Suspend all autonomous NPC initiatives during poker
-        if w.engine.state and w.engine.state.flags.get("poker_active"):
-            return
-        pending = getattr(w.engine, '_pending_initiatives', [])
-        if not pending:
-            return
-
-        hint = pending.pop(0)
-        logger.info("[Initiative] Autonomous turn for %s", hint.npc_id)
-
-        w._is_processing = True
-        w.lbl_status.setText(f"⚡ {hint.npc_display_name} prende l'iniziativa...")
-        try:
-            result = await w.engine.run_initiative_turn(hint)
-            if result:
-                w.display_manager.display_result(result)
-                w.display_manager.update_status()
-            else:
-                w.engine._pending_initiatives.insert(0, hint)
-                logger.warning("[Initiative] Turn returned None for %s — re-queued", hint.npc_id)
-        except Exception as e:
-            logger.error("[Initiative] Turn error for %s: %s", hint.npc_id, e)
-            w.engine._pending_initiatives.insert(0, hint)
-        finally:
-            w._is_processing = False
-            w.lbl_status.setText("Ready")
-
-    async def _process_choice_turn(self, choice_text: str) -> None:
+    async def process_choice_turn_async(self, choice_text: str) -> None:
         """Process a turn from a choice selection.
 
         Args:
@@ -188,7 +143,11 @@ class GameController:
             w.lbl_status.setText("Ready")
 
         except Exception as e:
+            import traceback
+            import logging
+            logger = logging.getLogger(__name__)
             logger.error(f"[Choice] Error processing choice: {e}")
+            from PyQt5.QtWidgets import QMessageBox
             QMessageBox.critical(w, "Error", f"Choice processing failed: {e}")
         finally:
             w._is_processing = False

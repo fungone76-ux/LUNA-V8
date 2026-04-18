@@ -92,6 +92,8 @@ def get_settings() -> AppConfig:
 
         local_sd_url=os.environ.get("LOCAL_SD_URL", "http://127.0.0.1:7860"),
         local_comfy_url=os.environ.get("LOCAL_COMFY_URL", "http://127.0.0.1:8188"),
+        local_ollama_url=os.environ.get("OLLAMA_URL", "http://localhost:11434"),
+        ollama_model=os.environ.get("OLLAMA_MODEL", "qwen2.5:32b"),
         database_url=os.environ.get(
             "DATABASE_URL",
             f"sqlite+aiosqlite:///{project_root / 'storage' / 'saves' / 'luna_v6.db'}",

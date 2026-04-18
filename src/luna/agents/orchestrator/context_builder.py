@@ -193,6 +193,24 @@ class ContextBuilderMixin:
         except Exception as e:
             logger.warning("[ContextBuilder] cross_location_hint failed: %s", e)
 
+        # Metodo 7: NPC presence context — stato accumulato off-screen
+        # Informa l'LLM di quanto tempo l'NPC è rimasto solo, in che umore è,
+        # cosa stava facendo. Rende la scena organica invece che scriptata.
+        ctx["npc_presence_context"] = ""
+        try:
+            ws = getattr(self.engine, "world_simulator", None)
+            if ws is not None:
+                presence = self._build_npc_presence_context(
+                    game_state.active_companion, game_state, ws
+                )
+                if presence:
+                    ctx["npc_presence_context"] = presence
+                    logger.debug(
+                        "[ContextBuilder] npc_presence_context injected (%d chars)", len(presence)
+                    )
+        except Exception as e:
+            logger.warning("[ContextBuilder] npc_presence_context failed: %s", e)
+
         return ctx
 
     async def _enrich_context(
@@ -274,6 +292,108 @@ class ContextBuilderMixin:
         pass
 
         return ctx
+
+    def _build_npc_presence_context(
+        self,
+        npc_id: str,
+        game_state: Any,
+        world_simulator: Any,
+    ) -> str:
+        """Metodo 7: costruisce il contesto presenza NPC per l'LLM.
+
+        Descrive quante tempo l'NPC è rimasto solo, in che stato emotivo è,
+        cosa stava facendo off-screen. L'LLM usa questo per calibrare
+        organicamente il comportamento dell'NPC senza trigger meccanici.
+        """
+        mind = world_simulator.mind_manager.get(npc_id)
+        if not mind:
+            return ""
+
+        npc_state = game_state.npc_states.get(npc_id)
+        parts: list[str] = []
+
+        # Quanto tempo l'NPC è rimasto senza contatto con il giocatore
+        turns_alone = mind.turns_since_player_contact
+        if turns_alone >= 15:
+            parts.append(
+                f"[{npc_id.upper()} STATO ACCUMULATO] "
+                f"Non vede il giocatore da {turns_alone} turni. "
+                "Si sente sola. Lo si nota dalla postura, dallo sguardo."
+            )
+        elif turns_alone >= 7:
+            parts.append(
+                f"[{npc_id.upper()} STATO ACCUMULATO] "
+                f"Non vede il giocatore da {turns_alone} turni. "
+                "Ha avuto tempo per pensare."
+            )
+        elif turns_alone >= 3:
+            parts.append(
+                f"[{npc_id.upper()} STATO ACCUMULATO] "
+                "Il giocatore non c'era da un po'."
+            )
+
+        # Stato emotivo accumulato (diverso dal default)
+        if npc_state:
+            emotional_state = npc_state.emotional_state
+            state_desc = {
+                "lonely":     "Si sente sola. Non lo dirà direttamente, ma traspare.",
+                "tired":      "È stanca. Movimenti lenti, voce bassa.",
+                "vulnerable": "È in un momento di vulnerabilità emotiva.",
+                "anxious":    "È in ansia per qualcosa. Agitata.",
+                "happy":      "È di buonumore. Si vede dalla leggerezza.",
+                "conflicted": "Ha qualcosa che la tormenta interiormente.",
+            }
+            desc = state_desc.get(emotional_state)
+            if desc:
+                parts.append(desc)
+
+        # Needs dominanti (senza mostrare numeri al LLM)
+        social_need   = mind.needs.get("social", 0.0)
+        intimacy_need = mind.needs.get("intimacy", 0.0)
+        if social_need > 0.70:
+            parts.append("Ha bisogno di compagnia. Non lo chiederà esplicitamente.")
+        elif intimacy_need > 0.70:
+            parts.append("Ha bisogno di connessione emotiva più profonda.")
+
+        # Off-screen log recente: cosa stava facendo
+        recent = [
+            e for e in (mind.off_screen_log or [])
+            if not e.told_to_player and e.importance >= 0.2
+        ]
+        if recent:
+            latest = recent[-1]
+            parts.append(f"Poco prima che arrivassi: {latest.description}.")
+
+        # Gossip / knowledge accumulata su altri NPC
+        knowledge_key = f"_knowledge_{npc_id}"
+        known_events = game_state.flags.get(knowledge_key, [])
+        current_turn = game_state.turn_count
+        fresh = [
+            k for k in known_events
+            if current_turn - k.get("turn", 0) <= 8
+            and not k.get("acknowledged")
+        ]
+        if fresh:
+            latest_k = fresh[-1]
+            subj = latest_k.get("subject", "qualcuno")
+            certainty = latest_k.get("certainty", 0.5)
+            covered = latest_k.get("covered", False)
+            if covered:
+                parts.append(
+                    f"Sa qualcosa su {subj} e il giocatore. Ha deciso di non dire niente. "
+                    "Ma lo ricorda."
+                )
+            elif certainty >= 0.6:
+                parts.append(
+                    f"Ha visto qualcosa che riguarda {subj} e il giocatore. "
+                    "Potrebbe portarlo fuori durante la conversazione."
+                )
+            else:
+                parts.append(
+                    f"Ha sentito voci su {subj} e il giocatore. Non è sicura."
+                )
+
+        return " ".join(parts) if parts else ""
 
     # =========================================================================
     # Farewell generation

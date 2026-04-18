@@ -1,4 +1,13 @@
-"""Luna RPG v6 - Google Gemini LLM Client (Vertex AI)."""
+"""Luna RPG v8 - Google Gemini LLM Client (Vertex AI).
+
+Modelli Vertex AI aggiornati ad aprile 2026:
+  - gemini-2.5-flash       → PRIMARY  (GA, veloce, ottimo equilibrio qualità/costo)
+  - gemini-2.5-pro         → FALLBACK (GA, più potente, contesto 1M token)
+  - gemini-2.5-flash-lite  → FALLBACK (GA, più economico, alta velocità)
+
+NOTA: gemini-2.0-flash-001 e gemini-1.5-* sono DEPRECATI e verranno spenti
+      il 1 giugno 2026. Rimosse dalle fallback per evitare 404.
+"""
 from __future__ import annotations
 
 import logging
@@ -28,7 +37,7 @@ except ImportError:
 
 
 # ---------------------------------------------------------------------------
-# Response schema — used by Gemini response_schema for structured output
+# Response schema
 # ---------------------------------------------------------------------------
 
 class _UpdatesSchema(BaseModel):
@@ -58,18 +67,34 @@ class _ResponseSchema(BaseModel):
 class GeminiClient(BaseLLMClient):
     """Google Gemini provider via Vertex AI.
 
-    Primary LLM for Luna RPG v6.
-    Loads model list from config/models.yaml.
+    Modelli in uso (aggiornati aprile 2026, tutti GA su Vertex AI):
+
+    PRIMARY:
+        gemini-2.5-flash      — Veloce, bilanciato, ideale per RPG real-time.
+                                Contesto 1M token. Retirement: ottobre 2026.
+
+    FALLBACK 1:
+        gemini-2.5-pro        — Più potente, per scene complesse o contesti lunghi.
+                                Contesto 1M token. Retirement: ottobre 2026.
+
+    FALLBACK 2:
+        gemini-2.5-flash-lite — Più economico e veloce. Per turni semplici.
+                                Retirement: ottobre 2026.
+
+    MODELLI RIMOSSI (deprecati/spenti):
+        gemini-2.0-flash-001  -> SPENTO 1 giugno 2026
+        gemini-1.5-pro/flash  -> GIA SPENTI (404)
+        gemini-1.0-*          -> GIA SPENTI (404)
     """
 
-    # Modelli Gemini disponibili (da lista API aggiornata):
-    DEFAULT_MODEL    = "gemini-2.5-flash"           # Primo tentativo
-    FALLBACK_MODELS  = [
-        "gemini-2.0-flash-001",                     # Secondo tentativo
-        "gemini-2.5-pro",                           # Terzo tentativo
+    DEFAULT_MODEL   = "gemini-2.5-flash"
+    FALLBACK_MODELS = [
+        "gemini-2.5-pro",
+        "gemini-2.5-flash-lite",
     ]
-    TEMPERATURE      = 0.95
-    MAX_TOKENS       = 2048
+
+    TEMPERATURE  = 0.95
+    MAX_TOKENS   = 4096
 
     def __init__(
         self,
@@ -78,11 +103,7 @@ class GeminiClient(BaseLLMClient):
         max_tokens: Optional[int] = None,
         **kwargs: Any,
     ) -> None:
-        print("[DEBUG] Sto provando a caricare Vertex AI...")
-        
-        # Try to load from models.yaml, fall back to defaults
         primary, fallbacks = self._load_model_config()
-
         super().__init__(model or primary, **kwargs)
         self.temperature  = temperature if temperature is not None else self.TEMPERATURE
         self.max_tokens   = max_tokens  if max_tokens  is not None else self.MAX_TOKENS
@@ -98,7 +119,6 @@ class GeminiClient(BaseLLMClient):
     # -------------------------------------------------------------------------
 
     def _load_model_config(self):
-        """Load model config from models.yaml if available."""
         try:
             from luna.config import get_model_config
             cfg = get_model_config()
@@ -108,13 +128,18 @@ class GeminiClient(BaseLLMClient):
 
     def _init_client(self) -> None:
         if not GEMINI_AVAILABLE:
-            logger.error("[Gemini] google-cloud-aiplatform not installed: pip install google-cloud-aiplatform")
+            logger.error(
+                "[Gemini] google-cloud-aiplatform not installed. "
+                "Run: pip install google-cloud-aiplatform"
+            )
             return
         try:
-            # Initialize Vertex AI with specific project and location using ADC
             vertexai.init(project='gen-lang-client-0617760675', location='us-central1')
             self._initialized = True
-            logger.info("[Gemini] Initialized Vertex AI — model: %s", self.model)
+            logger.info(
+                "[Gemini] Vertex AI initialized — primary: %s, fallbacks: %s",
+                self.model, self._fallbacks
+            )
         except Exception as e:
             logger.error("[Gemini] Init failed: %s", e)
 
@@ -142,6 +167,7 @@ class GeminiClient(BaseLLMClient):
         user_input: str,
         history: List[Dict[str, str]],
         json_mode: bool = True,
+        companion_name: Optional[str] = None,
     ) -> LLMResponse:
         if not self._initialized:
             return self._create_error_response("Vertex AI client not initialized")
@@ -149,6 +175,7 @@ class GeminiClient(BaseLLMClient):
         contents = self._build_gemini_contents(history, user_input)
         models_to_try = [self.model] + self._fallbacks
 
+        last_error = ""
         for model_name in models_to_try:
             try:
                 result = await self._generate_with_model(
@@ -156,11 +183,13 @@ class GeminiClient(BaseLLMClient):
                 )
                 if result:
                     return result
+                logger.warning("[Gemini] %s returned empty — trying next", model_name)
             except Exception as e:
+                last_error = str(e)
                 logger.warning("[Gemini] %s failed: %s", model_name, e)
                 continue
 
-        logger.error("[Gemini] All models failed. Project ID in use: gen-lang-client-0617760675")
+        logger.error("[Gemini] All models failed. Last error: %s", last_error)
         return self._create_error_response("All Gemini models failed")
 
     async def _generate_with_model(
@@ -170,41 +199,38 @@ class GeminiClient(BaseLLMClient):
         contents: Any,
         json_mode: bool,
     ) -> Optional[LLMResponse]:
-        """Try generation with a specific model."""
-        
-        # Safety settings for Vertex AI
         safety_settings = [
             SafetySetting(
                 category=HarmCategory.HARM_CATEGORY_HARASSMENT,
-                threshold=HarmBlockThreshold.BLOCK_NONE
+                threshold=HarmBlockThreshold.BLOCK_NONE,
             ),
             SafetySetting(
                 category=HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                threshold=HarmBlockThreshold.BLOCK_NONE
+                threshold=HarmBlockThreshold.BLOCK_NONE,
             ),
             SafetySetting(
                 category=HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                threshold=HarmBlockThreshold.BLOCK_NONE
+                threshold=HarmBlockThreshold.BLOCK_NONE,
             ),
             SafetySetting(
                 category=HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                threshold=HarmBlockThreshold.BLOCK_NONE
+                threshold=HarmBlockThreshold.BLOCK_NONE,
             ),
         ]
-        
-        generation_config = {
-            "temperature": self.temperature,
-            "top_p": 0.98,
-            "top_k": 40,
+
+        generation_config: Dict[str, Any] = {
+            "temperature":       self.temperature,
+            "top_p":             0.98,
+            "top_k":             40,
             "max_output_tokens": self.max_tokens,
         }
-        
+
         if json_mode:
             generation_config["response_mime_type"] = "application/json"
 
         model_instance = GenerativeModel(
             model_name=model_name,
-            system_instruction=system_prompt
+            system_instruction=system_prompt,
         )
 
         response = await model_instance.generate_content_async(
@@ -218,10 +244,10 @@ class GeminiClient(BaseLLMClient):
             logger.warning("[Gemini] %s returned empty response", model_name)
             return None
 
+        logger.debug("[Gemini] %s OK (%d chars)", model_name, len(raw))
         return self._parse(raw, model_name)
 
     def _parse(self, raw: str, model: str) -> Optional[LLMResponse]:
-        """Parse raw LLM output into LLMResponse using repair pipeline."""
         result = repair_json(raw)
 
         if result.error_type == RepairErrorType.EMPTY:
@@ -233,18 +259,15 @@ class GeminiClient(BaseLLMClient):
 
         data = result.data
         if not data.get("text"):
-            # Some callers (e.g. NPC authority turns) return "dialogue" or "note"
-            # instead of "text". Pass the raw JSON as text so the caller can parse it.
-            logger.debug("[Gemini] Response has no text field — passing raw JSON to caller")
+            logger.debug("[Gemini] No 'text' field — passing raw JSON to caller")
             data["text"] = raw
 
         if result.was_repaired:
-            logger.debug("[Gemini] JSON was repaired for model %s", model)
+            logger.debug("[Gemini] JSON repaired for model %s", model)
 
         return self._build_response(data, model)
 
     def _build_response(self, data: Dict[str, Any], model: str) -> LLMResponse:
-        """Build LLMResponse from validated dict."""
         updates_data = data.get("updates", {})
         try:
             updates = StateUpdate(**updates_data) if updates_data else StateUpdate()
@@ -272,7 +295,6 @@ class GeminiClient(BaseLLMClient):
         history: List[Dict[str, str]],
         user_input: str,
     ) -> List[Any]:
-        """Build Vertex AI format content list."""
         contents = []
         for msg in history:
             role = "user" if msg.get("role") == "user" else "model"

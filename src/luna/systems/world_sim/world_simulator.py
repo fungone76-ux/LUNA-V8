@@ -194,6 +194,12 @@ class WorldSimulator:
             if npc_id == active:
                 continue
             npc_loc = game_state.npc_locations.get(npc_id, "unknown")
+
+            # Metodo 7: aggiorna mood e simula attività off-screen per ogni NPC
+            self._update_npc_mood_from_needs(npc_id, mind, game_state, turn)
+            if turn % 3 == 0:  # ogni 3 turni per non saturare l'off_screen_log
+                self._simulate_npc_activity(npc_id, mind, npc_loc, game_state, turn)
+
             if npc_loc == player_loc:
                 continue
             npc_locations.setdefault(npc_loc, []).append(npc_id)
@@ -206,6 +212,107 @@ class WorldSimulator:
                     if random.random() > self.OFF_SCREEN_CHANCE:
                         continue
                     self._npc_interaction(npc_a, npc_b, turn)
+
+    def _update_npc_mood_from_needs(
+        self,
+        npc_id: str,
+        mind: Any,
+        game_state: Any,
+        turn: int,
+    ) -> None:
+        """Metodo 7: aggiorna emotional_state NPC in base ai needs accumulati.
+
+        Viene chiamato ogni turno per tutti gli NPC non attivi.
+        Non sovrascrive stati forzati dalla narrativa (es. "seductive").
+        """
+        npc_state = game_state.npc_states.get(npc_id)
+        if not npc_state:
+            return
+
+        current_state = npc_state.emotional_state
+        # Non sovrascrivere stati forzati/narrativi significativi
+        _PROTECTED_STATES = {
+            "seductive", "nervous_but_happy", "flustered",
+            "grateful", "devoted", "surprised",
+        }
+        if current_state in _PROTECTED_STATES:
+            return
+
+        social_need  = mind.needs.get("social", 0.0)
+        rest_need    = mind.needs.get("rest", 0.0)
+        intimacy_need = mind.needs.get("intimacy", 0.0)
+
+        # Determina nuovo stato in base al need dominante
+        new_state = None
+        if social_need > 0.75 and npc_id in ("luna", "stella", "maria"):
+            new_state = "lonely"
+        elif rest_need > 0.80:
+            new_state = "tired"
+        elif intimacy_need > 0.75 and npc_id in ("luna", "maria"):
+            new_state = "vulnerable"
+
+        if new_state and new_state != current_state:
+            game_state.npc_states[npc_id] = npc_state.model_copy(
+                update={"emotional_state": new_state, "emotional_state_set_turn": turn}
+            )
+            logger.debug(
+                "[WorldSim] %s mood → '%s' (social=%.2f rest=%.2f intimacy=%.2f)",
+                npc_id, new_state, social_need, rest_need, intimacy_need
+            )
+
+    def _simulate_npc_activity(
+        self,
+        npc_id: str,
+        mind: Any,
+        location: str,
+        game_state: Any,
+        turn: int,
+    ) -> None:
+        """Metodo 7: simula attività specifica dell'NPC off-screen.
+
+        Aggiunge voci all'off_screen_log che l'LLM userà per costruire
+        risposte organiche quando il giocatore visita l'NPC.
+        """
+        time_str = (
+            game_state.time_of_day.value
+            if hasattr(game_state.time_of_day, "value")
+            else str(game_state.time_of_day)
+        )
+
+        if npc_id == "luna":
+            activity_map = {
+                "Morning":   "stava preparando la lezione",
+                "Afternoon": "correggeva compiti dei suoi studenti",
+                "Evening":   "era ancora in ufficio da sola, correggendo compiti",
+                "Night":     "stava finalmente tornando a casa",
+            }
+            activity = activity_map.get(time_str)
+            if activity:
+                # Importanza alta la sera (scena emotiva potenziale)
+                importance = 0.6 if time_str == "Evening" else 0.25
+                mind.add_off_screen(activity, turn, importance=importance)
+
+        elif npc_id == "stella":
+            activity_map = {
+                "Morning":   "era già in classe, in anticipo per una volta",
+                "Afternoon": "stava studiando in biblioteca con le cuffie",
+                "Evening":   "girava per la scuola dopo le lezioni",
+                "Night":     "mandava messaggi alle amiche",
+            }
+            activity = activity_map.get(time_str)
+            if activity:
+                mind.add_off_screen(activity, turn, importance=0.2)
+
+        elif npc_id == "maria":
+            area_map = {
+                "Morning":   "puliva l'atrio e i corridoi del piano terra",
+                "Afternoon": "riordinava le aule dopo le lezioni",
+                "Evening":   "passava lo straccio negli uffici dei professori",
+                "Night":     "finiva il turno, stanca",
+            }
+            area = area_map.get(time_str)
+            if area:
+                mind.add_off_screen(area, turn, importance=0.2)
 
     def _npc_interaction(self, npc_a: str, npc_b: str, turn: int) -> None:
         mind_a = self.mind_manager.get(npc_a)

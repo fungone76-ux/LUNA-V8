@@ -1,0 +1,369 @@
+# ============================================================
+# LOCATIONS - School Life Complete
+# Location System V2
+# ============================================================
+
+locations:
+  # ============================================================
+  # SCUOLA - AREE PRINCIPALI
+  # ============================================================
+  
+  school_entrance:
+    id: "school_entrance"
+    name: "Ingresso della Scuola"
+    description: "Il portone principale del liceo Leonardo da Vinci. Studenti entrano e escono in gruppi."
+    visual_style: "school building, modern architecture, students"
+    lighting: "natural daylight"
+    
+    connected_to: ["school_corridor", "park"]
+    aliases: ["ingresso", "portone", "entrata", "scuola", "a scuola"]
+    
+    available_times: ["Morning", "Afternoon", "Evening"]
+    
+    available_characters: ["Stella", "random_student"]
+    companion_can_follow: true
+    
+    time_descriptions:
+      Morning: "Studenti frettolosi arrivano in ritardo."
+      Afternoon: "Caos durante il cambio delle lezioni."
+      Evening: "Il sole calda illumina il portone ormai vuoto."
+  
+  school_corridor:
+    id: "school_corridor"
+    name: "Corridoio Principale"
+    description: "Lunghi corridoi con armadietti e bacheche. Il cuore pulsante della scuola."
+    visual_style: "lockers, posters, natural light"
+    lighting: "indoor daylight"
+    
+    connected_to: ["school_entrance", "school_classroom", "school_gym", "school_library", "school_cafeteria", "school_bathroom_male", "school_bathroom_female", "school_office_luna", "school_secretary"]
+    aliases: ["corridoio", "hallway", "passaggio"]
+    
+    available_times: ["Morning", "Afternoon", "Evening"]
+    
+    available_characters: ["Stella", "Maria", "random_student"]
+    companion_can_follow: true
+    
+    dynamic_descriptions:
+      crowded: "Il corridoio è stracolmo di studenti. Difficile muoversi."
+      empty: "Il corridoio è deserto. I tuoi passi echeggiano."
+    
+    time_descriptions:
+      Morning: "Studenti frettolosi cercano le aule."
+      Afternoon: "Tra una lezione e l'altra, il caos regna sovrano."
+      Evening: "Silenzio. Solo i custodi e gli insegnanti in ritardo."
+  
+  school_classroom:
+    id: "school_classroom"
+    name: "Aula 3B"
+    description: "L'aula dove tieni le lezioni con Luna e frequenti insieme a Stella. Banchi, lavagna, finestroni."
+    visual_style: "desks, blackboard, sunlight"
+    lighting: "indoor bright"
+    
+    parent_location: "school_corridor"
+    requires_parent: true
+    
+    connected_to: ["school_corridor"]
+    aliases: ["aula", "classe", "3B"]
+    
+    available_times: ["Morning", "Afternoon"]
+    closed_description: "L'aula è chiusa, le luci spente."
+    
+    available_characters: ["Luna", "Stella"]
+    companion_can_follow: false
+    companion_refuse_message: "Non posso entrare durante le lezioni, aspetto fuori."
+    
+    time_descriptions:
+      Morning: "Lezione di matematica con Luna. Stella è alla sua scrivania."
+  
+  school_gym:
+    id: "school_gym"
+    name: "Palestra"
+    description: "Campo da basket, spogliatoi, palestra attrezzata. Odore di gomma e sudore."
+    visual_style: "basketball court, wood floor, high ceiling"
+    lighting: "indoor bright"
+    
+    parent_location: "school_corridor"
+    requires_parent: true
+    
+    connected_to: ["school_corridor", "school_locker_room"]
+    aliases: ["palestra", "gym", "basket"]
+    
+    available_times: ["Morning", "Afternoon", "Evening"]
+    
+    available_characters: ["Stella", "Luna"]
+    companion_can_follow: true
+    
+    time_descriptions:
+      Afternoon: "Stella si allena a pallavolo. I ragazzi la guardano."
+      Evening: "Palestra vuota, eco dei tuoi passi sul parquet."
+  
+  school_locker_room:
+    id: "school_locker_room"
+    name: "Spogliatoi"
+    description: "Spogliatoi maschili e femminili separati. Armadietti, panche, docce."
+    visual_style: "lockers, benches, steam"
+    lighting: "fluorescent"
+    
+    parent_location: "school_gym"
+    requires_parent: true
+    
+    connected_to: ["school_gym"]
+    aliases: ["spogliatoi", "locker", "docce"]
+    
+    available_times: ["Morning", "Afternoon"]
+    
+    companion_can_follow: false
+    companion_refuse_message: "Non posso entrare negli spogliatoi! Aspetto fuori."
+  
+  school_library:
+    id: "school_library"
+    name: "Biblioteca"
+    description: "Scaffali pieni di libri, tavoli da studio, silenzio solenne. Un rifugio."
+    visual_style: "bookshelves, reading lamps, quiet"
+    lighting: "soft indoor"
+    
+    parent_location: "school_corridor"
+    requires_parent: true
+    
+    connected_to: ["school_corridor"]
+    aliases: ["biblioteca", "library", "libri"]
+    
+    available_times: ["Morning", "Afternoon", "Evening"]
+    
+    available_characters: ["Maria", "Stella"]
+    companion_can_follow: true
+    
+    time_descriptions:
+      Evening: "Silenzio totale. Solo qualche studente diligente... e voi due."
+  
+  school_cafeteria:
+    id: "school_cafeteria"
+    name: "Mensa"
+    description: "Tavoli lunghi, distributori, odore di pasta e cotoletta. Il centro sociale."
+    visual_style: "tables, food, windows, social"
+    lighting: "indoor bright"
+    
+    parent_location: "school_corridor"
+    requires_parent: true
+    
+    connected_to: ["school_corridor"]
+    aliases: ["mensa", "cafeteria", "pranzo"]
+    
+    available_times: ["Morning", "Afternoon"]
+    
+    available_characters: ["Stella", "random_student"]
+    companion_can_follow: true
+  
+  school_office_luna:
+    id: "school_office_luna"
+    name: "Ufficio della Professoressa"
+    description: "L'ufficio privato di Luna. Piccolo, intimo, pieno di libri di matematica."
+    visual_style: "books, desk, warm lighting, private"
+    lighting: "warm indoor"
+    
+    parent_location: "school_corridor"
+    requires_parent: true
+    
+    connected_to: ["school_corridor"]
+    aliases: ["ufficio", "studio", "luna"]
+    
+    available_times: ["Morning", "Afternoon", "Evening"]
+    
+    available_characters: ["Luna"]
+    companion_can_follow: false
+    companion_refuse_message: "Non posso entrare nell'ufficio di un'altra professoressa."
+    
+    time_descriptions:
+      Evening: "L'ufficio è illuminato solo dalla lampada della scrivania. Intimo."
+  
+  school_secretary:
+    id: "school_secretary"
+    name: "Segreteria Scolastica"
+    description: "L'ufficio amministrativo della scuola. Impiegati al lavoro, archivi, computer."
+    visual_style: "office desks, filing cabinets, fluorescent lighting, school administration, papers, computers"
+    lighting: "fluorescent indoor"
+    
+    parent_location: "school_corridor"
+    requires_parent: true
+    
+    connected_to: ["school_corridor"]
+    aliases: ["segreteria", "segreteria scolastica", "ufficio amministrativo", "amministrazione"]
+    
+    available_times: ["Morning", "Afternoon"]
+    closed_description: "La segreteria è chiusa. Torna negli orari di ufficio."
+    
+    available_characters: ["segretaria", "impiegato"]
+    companion_can_follow: true
+  
+  school_storage:
+    id: "school_storage"
+    name: "Deposito delle Scope"
+    description: "Ripostiglio buio con scope, secchi, detersivi. Il territorio di Maria."
+    visual_style: "shelves, dim light, cramped, secret"
+    lighting: "dim indoor"
+    
+    parent_location: "school_corridor"
+    requires_parent: true
+    
+    connected_to: ["school_corridor"]
+    aliases: ["deposito", "ripostiglio", "scope"]
+    
+    available_times: ["Morning", "Afternoon", "Evening", "Night"]
+    
+    available_characters: ["Maria"]
+    companion_can_follow: false
+    companion_refuse_message: "Qui è dove lavora Maria... meglio non disturbare."
+  
+  school_bathroom_male:
+    id: "school_bathroom_male"
+    name: "Bagni Maschili"
+    description: "Bagni del piano terra. Piastrelle, specchi, odore di disinfettante."
+    visual_style: "public school bathroom, institutional setting, white ceramic tiles on walls, multiple sinks with mirrors above, fluorescent tube lighting, toilet stalls with metal doors, concrete floor, cleaning supplies visible, no windows, industrial feel"
+    lighting: "fluorescent"
+    
+    parent_location: "school_corridor"
+    requires_parent: true
+    
+    connected_to: ["school_corridor"]
+    aliases: ["bagno", "toilette", "wc"]
+    
+    available_times: ["Morning", "Afternoon", "Evening"]
+    
+    companion_can_follow: false
+    companion_refuse_message: "Aspetto fuori, non posso entrare qui!"
+  
+  school_bathroom_female:
+    id: "school_bathroom_female"
+    name: "Bagni Femminili"
+    description: "Bagni femminili. Piastrelle rosa, specchi, asciugamani."
+    visual_style: "public school bathroom, institutional setting, white and pink ceramic tiles, multiple sinks with mirrors, fluorescent tube lighting, toilet stalls, paper towel dispenser, concrete floor, no windows, school environment"
+    lighting: "fluorescent"
+    
+    parent_location: "school_corridor"
+    requires_parent: true
+    
+    connected_to: ["school_corridor"]
+    aliases: ["bagni femminili"]
+    
+    available_times: ["Morning", "Afternoon", "Evening"]
+    
+    companion_can_follow: false
+  
+  # ============================================================
+  # FUORI SCUOLA
+  # ============================================================
+  
+  park:
+    id: "park"
+    name: "Parco della Città"
+    description: "Alberi, panchine, vialetti ghiaiati. Posto per incontrarsi dopo scuola."
+    visual_style: "trees, grass, benches, nature"
+    lighting: "natural"
+    
+    connected_to: ["school_entrance", "bar_town"]
+    aliases: ["parco", "giardino"]
+    
+    available_times: ["Afternoon", "Evening"]
+    
+    available_characters: ["Stella", "Maria"]
+    companion_can_follow: true
+    
+    time_descriptions:
+      Evening: "Il tramonto filtra tra gli alberi. Romantico."
+  
+  bar_town:
+    id: "bar_town"
+    name: "Bar del Paese"
+    description: "Il bar centrale della cittadina. Caffè, cornetti, giochi. Posto di ritrovo."
+    visual_style: "tables, bar, coffee machine"
+    lighting: "warm indoor"
+    
+    connected_to: ["park", "stella_home"]
+    aliases: ["bar", "caffè", "paese"]
+    
+    available_times: ["Morning", "Afternoon", "Evening"]
+    
+    available_characters: ["Stella", "Maria", "Luna"]
+    companion_can_follow: true
+  
+  # ============================================================
+  # CASE PRIVATE
+  # ============================================================
+  
+  maria_home:
+    id: "maria_home"
+    name: "Casa di Maria"
+    description: "Appartamentino modesto ma accogliente. Piccolo, pulito, intimo."
+    visual_style: "cozy, kitchen, pictures, warm"
+    lighting: "warm indoor"
+    
+    connected_to: ["bar_town"]
+    aliases: ["casa maria", "appartamento maria"]
+    
+    available_times: ["Evening", "Night"]
+    
+    available_characters: ["Maria"]
+    companion_can_follow: false
+    
+    requires_flag: "maria_invited_home"
+    
+    time_descriptions:
+      Night: "L'appartamento è caldo, intimo. Maria ti ha preparato la cena."
+  
+  stella_home:
+    id: "stella_home"
+    name: "Villa di Stella"
+    description: "Villa borghese, grande, elegante. La ricchezza di Stella."
+    visual_style: "luxury, pink decor, big rooms"
+    lighting: "warm indoor"
+    
+    connected_to: ["bar_town"]
+    aliases: ["casa stella", "villa"]
+    
+    available_times: ["Afternoon", "Evening", "Night"]
+    
+    available_characters: ["Stella"]
+    companion_can_follow: false
+    
+    requires_flag: "stella_invited_home"
+    
+    time_descriptions:
+      Afternoon: "La camera di Stella è rosa, piena di foto e specchi."
+  
+  player_home:
+    id: "player_home"
+    name: "Casa Tua"
+    description: "Il tuo appartamento in affitto. Modesto ma tuo."
+    visual_style: "simple, bedroom, student apartment"
+    lighting: "warm indoor"
+    
+    connected_to: ["bar_town"]
+    aliases: ["casa", "home", "appartamento", "casa mia", "mia casa", "a casa", "torno a casa", "casa mia", "il mio appartamento"]
+    
+    available_times: ["Afternoon", "Evening", "Night"]
+    
+    companion_can_follow: false
+    
+    time_descriptions:
+      Morning: "Il mattino, la luce del sole entra dalle finestre. Una nuova giornata inizia."
+      Afternoon: "Il pomeriggio, l'appartamento è tranquillo. I raggi del sole filtrano dalle tende."
+      Evening: "La sera, la luce calda delle lampade accoglie il rientro a casa."
+      Night: "La notte, il tuo telefono illumina il buio. Messaggi in arrivo..."
+  
+  luna_home:
+    id: "luna_home"
+    name: "Casa di Luna"
+    description: "L'appartamento elegante di Luna. Libri dappertutto, silenzio assoluto."
+    visual_style: "luxury apartment, bookshelves, elegant furniture"
+    lighting: "warm indoor, soft lamp light"
+    
+    connected_to: ["bar_town"]
+    aliases: ["casa luna", "appartamento luna", "a casa di luna"]
+    
+    available_times: ["Evening", "Night"]
+    
+    available_characters: ["Luna"]
+    companion_can_follow: false
+    
+    time_descriptions:
+      Night: "L'appartamento di Luna è immerso nel silenzio. Solo il rumore delle pagine che si girano."

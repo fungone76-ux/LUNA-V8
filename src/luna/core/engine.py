@@ -14,12 +14,14 @@ from __future__ import annotations
 
 import logging
 import os
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+import traceback
+from typing import Any, Dict, List, Optional
+
+from luna.core.models import GameState, TurnResult, WorldDefinition
+from luna.systems.gameplay_manager import GameplayManager
 
 from luna.core.config import get_settings
 from luna.core.database import get_db_manager, DatabaseManager
-from luna.core.models import AppConfig, GameState, TurnResult, WorldDefinition
 
 logger = logging.getLogger(__name__)
 
@@ -629,6 +631,9 @@ class GameEngine:
             # NPCStateManager: unified query API over location + mind + affinity
             from luna.systems.npc_state_manager import NPCStateManager
             self.npc_state = NPCStateManager(mind_manager=mind_manager, world=self.world)
+
+            from luna.systems.witness_system import WitnessSystem
+            self.witness_system = WitnessSystem(self.npc_state)
 
             # Restore NPC mind states if saved
             minds_state = game_state.flags.get("_npc_minds_state")

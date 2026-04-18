@@ -1,0 +1,389 @@
+# ============================================================
+# RANDOM EVENTS - Valnera, La Valle delle Streghe
+# Eventi esplorativi ripetibili del mondo medievale oscuro
+# ============================================================
+
+events:
+
+  # --- 1. PATTUGLIA DELL'INQUISIZIONE ---
+  inquisition_patrol:
+    id: "inquisition_patrol"
+    title: "La Pattuglia"
+    description: "I soldati fermano il Cacciatore nella piazza per un controllo documenti"
+    type: "tension"
+    repeatable: true
+
+    trigger:
+      chance: 0.25
+      min_turn: 3
+      allowed_locations: ["valnera_square"]
+      allowed_times: ["Morning", "Afternoon"]
+
+    narrative: |
+      Due soldati dell'Ordine ti si avvicinano con passo misurato. Quello più alto porta
+      una mano sul pomolo della spada — gesto automatico, non ancora minaccioso.
+      'Documenti, forestiero.' Poi si ferma riconoscendoti: 'Ah, il Cacciatore di Corvus.
+      Scusate, signore.' Il sollievo sul suo viso è autentico. Qualcuno li ha messi in guardia
+      su qualcosa nel paese. Non ti dicono cosa.
+
+    choices:
+      - text: "Li interrogo su cosa stanno cercando"
+        effect: "intelligence"
+        set_flags: { "patrol_interrogated": true }
+        affinity_change: { "_global_": 0 }
+        outcome: "Menzioni un nome diverso da quello che cercano — il tuo. Ottieni qualche dettaglio."
+
+      - text: "Li congedo rapidamente"
+        effect: "neutral"
+        outcome: "Niente di utile. Ma niente di dannoso."
+
+      - text: "Dico loro di controllare più a fondo il paese"
+        effect: "order_loyalty"
+        affinity_change: { "Luna": -3, "Maria": -3 }
+        outcome: "I soldati ringraziano e intensificano i pattugliamenti. Il Covile lo nota."
+
+  # --- 2. IL ULULATO NOTTURNO ---
+  night_howl:
+    id: "night_howl"
+    title: "L'Ululato nel Bosco"
+    description: "Un suono strano dal bosco nel cuore della notte. È Stella? Una creatura? Qualcos'altro?"
+    type: "mystery"
+    repeatable: true
+
+    trigger:
+      chance: 0.20
+      min_turn: 2
+      allowed_locations: ["forest_edge", "valnera_square"]
+      allowed_times: ["Night"]
+
+    narrative: |
+      Un suono sale dal bosco — tra l'ululato e il canto, con una nota che non appartiene
+      a nessuna bestia che conosci. I soldati della ronda si fermano. Uno fa il segno della
+      croce. Il suono si ripete, più vicino. Potrebbe essere Stella in mezzo a un surge.
+      Potrebbe essere qualcos'altro che la magia del bosco ha risvegliato.
+      Non c'è modo di saperlo senza entrare.
+
+    choices:
+      - text: "Entro nel bosco a cercare l'origine"
+        effect: "brave_curious"
+        affinity_change: { "Stella": 5 }
+        set_flags: { "entered_night_forest_alone": true }
+        outcome: "Il bosco è silenzio totale intorno a te. Ma qualcosa osserva. Potresti incrociare Stella."
+
+      - text: "Rimango e osservo i soldati reagire"
+        effect: "observer"
+        outcome: "I soldati si calmano. Il suono non si ripete. Torni al letto. Qualcosa ti fa sentire osservato."
+
+      - text: "Riferisco l'accaduto alla cappella al mattino"
+        effect: "order_duty"
+        affinity_change: { "Stella": -5, "Luna": -2 }
+        outcome: "I soldati aumentano le pattuglie verso il bosco. Stella lo eviterà per giorni."
+
+  # --- 3. IL SEGNO DEL COVILE ---
+  coven_sign:
+    id: "coven_sign"
+    title: "Il Segno sul Muro"
+    description: "Trovi un segno di gesso su un muro — codice del Covile. Sai cosa significa?"
+    type: "discovery"
+    repeatable: false
+
+    trigger:
+      chance: 0.15
+      min_turn: 5
+      allowed_locations: ["valnera_square", "hidden_tunnels", "the_wayward_crow"]
+      allowed_times: ["Morning", "Afternoon", "Evening", "Night"]
+
+    narrative: |
+      All'angolo di un vicolo, quasi invisibile: un piccolo segno di gesso bianco
+      tracciato con precisione. Non è uno scarabocchio — le linee sono deliberate,
+      angolate, con un punto centrale. Il tuo addestramento te ne mostra la categoria:
+      segnaletica occulta. Ma il tuo addestramento non ti ha insegnato a leggerla.
+      Maria è di passaggio dall'altra parte della piazza. Ha visto che l'hai visto.
+
+    choices:
+      - text: "Chiedo a Maria cosa significa"
+        effect: "trust_building"
+        affinity_change: { "Maria": 8 }
+        outcome: "Maria ti studia per un lungo momento. Poi, a voce bassissima, dice la traduzione. Questo era un test."
+
+      - text: "Lo cancello prima che i soldati lo vedano"
+        effect: "protective"
+        affinity_change: { "Maria": 5, "Luna": 3 }
+        outcome: "Nessuno sa che l'hai cancellato. Tranne Maria, che ha visto tutto."
+
+      - text: "Lo disegno nei miei appunti per riferirlo"
+        effect: "order_duty"
+        affinity_change: { "Maria": -8, "Luna": -5 }
+        set_flags: { "reported_coven_sign": true }
+        outcome: "I soldati studiano il disegno. Non capiscono niente. Ma il Covile ha sentito che qualcuno li ha traditi."
+
+  # --- 4. LA STREGA FUGGIASCA ---
+  fugitive_witch:
+    id: "fugitive_witch"
+    title: "La Fuggiasca"
+    description: "Un forestiero arriva alla locanda — chiaramente in fuga, chiaramente una strega. Maria guarda per vedere come reagisce il Cacciatore."
+    type: "moral_choice"
+    repeatable: false
+
+    trigger:
+      chance: 0.10
+      min_turn: 8
+      allowed_locations: ["the_wayward_crow"]
+      allowed_times: ["Evening"]
+
+    narrative: |
+      Una donna entra dalla porta della locanda con la veste fradicia di pioggia e gli occhi
+      di chi ha corso per ore. La mano destra ha piccole bruciature — non da fuoco. Da magia
+      incontrollata. Si guarda intorno con il terrore di un animale braccato. Maria l'ha già
+      vista. Maria ti guarda. Non dice niente. Ma il messaggio è chiarissimo: cosa farai?
+
+    choices:
+      - text: "La nascondo — le dico dove andare"
+        effect: "protect_witch"
+        affinity_change: { "Maria": 12, "Luna": 8 }
+        set_flags: { "helped_fugitive": true }
+        outcome: "Maria gestisce il resto senza una parola. La donna sparisce in dieci minuti. Luna lo saprà entro domani mattina."
+
+      - text: "La ignoro — non è affar mio"
+        effect: "neutral"
+        outcome: "Maria la nasconde da sola. Nessun cambiamento nella vostra relazione. Ma lei nota che non hai fatto niente di male."
+
+      - text: "La arresto — è il mio dovere"
+        effect: "order_duty"
+        affinity_change: { "Maria": -20, "Luna": -15, "Stella": -10 }
+        set_flags: { "arrested_fugitive": true }
+        outcome: "Maria non interviene. Ma l'espressione sul suo viso è quella di una porta che si chiude per sempre."
+
+  # --- 5. LA VISIONE FANTASMA ---
+  ghost_vision:
+    id: "ghost_vision"
+    title: "La Visione"
+    description: "Un lampo di visione magica — una donna che brucia, quindici anni fa. Il bosco ricorda."
+    type: "lore"
+    repeatable: false
+
+    trigger:
+      chance: 0.15
+      min_turn: 6
+      allowed_locations: ["valnera_square"]
+      allowed_times: ["Night"]
+
+    narrative: |
+      Passi sul punto esatto dove una volta c'era il palo del rogo.
+      Senza preavviso — un lampo di qualcosa che non è ricordo ma sembra tale:
+      una donna in fiamme, e una bambina che urla finché qualcuno la porta via.
+      La visione dura un secondo. La piazza è vuota, la notte è silenziosa.
+      Ma senti ancora il calore sulle dita per qualche minuto dopo.
+      Non era magia tua. Era della terra.
+
+    choices:
+      - text: "Chiedo a Maria cosa è successo qui quindici anni fa"
+        effect: "history_seeking"
+        affinity_change: { "Maria": 6 }
+        set_flags: { "knows_burning_history": true }
+        outcome: "Maria si ferma. Poi, lentamente: 'Questo non è un posto dove fare quella domanda ad alta voce. Aspetta stanotte.'"
+
+      - text: "Noto la posizione esatta nei miei appunti"
+        effect: "investigator"
+        set_flags: { "noted_burning_location": true }
+        outcome: "L'informazione potrebbe essere utile — o potrebbe danneggiare qualcuno se trovata dai soldati."
+
+      - text: "Continuo come se niente fosse"
+        effect: "neutral"
+        outcome: "La visione svanisce. Ma il calore sulle dita dura più a lungo di quello che ti aspettavi."
+
+  # --- 6. LA VOLPE ARGENTATA ---
+  magical_creature:
+    id: "magical_creature"
+    title: "La Volpe degli Occhi Argento"
+    description: "Una volpe con occhi d'argento ti segue nel bosco. Non è una volpe ordinaria."
+    type: "encounter"
+    repeatable: true
+
+    trigger:
+      chance: 0.20
+      min_turn: 3
+      allowed_locations: ["ancient_forest", "forest_edge"]
+      allowed_times: ["Morning", "Afternoon", "Evening", "Night"]
+
+    narrative: |
+      Senti di essere seguito prima di vederlo. Poi — tra i tronchi — una volpe.
+      Pelo rosso normale. Occhi completamente argento, come specchi.
+      Non ha paura di te. Ti osserva con qualcosa che suona intelletto.
+      Quando cerchi di avvicinarti, si allontana esattamente di quella distanza.
+      Quando ti fermi, si ferma. Poi cambia direzione — verso il profondo del bosco.
+
+    choices:
+      - text: "Seguo la volpe"
+        effect: "follow_magic"
+        set_flags: { "followed_silver_fox": true }
+        outcome: "La volpe ti porta a una radura che non sapevi esistesse. C'è qualcosa lì — resti di un rituale recente, o erbe particolari, o tracce di Stella."
+
+      - text: "La ignoro e continuo"
+        effect: "neutral"
+        outcome: "La volpe scompare tra gli alberi. Non sembra delusa. Solo paziente."
+
+      - text: "Cerco di catturarla"
+        effect: "force"
+        affinity_change: { "Stella": -5 }
+        outcome: "La volpe scappa con una velocità impossibile. Qualcosa nel bosco cambia tono. Stella lo sentirà."
+
+  # --- 7. IL SOLDATO UBRIACO ---
+  soldier_drunk:
+    id: "soldier_drunk"
+    title: "Il Soldato Ubriaco"
+    description: "Un soldato ubriaco insulta una donna del villaggio nella piazza. Tutti guardano dall'altra parte."
+    type: "moral_choice"
+    repeatable: true
+
+    trigger:
+      chance: 0.20
+      min_turn: 4
+      allowed_locations: ["valnera_square"]
+      allowed_times: ["Evening"]
+
+    narrative: |
+      Un soldato dell'Ordine con il fiato pesante di birra ha bloccato una donna del
+      villaggio contro il muro del pozzo. Non la tocca — non ancora — ma le sue parole
+      sono veleno. 'Strega.' 'Puttana del diavolo.' Ridacchia. Gli altri villager hanno
+      abbassato la testa. Un altro soldato sobrio osserva da lontano senza intervenire.
+      La donna ha gli occhi di chi è sopravvissuta a questo prima. E dopo.
+
+    choices:
+      - text: "Intervengo e mando via il soldato"
+        effect: "protect_village"
+        affinity_change: { "Maria": 6, "Luna": 4, "_global_": 2 }
+        set_flags: { "defended_villager": true }
+        outcome: "Il soldato si ritira. L'altro soldato sobrio ti ringrazia in silenzio. La donna ti guarda come se volesse dire qualcosa che non dice."
+
+      - text: "Ignoro la scena"
+        effect: "neutral"
+        affinity_change: { "Maria": -3 }
+        outcome: "La donna si libera da sola dopo qualche minuto. Maria ha visto che non hai fatto niente. Lo nota."
+
+      - text: "Faccio una nota formale sul soldato"
+        effect: "bureaucratic"
+        outcome: "Esci dall'imbarazzo con la carta. Il soldato smette. La donna non è convinta che il problema sia risolto."
+
+  # --- 8. L'ERBA RARA ---
+  herb_discovery:
+    id: "herb_discovery"
+    title: "L'Erba del Velo"
+    description: "Trovi un'erba rara con proprietà magiche nel bosco. Luna la vorrebbe."
+    type: "opportunity"
+    repeatable: true
+
+    trigger:
+      chance: 0.25
+      min_turn: 2
+      allowed_locations: ["ancient_forest"]
+      allowed_times: ["Morning"]
+
+    narrative: |
+      Tra le radici di un albero antico — qualcosa che non dovresti riconoscere ma riconosci
+      dal tuo addestramento: Erba del Velo. Usata nei rituali di protezione e occultamento.
+      Illegale secondo l'Ordine Sacro. Rara, preziosa, con le foglie di un verde che tende
+      al viola ai bordi. Luna ne userebbe immediatamente. Potresti anche bruciarla.
+      O portarla al capitano della pattuglia come prova.
+
+    choices:
+      - text: "La raccoglio per darla a Luna"
+        effect: "coven_ally"
+        affinity_change: { "Luna": 8 }
+        set_flags: { "collected_herb_for_luna": true }
+        outcome: "Luna, quando la vedi, si ferma. Poi: 'Come sapevi che ne avevo bisogno.' Non è una domanda."
+
+      - text: "La brucio — è materiale proibito"
+        effect: "order_duty"
+        affinity_change: { "Luna": -5 }
+        outcome: "Il fumo ha un odore strano. Qualcosa nel bosco nota la perdita."
+
+      - text: "La lascio dove sta"
+        effect: "neutral"
+        outcome: "Qualcuno la raccoglierà. Probabilmente Stella."
+
+  # --- 9. I RESTI DEL RITUALE ---
+  ritual_remnants:
+    id: "ritual_remnants"
+    title: "Le Tracce del Rito"
+    description: "Trovi tracce di un rituale recente nel bosco — cenere, cera, erbe bruciate."
+    type: "investigation"
+    repeatable: true
+
+    trigger:
+      chance: 0.15
+      min_turn: 4
+      allowed_locations: ["ancient_forest", "stone_circle"]
+      allowed_times: ["Morning", "Afternoon"]
+
+    narrative: |
+      Una piccola radura con un cerchio di cera solidificata sul terreno, cenere
+      di erbe rituali ancora fresca, e nel centro — impronte. Piedi nudi.
+      Due persone, forse tre. Il rituale è stato fatto poche ore fa.
+      Come Cacciatore, sai riconoscere i segni di magia attiva.
+      Questo è stato potente. Questo è stato recente.
+      Questa è esattamente la prova che dovresti raccogliere.
+
+    choices:
+      - text: "Documento tutto per il rapporto"
+        effect: "order_investigation"
+        affinity_change: { "Luna": -5, "Stella": -3 }
+        set_flags: { "documented_ritual": true }
+        outcome: "Il capitano della pattuglia è molto interessato. Il Covile sentirà che qualcuno ha guardato troppo da vicino."
+
+      - text: "Cancello le tracce prima che qualcun altro le veda"
+        effect: "protect_coven"
+        affinity_change: { "Luna": 6, "Stella": 4 }
+        outcome: "Nessuno troverà niente. Qualcuno lo saprà — e non dimenticherà."
+
+      - text: "Osservo solo e me ne vado"
+        effect: "neutral"
+        set_flags: { "saw_ritual_remnants": true }
+        outcome: "Sai che qualcosa è successo qui. Userai questa informazione come ritieni."
+
+  # --- 10. IL MESSAGGERO DI CORVUS ---
+  corvus_messenger:
+    id: "corvus_messenger"
+    title: "Il Messaggero"
+    description: "Un messaggero di Corvus arriva con ordini aggiornati — e una scadenza."
+    type: "pressure"
+    repeatable: false
+
+    trigger:
+      chance: 0.10
+      min_turn: 20
+      allowed_locations: ["village_chapel"]
+      allowed_times: ["Afternoon"]
+
+    narrative: |
+      Il messaggero porta il sigillo di Corvus — nero con la croce d'oro.
+      Il capitano te lo consegna con uno sguardo che dice già tutto.
+      Il messaggio è chiaro: il Grande Inquisitore è in marcia.
+      Cinque giorni, forse sei. Vuole un rapporto completo sullo stato delle operazioni.
+      Vuole nomi. 'Se ci sono streghe a Valnera,' scrive nella sua grafia precisa,
+      'portamele. Se non sei in grado, mandami il perché in dettaglio.'
+      Senti il conto alla rovescia che inizia nel momento in cui leggi l'ultima riga.
+
+    choices:
+      - text: "Confermo che l'indagine è in corso — chiedo più tempo"
+        effect: "delay"
+        set_flags: { "corvus_notified_delay": true }
+        outcome: "Corvus accetterà il ritardo. Una volta. Il messaggero parte. Hai guadagnato qualche giorno."
+
+      - text: "Mando un rapporto pulito — niente di sospetto trovato"
+        effect: "protect_coven"
+        affinity_change: { "Luna": 5, "Maria": 5 }
+        set_flags: { "sent_false_report": true, "corvus_suspicion_growing": true }
+        outcome: "Corvus riceve il rapporto. Non ci crede del tutto. Ma aspetta. Per ora."
+
+      - text: "Chiedo rinforzi — ho trovato tracce concrete"
+        effect: "order_betrayal"
+        affinity_change: { "Luna": -15, "Maria": -12, "Stella": -10 }
+        set_flags: { "requested_reinforcements": true }
+        outcome: "I rinforzi vengono inviati. Il Covile ha cinque giorni al massimo. Tutto cambia."
+
+      - text: "Informo il Covile del messaggio"
+        effect: "full_alliance"
+        affinity_change: { "Luna": 10, "Maria": 8, "Stella": 6 }
+        set_flags: { "coven_warned_corvus": true }
+        outcome: "Luna riceve la notizia senza tremare. Poi: 'Sapevo che stava arrivando. Grazie per dirmelo.' Qualcosa tra voi è cambiato. Definitivamente."

@@ -64,6 +64,7 @@ class TurnContext:
     is_temporary: bool = False
     initiative_context: str = ""
     initiative_event_payload: Optional[Dict[str, Any]] = None
+    present_npcs: list = field(default_factory=list)  # NPC presenti nella scena
     # Se non None, execute() ritorna immediatamente con questo risultato
     early_return: Optional[Any] = None   # TurnResult — Any per evitare import circolare
 

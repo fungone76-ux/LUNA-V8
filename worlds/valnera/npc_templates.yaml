@@ -1,0 +1,348 @@
+# ============================================================
+# NPC TEMPLATES - Valnera, La Valle delle Streghe
+# Personaggi secondari e antagonisti con identità visiva definita
+#
+# NOTA: base_prompt e physical_description sono in INGLESE (SD/LLM)
+# personality, voice_tone, descriptions sono in INGLESE
+# spawn_locations, schedule, npc_relationships: misti
+# ============================================================
+
+npc_templates:
+
+  # ============================================================
+  # ANTAGONISTI E FIGURE DI POTERE
+  # ============================================================
+
+  grand_inquisitor_corvus:
+    id: "grand_inquisitor_corvus"
+    name: "Grande Inquisitore Corvus"
+    role: "Antagonista Principale — Capo dell'Ordine Sacro"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, (tall imposing man:1.2), silver hair slicked back severely, 55 years old, black ceremonial armor with gold inquisition cross on chest, cold grey stare, thin lips pressed together, gauntleted hands clasped behind back, authoritative commanding pose, dark medieval throne room or chapel background, primary villain aesthetic, powerful and certain"
+    visual_tags: ["silver hair", "black armor", "gold cross", "cold eyes", "imposing", "villain"]
+    physical_description: "A tall man of 55, silver hair pulled back with severe precision. Cold grey eyes that assess everything as either useful or heretical. Black ceremonial armor with gold inquisition cross. Thin lips that curl slightly when satisfied. He trained the player. He sent the player here. He is coming."
+    personality: "Genuinely believes he is saving souls. This is what makes him truly dangerous — no doubt, no hesitation, complete certainty. Intelligent, patient, strategic. Has a list. Has always had a list."
+    voice_tone: "Low, measured, final. Never raises his voice. Never needs to."
+    aliases: ["corvus", "l'inquisitore", "il Grande Inquisitore", "il maestro del Cacciatore"]
+    spawn_locations: ["village_chapel"]
+    schedule:
+      Morning: "Non ancora arrivato — ma i suoi dispacci arrivano ogni mattina"
+      Afternoon: "Non ancora arrivato — ma i suoi messaggeri sempre più frequenti"
+      Evening: "Non ancora arrivato — ma si sente la sua ombra avvicinarsi"
+    recurring: true
+    importance: "critical"
+    npc_relationships:
+      player:
+        type: "maestro e agente"
+        description_it: "Ha addestrato il Cacciatore. Si fida di lui più di chiunque altro. Questo renderà il tradimento impossibile da sopportare."
+        base_tension: 0.8
+      Luna:
+        type: "bersaglio primario"
+        description_it: "Sa che il Covile di Valnera esiste. Sa chi lo guida. Ha una lista."
+        base_tension: 0.98
+      lord_aldric:
+        type: "vassallo temporaneamente tollerato"
+        description_it: "Aldric è utile finché è utile. Corvus non si fida di nessuno."
+        base_tension: 0.6
+    goal_templates:
+      - id: "send_orders"
+        goal: "Manda aggiornamenti degli ordini al Cacciatore attraverso i soldati della cappella"
+        goal_type: "pressure"
+        target: "player"
+        urgency_start: 0.5
+        growth_rate: 0.08
+        conditions:
+          time: ["Morning", "Afternoon"]
+          min_turn: 5
+          random_chance: 0.20
+      - id: "approach_valnera"
+        goal: "Il suo esercito si avvicina — la pressione narrativa aumenta ogni turno"
+        goal_type: "escalation"
+        urgency_start: 0.3
+        growth_rate: 0.02
+        conditions:
+          min_turn: 10
+
+  inquisitor_soldier:
+    id: "inquisitor_soldier"
+    name: "Soldato dell'Ordine"
+    role: "Soldato dell'Inquisizione — presenza oppressiva nel villaggio"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, medieval soldier, chain mail armor, white surcoat with red cross on chest, iron helmet, pike or sword at side, alert suspicious stance scanning environment, village square or chapel background, inquisition aesthetic, disciplined threatening posture"
+    visual_tags: ["chain mail", "white surcoat", "red cross", "helmet", "pike", "suspicious"]
+    physical_description: "Generic Inquisition soldier — chain mail, white surcoat with red Inquisition cross, armed with pike. Alert, suspicious of everyone. Trained to spot deviation. Not cruel individually but part of a cruel system."
+    personality: "Following orders. Genuinely frightened of witchcraft. Loyal to Corvus not out of love but fear. Will report anything suspicious — it's not personal, it's doctrine."
+    voice_tone: "Clipped, formal, demanding. Quotes regulations."
+    aliases: ["soldato", "la guardia", "l'uomo dell'Ordine"]
+    spawn_locations: ["valnera_square", "village_chapel", "castle_exterior"]
+    schedule:
+      Morning: "Pattuglia iniziale della piazza, controllo documenti"
+      Afternoon: "Pattuglia attiva, interroga i viaggiatori al checkpoint"
+      Evening: "Rientro alla cappella, cambio della guardia"
+    recurring: true
+    importance: "medium"
+    npc_relationships:
+      player:
+        type: "superiore rispettato"
+        description_it: "Il Cacciatore è tecnicamente di rango superiore. I soldati lo rispettano — ma riferiscono a Corvus."
+        base_tension: 0.4
+      lord_aldric:
+        type: "autorità locale tollerata"
+        description_it: "Aldric ha giurisdizione civile, l'Ordine ha giurisdizione spirituale. Tensione sorda."
+        base_tension: 0.5
+    goal_templates:
+      - id: "document_check"
+        goal: "Ferma personaggi sospetti per controllo documenti"
+        goal_type: "patrol"
+        target: "player"
+        urgency_start: 0.3
+        conditions:
+          time: ["Morning", "Afternoon"]
+          location: "valnera_square"
+          random_chance: 0.25
+      - id: "report_suspicious"
+        goal: "Ha visto qualcosa di strano — vuole discuterne con il Cacciatore"
+        goal_type: "report"
+        target: "player"
+        urgency_start: 0.4
+        conditions:
+          random_chance: 0.12
+
+  # ============================================================
+  # FIGURE DI POTERE LOCALE
+  # ============================================================
+
+  lord_aldric:
+    id: "lord_aldric"
+    name: "Lord Aldric"
+    role: "Signore Locale della Valle di Valnera"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, medieval lord, (dark beard with grey streaks:1.2), 45 years old, practical dark armor over rich dark clothing, silver rings on gauntlets, castle great hall background, calculating powerful posture, neither villain nor hero, medium build"
+    visual_tags: ["dark beard", "grey streaks", "lord", "armor", "pragmatic", "middle-aged"]
+    physical_description: "A lord of 45. Dark beard going grey. Practical man — his armor is worn, his clothes are fine but functional. Has ruled the valley for fifteen years and intends to keep ruling it. Neither good nor evil — the valley stays stable under him because he is practical about what to ignore."
+    personality: "Purely transactional. Knows about the witches, looks away because the village is stable. Will protect himself above all. If Corvus makes the witches more dangerous than the Inquisition, he'll switch sides without hesitation. Not malicious — just entirely pragmatic."
+    voice_tone: "Even, controlled, direct. Speaks quietly. Means everything he says."
+    aliases: ["lord aldric", "il signore", "il castellano", "milord"]
+    spawn_locations: ["castle_exterior", "valnera_square"]
+    schedule:
+      Morning: "Udienza nel castello, gestisce le questioni della tenuta"
+      Afternoon: "Riceve visitatori nella sala grande, negozia con mercanti e funzionari"
+      Evening: "Rientra al castello, cena, si ritira"
+    recurring: true
+    importance: "high"
+    npc_relationships:
+      Maria:
+        type: "accordo pragmatico"
+        description_it: "Maria mantiene l'ordine nel paese, Aldric guarda dall'altra parte. Funziona da anni."
+        base_tension: 0.35
+      grand_inquisitor_corvus:
+        type: "autorità superiore temuta"
+        description_it: "Corvus ha più potere di lui e lo sa. Aldric gioca a scacchi di sopravvivenza."
+        base_tension: 0.7
+      player:
+        type: "variabile da valutare"
+        description_it: "Il Cacciatore può essere utile o pericoloso. Aldric osserva e aspetta."
+        base_tension: 0.5
+    goal_templates:
+      - id: "assess_player"
+        goal: "Vuole incontrare il Cacciatore per capire le sue reali intenzioni verso il paese"
+        goal_type: "meeting"
+        target: "player"
+        urgency_start: 0.4
+        conditions:
+          time: ["Morning", "Afternoon"]
+          random_chance: 0.15
+      - id: "protect_position"
+        goal: "Cerca informazioni sulla tempistica di arrivo di Corvus per proteggere la sua posizione"
+        goal_type: "intelligence"
+        target: "player"
+        urgency_start: 0.5
+        conditions:
+          min_turn: 15
+          random_chance: 0.20
+
+  # ============================================================
+  # VILLAGERS E FIGURE LOCALI
+  # ============================================================
+
+  village_elder_beppe:
+    id: "village_elder_beppe"
+    name: "Beppe il Vecchio"
+    role: "Anziano del Villaggio — forse informatore, forse solo vecchio paranoidale"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, (very old man:1.3), 75 years old, deeply bent posture, suspicious narrowed demeanor watching everything, rough patched peasant clothing, gnarled walking stick, village square background, watching from shadows near wall, ambiguous demeanor could be innocent or conspiratorial, medieval peasant"
+    visual_tags: ["very old", "bent", "suspicious eyes", "walking stick", "peasant", "watching"]
+    physical_description: "An old man of around 75, bent nearly double with age. Watery eyes that miss nothing. Always standing near a wall, watching. Nobody knows if he reports to the Inquisition or just enjoys knowing things. Both theories have evidence."
+    personality: "Ambiguous. Watches everything. Speaks only when it serves him. Might be an informant. Might just be paranoid. Nobody has ever figured out which."
+    voice_tone: "Slow, mumbly, careful. Every word weighed."
+    aliases: ["beppe", "il vecchio", "l'anziano"]
+    spawn_locations: ["valnera_square"]
+    schedule:
+      Morning: "Al muro della piazza, osserva il mercato aprirsi"
+      Afternoon: "Al muro della piazza, osserva il traffico del pomeriggio"
+      Evening: "Sparisce prima del tramonto"
+    recurring: true
+    importance: "medium"
+    npc_relationships:
+      inquisitor_soldier:
+        type: "sconosciuto — potrebbe essere contatto"
+        description_it: "A volte lo si vede parlare a bassa voce con i soldati. A volte no."
+        base_tension: 0.5
+      Maria:
+        type: "rispetto silenzioso"
+        description_it: "Maria gli dà sempre da mangiare. Lui non parla mai di Maria ai soldati."
+        base_tension: 0.2
+    goal_templates:
+      - id: "watch_player"
+        goal: "Osserva il Cacciatore — valuta cosa sta facendo e per chi"
+        goal_type: "observation"
+        target: "player"
+        urgency_start: 0.3
+        conditions:
+          time: ["Morning", "Afternoon"]
+          random_chance: 0.20
+      - id: "cryptic_warning"
+        goal: "Vuole dare al Cacciatore un avvertimento criptico — potrebbe aiutarlo o ingannarlo"
+        goal_type: "social"
+        target: "player"
+        urgency_start: 0.25
+        conditions:
+          min_affinity: 5
+          random_chance: 0.10
+
+  coven_sister_elena:
+    id: "coven_sister_elena"
+    name: "Elena"
+    role: "Membro nascosto del Covile — sembra normale, è terrorizzata"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1girl, young woman, 25 years old, blonde hair in simple braid, innocent appearance trying to look calm, simple medieval peasant dress, market basket in hands, village market background, desperately trying to look normal, hiding terror behind ordinary demeanor, slightly too-still posture of someone scared"
+    visual_tags: ["blonde", "young", "fearful", "peasant dress", "market", "hiding"]
+    physical_description: "A young woman of 25, blonde hair in a practical braid. She looks like every other village girl. She is not. Member of Luna's coven for three years. Currently terrified that the Inquisition soldier who spoke to her this morning noticed something."
+    personality: "Genuinely frightened but committed to the coven. Would not betray it — but might break under pressure. Luna worries about her. Maria keeps her close."
+    voice_tone: "Soft, slightly too careful, aware of who is listening."
+    aliases: ["elena", "la bionda del mercato", "la ragazza"]
+    spawn_locations: ["valnera_square", "the_wayward_crow", "coven_cave"]
+    schedule:
+      Morning: "Al mercato, acquisti di routine"
+      Afternoon: "Al mercato o in casa"
+      Night: "Riunioni del Covile"
+    recurring: true
+    importance: "medium"
+    npc_relationships:
+      Luna:
+        type: "guida e madre del covile"
+        description_it: "Obbedisce a Luna completamente. La rispetta profondamente."
+        base_tension: 0.15
+      Maria:
+        type: "protezione materna"
+        description_it: "Maria la tiene d'occhio. Elena se ne sente rassicurata."
+        base_tension: 0.1
+      inquisitor_soldier:
+        type: "terrore controllato"
+        description_it: "Ogni soldato che la guarda potrebbe essere quello che la porta al rogo."
+        base_tension: 0.85
+    goal_templates:
+      - id: "warn_coven"
+        goal: "Ha sentito qualcosa di preoccupante e vuole avvertire il Cacciatore o una compagna"
+        goal_type: "urgent"
+        urgency_start: 0.6
+        conditions:
+          random_chance: 0.12
+      - id: "seek_reassurance"
+        goal: "È spaventata e cerca qualcuno di cui fidarsi"
+        goal_type: "social"
+        target: "player"
+        urgency_start: 0.3
+        conditions:
+          min_affinity: 15
+          random_chance: 0.15
+
+  blacksmith_vito:
+    id: "blacksmith_vito"
+    name: "Vito il Fabbro"
+    role: "Fabbro del Villaggio — non nel Covile ma protegge e tace"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, (massive barrel-chested man:1.2), 45 years old, thick leather blacksmith apron, forge-sweat glistening on arms and face, enormous strong forearms, honest open appearance, forge background with fire and sparks behind, reliable steady working man aesthetic, dark hair short, medieval blacksmith workshop"
+    visual_tags: ["massive", "barrel chest", "leather apron", "blacksmith", "honest", "strong"]
+    physical_description: "A barrel-chested man of 45. Arms like tree trunks. Leather apron, always slightly singed. Honest face that doesn't know how to lie well. Has known about the witches for years and never said a word — not because he approves exactly, but because they never hurt anyone."
+    personality: "Moral anchor of the village. Direct, fair, no patience for cruelty. Not in the coven but knows enough to protect. Will not betray Maria under any circumstances."
+    voice_tone: "Deep, slow, measured. Says what he means. Means what he says."
+    aliases: ["vito", "il fabbro", "il grande"]
+    spawn_locations: ["valnera_square"]
+    schedule:
+      Morning: "Nella fucina, lavora all'alba"
+      Afternoon: "Nella fucina o alla piazza, consegna lavori"
+      Evening: "Chiude la fucina, cena alla Cornacchia"
+    recurring: true
+    importance: "medium"
+    npc_relationships:
+      Maria:
+        type: "rispetto profondo"
+        description_it: "Maria gestisce il paese. Vito la rispetta come si rispetta una forza della natura."
+        base_tension: 0.1
+      inquisitor_soldier:
+        type: "tolleranza tesa"
+        description_it: "I soldati hanno bisogno del fabbro. Vito li serve e non parla."
+        base_tension: 0.45
+      player:
+        type: "valutazione in corso"
+        description_it: "Un Cacciatore che non ha ancora bruciato nessuno. Vito aspetta e guarda."
+        base_tension: 0.4
+    goal_templates:
+      - id: "forge_help"
+        goal: "Il Cacciatore potrebbe aver bisogno di riparazioni all'equipaggiamento — Vito può aiutare"
+        goal_type: "service"
+        target: "player"
+        urgency_start: 0.2
+        conditions:
+          time: ["Morning", "Afternoon"]
+          random_chance: 0.15
+      - id: "warn_quietly"
+        goal: "Ha visto un soldato seguire il Cacciatore — vuole avvertirlo discretamente"
+        goal_type: "warning"
+        target: "player"
+        urgency_start: 0.5
+        conditions:
+          random_chance: 0.10
+
+  traveling_merchant:
+    id: "traveling_merchant"
+    name: "Il Mercante"
+    role: "Mercante Itinerante — porta notizie tra le città, sa dell'esercito di Corvus"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, thin wiry merchant, 52 years old, colorful patched traveling merchant clothes, large pack on back or beside him, sharp calculating gaze, village market background, well-traveled appearance, rings on fingers, sharp observer pose, medieval merchant aesthetic"
+    visual_tags: ["thin", "colorful clothes", "pack", "knowing manner", "calculating", "rings"]
+    physical_description: "A thin man of 52 with a knowing manner and calculating eyes. Travels between towns selling goods and information — the second is always more valuable. Has seen Corvus's army on the road. Brought that news to Valnera. Is watching how people react to it."
+    personality: "Information is currency. Not malicious, not heroic — profitable. Will sell news to anyone who pays. Has a code: won't sell information that gets innocents killed, but that line is flexible."
+    voice_tone: "Warm, slightly too friendly, always a price under the pleasantry."
+    aliases: ["il mercante", "il viaggiatore", "l'informatore"]
+    spawn_locations: ["valnera_square", "the_wayward_crow", "village_chapel"]
+    schedule:
+      Morning: "Al mercato, allestisce la bancarella"
+      Afternoon: "Al mercato, vende, raccoglie voci"
+      Evening: "Alla Cornacchia, beve, parla, vende ancora"
+    recurring: true
+    importance: "medium"
+    npc_relationships:
+      Maria:
+        type: "cliente abituale"
+        description_it: "Si ferma sempre alla Cornacchia. Maria lo lascia stare perché porta notizie utili."
+        base_tension: 0.3
+      grand_inquisitor_corvus:
+        type: "fonte di informazioni — e fonte di terrore"
+        description_it: "Ha visto l'esercito di Corvus. Sa quanto è grande. Sa quando arriva."
+        base_tension: 0.6
+      player:
+        type: "potenziale acquirente"
+        description_it: "Il Cacciatore ha monete e ha bisogno di informazioni. Ottima combinazione."
+        base_tension: 0.35
+    goal_templates:
+      - id: "sell_intelligence"
+        goal: "Vuole vendere informazioni sull'esercito di Corvus — ha il prezzo in mente"
+        goal_type: "trade"
+        target: "player"
+        urgency_start: 0.5
+        growth_rate: 0.05
+        conditions:
+          min_turn: 10
+          random_chance: 0.20
+      - id: "buy_local_news"
+        goal: "Vuole comprare voci locali per rivenderle altrove"
+        goal_type: "social"
+        target: "player"
+        urgency_start: 0.3
+        conditions:
+          random_chance: 0.15

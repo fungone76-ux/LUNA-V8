@@ -1,0 +1,324 @@
+# ============================================================
+# LUNA RPG v4 - WORLD CONFIGURATION
+# School Life Complete Edition
+# ============================================================
+
+meta:
+  id: "school_life_complete"
+  name: "Scuola di Provinzia"
+  genre: "Slice of Life, Romance, Erotic (18+)"
+  version: "4.0.0"
+  description: |
+    Un nuovo studente si trasferisce nel liceo "Leonardo da Vinci" di una cittadina di provincia.
+    Deve sciogliere i propri blocchi emotivi attraverso connessioni profonde con tre donne:
+    Maria (bidella 42enne, invisibile), Stella (compagna 18enne, snob), 
+    Luna (professoressa 38enne, divorziata).
+    
+  lore: |
+    Il Liceo "Leonardo da Vinci" è un istituto storico di una cittadina di provincia italiana.
+    Un luogo dove le vite si intrecciano tra lezioni, ricreazioni e segreti che si sussurrano nei corridoi.
+    Il protagonista è un nuovo arrivato, determinato a conquistare chiunque gli capiti a tiro,
+    dalla bidella trascurata alla professoressa più ambita.
+
+# ============================================================
+# PLAYER CHARACTER
+# ============================================================
+player_character:
+  identity:
+    name: "Protagonista"
+    age: 18
+    background: "Nuovo studente trasferito, determinato e carismatico"
+  
+  starting_stats:
+    strength: 10
+    mind: 10
+    charisma: 15
+    gold: 50
+
+# ============================================================
+# GAMEPLAY SYSTEMS
+# ============================================================
+gameplay_systems:
+  affinity:
+    enabled: true
+    tiers:
+      - threshold: 0
+        name: "Sconosciuto"
+        description: "Appena conosciuti"
+      - threshold: 20
+        name: "Conoscente"
+        description: "Primi contatti"
+      - threshold: 50
+        name: "Amico"
+        unlocked_actions: ["flirt", "regalo", "abbraccio"]
+      - threshold: 75
+        name: "Intimo"
+        unlocked_actions: ["appuntamento", "bacio"]
+      - threshold: 100
+        name: "Conquistato"
+        unlocked_actions: ["intimo"]
+  
+  economy:
+    enabled: true
+    currency: "euro"
+    starting_amount: 50
+    prices:
+      caffè: 2
+      regalo_fiori: 15
+      cena: 40
+      cinema: 12
+  
+  reputation:
+    enabled: true
+    factions:
+      studenti:
+        starting: 0
+        description: "Gli altri studenti"
+      professori:
+        starting: 5
+        description: "Il corpo docente"
+
+# ============================================================
+# NARRATIVE ARC (con Story Beats)
+# ============================================================
+narrative_arc:
+  premise: |
+    Storia di conquista e maturazione in un liceo di provincia.
+    Il protagonista deve costruire relazioni autentiche attraverso affinità emotiva,
+    non turni passivi. Ogni personaggio ha un arco specifico:
+    Maria (invisibile→devota), Stella (snob→gelosa), Luna (rigida→trasgressiva).
+  
+  themes:
+    - "conquista"
+    - "intimità"
+    - "eros"
+    - "trasgressione"
+    - "desiderio"
+  
+  hard_limits:
+    - "Tutti i personaggi sono adulti consenzienti (18+)"
+    - "Stella ha 18 anni (studente adulta)"
+    - "Nessuna forza o coercizione"
+    - "Progressione naturale basata su affinità"
+  
+  soft_guidelines: []
+  
+  beats:
+    # === MARIA (Bidella 42 anni) ===
+    - id: "maria_primo_sguardo"
+      description: "Maria si accorge che qualcuno finalmente la vede come donna"
+      trigger: "affinity_Maria >= 20"
+      required_elements: ["sguardo", "sorpresa", "arrossire"]
+      tone: "awkward_intimate"
+      once: true
+      consequence: "maria_flag_first_noticed = true"
+    
+    - id: "maria_confessione_solitudine"
+      description: "Maria confessa la sua invisibilità e solitudine"
+      trigger: "affinity_Maria >= 50"
+      required_elements: ["confessione", "solitudine", "lacrime"]
+      tone: "vulnerable"
+      once: true
+      consequence: "maria_flag_confessed = true"
+    
+    - id: "maria_devozione_totale"
+      description: "Maria si offre completamente, diventa devota"
+      trigger: "affinity_Maria >= 85"
+      required_elements: ["devozione", "sottomissione", "amore"]
+      tone: "passionate_devoted"
+      once: true
+      consequence: "maria_flag_devoted = true, maria_accepted_young_lover = true"
+    
+    # === STELLA (Compagna 18 anni) ===
+    - id: "stella_servizio_fotografico"
+      description: "Il servizio fotografico dove Stella capisce che sei diverso"
+      trigger: "affinity_Stella >= 50"
+      required_elements: ["fotocamera", "sguardo", "cambiamento"]
+      tone: "tense_romantic"
+      once: true
+      consequence: "stella_flag_photoshoot = true"
+    
+    - id: "stella_gelosia_esplosiva"
+      description: "Stella esplode di gelosia e ti reclama pubblicamente"
+      trigger: "affinity_Stella >= 75 AND flag:stella_flag_jealous >= 1"
+      required_elements: ["gelosia", "confronto", "possessività"]
+      tone: "dramatic_possessive"
+      once: true
+      consequence: "stella_flag_possessive = true"
+    
+    - id: "stella_dichiarazione_totale"
+      description: "Stella si dichiara completamente tua"
+      trigger: "affinity_Stella >= 90"
+      required_elements: ["dichiarazione", "totale", "amore"]
+      tone: "passionate_obsessive"
+      once: true
+      consequence: "stella_confessed_love = true"
+    
+    # === LUNA (Professoressa 38 anni) ===
+    - id: "luna_confessione_divorzio"
+      description: "Luna confessa il suo divorzio e bisogno di calore"
+      trigger: "affinity_Luna >= 40"
+      required_elements: ["confessione", "divorzio", "bisogno"]
+      tone: "vulnerable_conflicted"
+      once: true
+      consequence: "luna_flag_confessed_divorce = true"
+    
+    - id: "luna_lezione_privata"
+      description: "La lezione privata dove i freni cedono"
+      trigger: "affinity_Luna >= 60 AND location == luna_office"
+      required_elements: ["porta_chiusa", "tensione", "trasgressione"]
+      tone: "forbidden_tense"
+      once: true
+      consequence: "luna_flag_private_lesson = true"
+    
+    - id: "luna_scelta_finale"
+      description: "Luna sceglie te nonostante il rischio carriera"
+      trigger: "affinity_Luna >= 90"
+      required_elements: ["scelta", "rischio", "amore"]
+      tone: "dramatic_romantic"
+      once: true
+      consequence: "luna_confessed_love = true"
+
+# ============================================================
+# NPC DETECTION HINTS (for generic NPC generation)
+# ============================================================
+npc_logic:
+  female_hints:
+    - donna
+    - ragazza
+    - segretaria
+    - bibliotecaria
+    - cameriera
+    - infermiera
+    - professoressa
+    - studentessa
+    - bidella
+    - signora
+  
+  male_hints:
+    - uomo
+    - ragazzo
+    - professore
+    - preside
+    - bidello
+    - studente
+    - signore
+    - commesso
+    - barista
+
+# ============================================================
+# ENDGAME
+# ============================================================
+endgame:
+  description: "Conquista tutte e tre le protagoniste"
+  victory_conditions:
+    - type: "companion_conquered"
+      target: "Maria"
+      requires:
+        - affinity: 100
+        - flag: "maria_accepted_young_lover"
+    
+    - type: "companion_conquered"
+      target: "Stella"
+      requires:
+        - affinity: 100
+        - flag: "stella_confessed_love"
+    
+    - type: "companion_conquered"
+      target: "Luna"
+      requires:
+        - affinity: 100
+        - flag: "luna_confessed_love"
+
+# ============================================================
+# GM AGENDA — Arc threads, Dramatic Questions, Climate
+# ============================================================
+gm_agenda:
+
+  default_climate: >
+    Un liceo di provincia dove ogni sguardo ha un peso e ogni silenzio
+    nasconde qualcosa. La routine scolastica è la superficie — sotto covano
+    desideri repressi, solitudine e tensioni che cercano uno sfogo.
+
+  dramatic_questions:
+    UNKNOWN:   "Chi sei tu per {name} — un altro studente o qualcosa di diverso?"
+    ARMOR:     "{name} abbassa la guardia o costruisce un muro più alto?"
+    CRACKS:    "Il momento di autenticità durerà o verrà ritrattato?"
+    CONFLICT:  "{name} sceglie il desiderio o il ruolo che si è costruita?"
+    SURRENDER: "Quanto in profondità si spingerà la vulnerabilità di {name}?"
+    DEVOTED:   "Cosa è disposta a rischiare {name} per proteggerti?"
+
+  arc_threads:
+
+    Luna:
+      UNKNOWN: >
+        La professoressa ti ha inquadrato: nuovo studente, probabilmente problematico.
+        Ti osserva con la distanza professionale di chi ha imparato a non coinvolgersi.
+      ARMOR: >
+        Luna mantiene la linea prof-studente con precisione chirurgica — ogni
+        avvicinamento viene reindirizzato verso il registro o il programma scolastico.
+        Ma a volte indugia un secondo di troppo.
+      CRACKS: >
+        Il divorzio le pesa più di quanto ammetta. In certi momenti dimentica
+        di essere la professoressa e diventa semplicemente una donna di 38 anni
+        che non è stata guardata davvero da molto tempo.
+      CONFLICT: >
+        Sa che quello che sta provando è sbagliato per il suo ruolo — e non riesce
+        a smettere di pensarci. Ogni interazione con te diventa una battaglia
+        tra la donna che è e il personaggio che recita.
+      SURRENDER: >
+        I freni cedono uno per uno. Non è impulsività — è la stanchezza di resistere
+        a qualcosa che sente come inevitabile. La porta dell'ufficio si chiude.
+      DEVOTED: >
+        Ha scelto. Sa cosa rischia — la carriera, la reputazione, tutto. Lo ha
+        soppesato e ha scelto lo stesso. Adesso ti protegge con la stessa
+        determinazione con cui prima ti teneva a distanza.
+
+    Maria:
+      UNKNOWN: >
+        Ti vede come vede tutti: uno studente di passaggio. Anni di invisibilità
+        le hanno insegnato a non aspettarsi di essere notata davvero.
+      ARMOR: >
+        Maria non ha un muro — ha una rassegnazione. Non si difende perché non
+        si aspetta che valga la pena difendersi. La gentilezza genuina la
+        disorienta completamente.
+      CRACKS: >
+        Per la prima volta qualcuno la vede. Non il servizio che rende,
+        non la divisa — lei. Reagisce con goffaggine e meraviglia in parti uguali.
+        Non sa come comportarsi quando non è invisibile.
+      CONFLICT: >
+        La differenza d'età pesa su di lei come un giudizio permanente. Vuole
+        credere che sia reale, teme di essere ridicola. Oscilla tra aprirsi
+        e sparire di nuovo.
+      SURRENDER: >
+        Ha smesso di chiedersi se merita. La devozione che dà non è debolezza —
+        è la generosità di qualcuno che ha aspettato troppo a lungo di poterla esprimere.
+      DEVOTED: >
+        Maria non fa le cose a metà. Adesso che ha scelto di fidarsi,
+        si fida completamente. Ti porta il caffè prima che tu lo chieda.
+        Sa dove sei prima ancora che tu glielo dica.
+
+    Stella:
+      UNKNOWN: >
+        Nuovo studente — categoria "da ignorare" finché non dimostra di meritare
+        attenzione. Stella ha standard alti e poca pazienza per chi non li soddisfa.
+      ARMOR: >
+        Lo snobismo è uno scudo costruito con cura. Stella vuole essere desiderata
+        ma mai raggiunta. La sfida implicita è: sei abbastanza interessante
+        da farmi abbassare la guardia?
+      CRACKS: >
+        Qualcosa in te l'ha disturbata. Non riesce a catalogarti come gli altri
+        e questo la infastidisce. L'irritazione che mostra è inversamente
+        proporzionale alla sicurezza che sente.
+      CONFLICT: >
+        Stella non sa come gestire qualcuno che non la insegue in modo prevedibile.
+        Il controllo le sta scivolando dalle mani e non sa se odiarlo o volerne di più.
+        La gelosia che prova la sorprende per prima.
+      SURRENDER: >
+        L'orgoglio cede di fronte all'evidenza. Non lo ammetterà facilmente —
+        ma quando lo fa, lo fa in modo totale e teatrale, come tutto ciò
+        che riguarda Stella.
+      DEVOTED: >
+        Stella possiede ciò che ama. Non è possessività tossica — è il modo
+        in cui esprime un attaccamento che non sa ancora come nominare.
+        Ti difende pubblicamente, senza chiederti il permesso.

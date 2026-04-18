@@ -503,23 +503,32 @@ class IntentHandlersMixin:
                 is_too_long = word_count > 10
                 
                 # Skip if passive observation words present
-                passive_words = ['guardo', 'vedo', 'noto', 'osservo', 'guardando', 'vedendo', 
-                                'guardo', 'vedo', 'watch', 'look', 'see', 'observing']
+                passive_words = ['vedo', 'noto', 'osservo', 'guardando', 'vedendo',
+                                'watch', 'look', 'see', 'observing']
                 has_passive = any(w in lower for w in passive_words)
-                
-                # Require active approach words for short commands
+
+                # Require active approach/interaction words for short commands
                 active_words = ['vado', 'parlo', 'approccio', 'incontro', 'cerco', 'chiamo',
-                               'go', 'talk', 'approach', 'meet', 'find', 'call']
+                               'ascolto', 'sento', 'chiedo', 'rispondo', 'guardo',
+                               'go', 'talk', 'approach', 'meet', 'find', 'call', 'listen', 'ask']
                 has_active = any(w in lower for w in active_words)
-                
-                # Conservative switch: only if explicit intent
-                should_switch = not is_roleplay and not is_too_long and not has_passive
-                
-                # If short but no active words, be extra conservative
-                # Exception: in solo mode, any explicit name mention is enough to switch
+
+                # Se l'active è un NPC temporaneo e si menziona un companion,
+                # ignora i limiti di lunghezza e passività — switch sempre permesso
                 in_solo = (old == _SOLO_COMPANION)
-                if word_count <= 5 and not has_active and not in_solo:
-                    should_switch = False
+                old_is_npc = (
+                    self.engine.world.npc_templates.get(old) is not None
+                    and self.engine.world.companions.get(old) is None
+                )
+
+                if old_is_npc:
+                    # Con NPC attivo: basta che il companion sia menzionato
+                    should_switch = not is_roleplay
+                else:
+                    # Logica conservativa standard
+                    should_switch = not is_roleplay and not is_too_long and not has_passive
+                    if word_count <= 5 and not has_active and not in_solo:
+                        should_switch = False
                 
                 if should_switch:
                     comp_def = self.engine.world.companions.get(mentioned)

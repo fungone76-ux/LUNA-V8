@@ -1,0 +1,40 @@
+# Environments
+.env
+.venv
+.env1
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Logs
+logs/
+*.log
+
+# Caches
+.aider*
+.idea/
+.pytest_cache/
+.coverage
+
+# Config / Sensitive data
+*credentials*.json
+*.json
+!/config/comfy_workflow_image.json
+!/config/comfy_workflow_video.json
+!/package.json
+
+# Storage / User Data
+storage/
+worlds/*/saves/
+worlds/*/temp/
+
+# Unwanted Archives
+*.rar
+*.zip
+*.tar.gz
+
+# Temp files
+temp*.txt
+chat.py

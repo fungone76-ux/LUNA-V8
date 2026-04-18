@@ -1,0 +1,475 @@
+# ============================================================
+# LOCATIONS - Valnera, La Valle delle Streghe
+# Tutti i luoghi del mondo di gioco
+# visual_style: English (per ComfyUI)
+# descriptions: Italiano
+# ============================================================
+
+locations:
+
+  # ============================================================
+  # VALNERA SQUARE — Piazza del Villaggio
+  # ============================================================
+  valnera_square:
+    id: "valnera_square"
+    name: "Piazza di Valnera"
+    aliases:
+      - piazza
+      - piazza di valnera
+      - square
+      - centro
+      - mercato
+      - village square
+    description: |
+      Il cuore del villaggio. Bancarelle del mercato, un pozzo di pietra al centro,
+      strade di fango battuto. Il cielo è quasi sempre coperto — la nebbia scende
+      dalla montagna e non se ne va mai del tutto. I villagers si muovono veloci,
+      occhi bassi. I soldati dell'Inquisizione pattugliano in coppia.
+      Qui si vede tutto. E niente viene dimenticato.
+    visual_style: "medieval village square, market stalls with rough goods, stone well center, muddy cobblestone streets, overcast grey sky, mist in air, inquisition soldiers patrolling, villagers avoiding eye contact, dark medieval atmosphere, oppressive grey light"
+    connected_to:
+      - the_wayward_crow
+      - luna_apothecary
+      - village_chapel
+      - forest_edge
+      - castle_exterior
+    available_characters:
+      - Maria
+      - Luna
+      - villagers
+      - inquisitor_soldier
+      - village_elder_beppe
+      - blacksmith_vito
+    available_times:
+      - Morning
+      - Afternoon
+      - Evening
+      - Night
+    ambient:
+      Morning: "La piazza si sveglia lentamente. Il fumo dai camini, i commercianti che aprono. I soldati iniziano il giro."
+      Afternoon: "Il mercato è nel pieno. Occhi ovunque. I soldati dell'Ordine sono visibili da ogni angolo."
+      Evening: "Le bancarelle chiudono. La piazza si svuota in fretta. Nessuno vuole stare fuori dopo il tramonto."
+      Night: "Silenzio di pietra. Solo le torce e le ronde notturne. Chi è sveglio non vuole essere visto."
+
+  # ============================================================
+  # THE WAYWARD CROW — L'Osteria della Cornacchia Randagia
+  # ============================================================
+  the_wayward_crow:
+    id: "the_wayward_crow"
+    name: "La Cornacchia Randagia"
+    aliases:
+      - locanda
+      - osteria
+      - cornacchia
+      - tavern
+      - inn
+      - wayward crow
+      - da maria
+    description: |
+      L'osteria di Maria. Travi di legno scuro, un camino sempre acceso, tavoli di rozza quercia,
+      odore di birra e stufato. È il posto più caldo di Valnera — fisicamente e nel senso
+      che qui la gente parla. Maria sente tutto, dimentica niente.
+      Il piano di sopra è dove dormono i forestieri. Il piano di sotto nasconde qualcosa
+      che solo pochi conoscono.
+    visual_style: "medieval tavern interior, dark oak beams, roaring fireplace crackling with orange flame, tallow candles on rough tables, ale mugs and wooden bowls, stone floor, warm amber lighting, rustic worn atmosphere, smoke-stained walls, low ceiling"
+    connected_to:
+      - valnera_square
+      - player_room
+      - hidden_tunnels
+    available_characters:
+      - Maria
+      - traveling_merchant
+    available_times:
+      - Morning
+      - Afternoon
+      - Evening
+      - Night
+    ambient:
+      Morning: "L'osteria è semideserta. Qualche viaggiatore e la colazione. Maria prepara il fuoco."
+      Afternoon: "Qualche cliente di passaggio. Maria serve e ascolta. Sempre ascolta."
+      Evening: "L'ora più viva. Vino, voci basse, segreti che si sfiorano. Maria è ovunque e da nessuna parte."
+      Night: "Chiusa al pubblico. Buio e silenzio — o così sembra."
+
+  # ============================================================
+  # PLAYER ROOM — La Stanza del Cacciatore
+  # ============================================================
+  player_room:
+    id: "player_room"
+    name: "La Stanza"
+    aliases:
+      - stanza
+      - camera
+      - my room
+      - stanza mia
+      - camera mia
+      - sopra la locanda
+      - casa
+      - casa mia
+      - a casa
+      - home
+    description: |
+      Piccola stanza sopra l'osteria. Materasso di paglia, una candela sul davanzale,
+      una finestra che dà sulla piazza. Abbastanza privata da non sentirsi in trappola.
+      Non abbastanza da sentirsi al sicuro. Qui il Cacciatore dorme — o ci prova.
+    visual_style: "small medieval room above tavern, straw mattress on wooden frame, single tallow candle on windowsill, rough stone walls, small window overlooking village square at night, intimate private atmosphere, warm candlelight against cold stone"
+    connected_to:
+      - the_wayward_crow
+    available_characters:
+      - Maria
+      - Luna
+      - Stella
+    available_times:
+      - Evening
+      - Night
+    access_restrictions:
+      requires_flag: "room_rented"
+      restriction_note: "Solo dopo aver affittato la stanza da Maria (5 monete d'argento)"
+    ambient:
+      Evening: "La luce della piazza entra dalla finestra. Passi sulle travi. Voci soffocate dal piano di sotto."
+      Night: "Silenzio assoluto fuori. Dentro, solo il respiro e la candela che trema."
+
+  # ============================================================
+  # LUNA'S APOTHECARY — L'Apotecario di Luna
+  # ============================================================
+  luna_apothecary:
+    id: "luna_apothecary"
+    name: "L'Apotecario della Guaritrice"
+    aliases:
+      - apotecario
+      - erboristeria
+      - luna
+      - da luna
+      - apothecary
+      - shop
+      - negozio
+    description: |
+      Il negozio di erbe di Luna. Facciata di rispettabilità: erbe secche appese al soffitto,
+      boccette di vetro colorato, odore di lavanda e menta. I soldati ci entrano per i rimedi
+      e non si accorgono di niente. Dietro il bancone c'è una porta.
+      Dietro la porta c'è la donna vera.
+    visual_style: "medieval apothecary shop, dried herbs hanging from low wooden ceiling, glass bottles with colored liquids on shelves, candlelight warm glow, old wooden shelves with mysterious ingredients, partially hidden spell books, herbalist atmosphere, amber and green light tones"
+    connected_to:
+      - valnera_square
+      - apothecary_inner
+    available_characters:
+      - Luna
+    available_times:
+      - Morning
+      - Afternoon
+      - Evening
+    ambient:
+      Morning: "Luna serve i clienti mattinieri con professionale distanza. La maschera è perfetta."
+      Afternoon: "L'apotecario è aperto. Luna misura, pesa, dispensa rimedi. Non una parola di troppo."
+      Evening: "Il negozio sta chiudendo. La luce cambia. Luna è meno guaritrice, più strega."
+
+  # ============================================================
+  # APOTHECARY INNER — La Stanza Interna
+  # ============================================================
+  apothecary_inner:
+    id: "apothecary_inner"
+    name: "La Stanza dei Rituali"
+    aliases:
+      - retro apotecario
+      - stanza dei rituali
+      - inner room
+      - stanza interna
+      - dietro il bancone
+    description: |
+      Il retro dell'apotecario. Qui la facciata sparisce.
+      Sul pavimento di pietra, un cerchio rituale inciso con i simboli antichi.
+      Scaffali scuri con ingredienti che nessun guaritrice legittima dovrebbe avere.
+      Un altare basso al centro. Candele nere. L'aria è più densa qui — carica di qualcosa
+      che non è odore di erbe. È potere. È lei.
+    visual_style: "secret ritual chamber, stone floor with deeply carved ritual circle glowing faintly, black candles in silver holders, dark shelves with forbidden occult ingredients, small stone altar, atmospheric ground fog, dramatic shadows, warm candlelight against cold stone, occult symbols on walls"
+    connected_to:
+      - luna_apothecary
+    available_characters:
+      - Luna
+      - Stella
+    available_times:
+      - Evening
+      - Night
+    access_restrictions:
+      requires_flag: "luna_trusts_player"
+      restriction_note: "Luna deve fidarsi abbastanza da mostrare questa stanza"
+    ambient:
+      Evening: "Le candele nere bruciano. Luna lavora senza parlare. Ogni gesto è preciso, rituale."
+      Night: "Il cerchio sul pavimento sembra respirare. La notte rende il potere di Luna visibile."
+
+  # ============================================================
+  # ANCIENT FOREST — Il Bosco Antico
+  # ============================================================
+  ancient_forest:
+    id: "ancient_forest"
+    name: "Il Bosco Antico"
+    aliases:
+      - bosco
+      - foresta
+      - bosco antico
+      - forest
+      - woods
+      - alberi
+    description: |
+      Il bosco a est di Valnera. Gli alberi sono vecchi di secoli — troppo vecchi,
+      troppo storti. Si dice che respirino di notte. I soldati dell'Inquisizione
+      non ci entrano. I villager ci entrano solo di giorno, e non troppo in profondità.
+      Luci argentate tra i rami. Occhi nel buio. Qualcosa di antico veglia qui.
+      E qualcosa di più recente — e molto più pericoloso — lo chiama casa.
+    visual_style: "enchanted dark forest, ancient massive twisted trees with gnarled roots, silver moonlight filtering between dense canopy, glowing bioluminescent mushrooms on forest floor, ground mist flowing between roots, mysterious atmospheric shadows, ethereal silver-green light, fantasy medieval setting, otherworldly beauty"
+    connected_to:
+      - forest_edge
+      - stone_circle
+      - stella_lair
+    available_characters:
+      - Stella
+    available_times:
+      - Morning
+      - Afternoon
+      - Evening
+      - Night
+    danger_note: "Pericoloso di notte senza Stella — la magia del bosco diventa incontrollabile"
+    ambient:
+      Morning: "La nebbia mattutina è densa tra i tronchi. Il bosco sembra dormire. Sembra."
+      Afternoon: "Qualche raggio di sole filtra. Ma il bosco ha sempre la sensazione di essere guardati."
+      Evening: "Il crepuscolo trasforma il bosco. I funghi cominciano a brillare. Qualcosa si muove."
+      Night: "Il bosco è vivo di notte. Ogni suono è amplificato. Ogni ombra si muove. Stella è l'unica protezione."
+
+  # ============================================================
+  # FOREST EDGE — Il Margine del Bosco
+  # ============================================================
+  forest_edge:
+    id: "forest_edge"
+    name: "Il Margine del Bosco"
+    aliases:
+      - margine bosco
+      - confine bosco
+      - forest edge
+      - treeline
+      - bordo bosco
+    description: |
+      Il confine tra il villaggio e il bosco. Qui il terreno cambia — dalla pietra e fango
+      alle radici e all'erba alta. I bambini del villaggio sanno che non si passa.
+      Da qui si sente Valnera alle spalle e il bosco davanti.
+      Stella a volte si siede sulle radici e guarda il villaggio da lontano.
+      Come se studiasse un branco che non le appartiene.
+    visual_style: "forest treeline border, last houses of medieval village behind, towering ancient trees ahead, rough grass and exposed roots at transition zone, overcast sky, late afternoon or dusk light, lonely boundary atmosphere, isolation mood"
+    connected_to:
+      - valnera_square
+      - ancient_forest
+    available_characters:
+      - Stella
+    available_times:
+      - Morning
+      - Afternoon
+      - Evening
+      - Night
+    ambient:
+      Morning: "La nebbia del bosco si mescola con quella del villaggio. Un limbo."
+      Afternoon: "Il confine è nitido alla luce del giorno. Due mondi distinti."
+      Evening: "Il bosco si avvicina al tramonto. Le ombre crescono verso il villaggio."
+      Night: "Da qui si sentono le cose del bosco. E si sente anche Stella, se si sa ascoltare."
+
+  # ============================================================
+  # STONE CIRCLE — Il Cerchio di Pietra
+  # ============================================================
+  stone_circle:
+    id: "stone_circle"
+    name: "Il Cerchio di Pietra"
+    aliases:
+      - cerchio di pietra
+      - cerchio
+      - pietre
+      - stone circle
+      - standing stones
+      - sito rituale
+    description: |
+      Un antico sito rituale nel profondo del bosco. Pietre erette alte due metri,
+      incise con simboli che nessuno sa leggere tranne Luna e Stella.
+      L'erba dentro il cerchio non cresce mai. Il terreno è sempre tiepido.
+      Qui il Covile si riunisce. Qui la magia è più forte di qualunque altra parte
+      di Valnera. Qui anche il Cacciatore sente qualcosa che non sa spiegare.
+    visual_style: "ancient stone circle in moonlit clearing, massive standing stones with carved glowing runes pulsing with soft light, deep forest surrounding, ritual candles placed around perimeter, ground mist, dramatic dark sky with full moon, occult atmosphere, powerful and sacred energy, medieval fantasy"
+    connected_to:
+      - ancient_forest
+      - coven_cave
+    available_characters:
+      - Luna
+      - Stella
+    available_times:
+      - Evening
+      - Night
+    access_restrictions:
+      requires_flag: "knows_stone_circle"
+      restriction_note: "Il Cacciatore deve sapere dove si trova"
+    ambient:
+      Evening: "Le pietre captano la luce del tramonto in modo strano. Come se riflettessero qualcosa che non è lì."
+      Night: "Al chiaro di luna, le incisioni sulle pietre brillano. Luna o Stella potrebbero essere qui."
+
+  # ============================================================
+  # STELLA'S LAIR — Il Rifugio di Stella
+  # ============================================================
+  stella_lair:
+    id: "stella_lair"
+    name: "Il Rifugio nel Bosco"
+    aliases:
+      - rifugio
+      - rifugio di stella
+      - tana
+      - lair
+      - grotta stella
+      - riparo
+    description: |
+      Nascosto nel profondo del bosco antico, il rifugio di Stella è allo stesso tempo
+      selvaggio e stranamente caldo. Pellicce di animali sul terreno. Erbe selvatiche
+      appese a corde tra i rami. Un piccolo fuoco che non si spegne mai.
+      L'apertura di una cavità rocciosa le fa da tetto. Qui Stella è nel suo elemento —
+      pericolosa, libera, e per la prima volta in anni, non sola.
+    visual_style: "hidden forest shelter in natural cave opening, animal fur and hide bedding, small firepit with crackling flame, hanging bundles of wild herbs from tree branches, rough natural stone walls, intimate warm firelight against surrounding dark forest, wild and primal atmosphere, cozy yet dangerous energy"
+    connected_to:
+      - ancient_forest
+    available_characters:
+      - Stella
+    available_times:
+      - Evening
+      - Night
+    access_restrictions:
+      requires_flag: "stella_trusts_player"
+      restriction_note: "Stella deve portarti lei stessa — non si trova da soli"
+    ambient:
+      Evening: "Il fuoco nel rifugio è l'unica luce calda nel bosco. Stella si muove come un'ombra."
+      Night: "Nel rifugio la notte diventa qualcos'altro. Il bosco fuori è vivo. Dentro, sono solo loro."
+
+  # ============================================================
+  # HIDDEN TUNNELS — I Tunnel Segreti
+  # ============================================================
+  hidden_tunnels:
+    id: "hidden_tunnels"
+    name: "I Tunnel Segreti"
+    aliases:
+      - tunnel
+      - tunnel segreti
+      - cunicoli
+      - sotterranei
+      - tunnels
+      - passaggi segreti
+    description: |
+      Corridoi di pietra sotto il villaggio, scavati con le mani di Maria
+      vent'anni fa, nel mese dopo che Giacomo è morto.
+      Torce ogni dieci metri. Pareti grezze. L'odore della terra e della cera.
+      Questi tunnel sono la differenza tra la vita e la morte per il Covile —
+      vie di fuga, punti di incontro, archivi nascosti.
+      Maria li percorre come se fossero le vene del suo corpo.
+    visual_style: "underground stone tunnel passage, rough-hewn stone walls with ancient masonry, torch sconces every few meters casting dancing orange light, shadows deep between pools of light, narrow passage with low ceiling, damp ancient atmosphere, medieval underground, secret passageway feel"
+    connected_to:
+      - the_wayward_crow
+      - coven_cave
+    available_characters:
+      - Maria
+    available_times:
+      - Night
+    access_restrictions:
+      requires_flag: "maria_showed_tunnels"
+      restriction_note: "Solo Maria può portarti qui la prima volta"
+    ambient:
+      Night: "Il silenzio dei tunnel è totale tranne per i passi e il crepitio dei fuochi. Maria conosce ogni svolta."
+
+  # ============================================================
+  # COVEN CAVE — La Grotta del Covile
+  # ============================================================
+  coven_cave:
+    id: "coven_cave"
+    name: "La Grotta del Covile"
+    aliases:
+      - grotta
+      - covile
+      - grotta del covile
+      - coven cave
+      - tana delle streghe
+      - riunione covile
+    description: |
+      Il luogo di riunione del Covile di Valnera. Una camera sotterranea naturale
+      raggiunta dai tunnel di Maria o dal bosco attraverso il cerchio di pietra.
+      Un altare di pietra al centro. Sedili di pietra in cerchio. Torce alle pareti
+      tra simboli incisi nell'oscurità. Il fuoco rituale al centro non si spegne
+      tra una riunione e l'altra. Questo è il cuore del segreto che il Cacciatore
+      dovrebbe distruggere. Questo è il posto più sacro che abbia mai visto.
+    visual_style: "underground ritual chamber, vaulted natural stone ceiling, central stone altar with ritual offerings, ring of wall torches casting dramatic light, carved occult symbols in stone, ancient stone seats in circle, perpetual ritual fire at center, candle smoke lingering, deep shadows and warm firelight contrast, powerful sacred occult atmosphere"
+    connected_to:
+      - hidden_tunnels
+      - stone_circle
+    available_characters:
+      - Luna
+      - Maria
+      - Stella
+      - coven_sister_elena
+    available_times:
+      - Night
+    access_restrictions:
+      requires_flag: "admitted_to_coven"
+      restriction_note: "Il Covile deve decidere all'unanimità di ammettere il Cacciatore"
+    ambient:
+      Night: "La grotta risuona di voci basse e fuoco. Il potere qui è tangibile — quasi opprimente."
+
+  # ============================================================
+  # CASTLE EXTERIOR — Il Castello di Lord Aldric
+  # ============================================================
+  castle_exterior:
+    id: "castle_exterior"
+    name: "Il Castello di Aldric"
+    aliases:
+      - castello
+      - castello di aldric
+      - castle
+      - fortezza
+      - lord aldric
+    description: |
+      Il castello di Lord Aldric sovrasta la valle dall'alto della collina.
+      Pietra nera, torri squadrate, un fossato asciutto. Non è bello — è funzionale.
+      Come Aldric. Lord della valle da quindici anni, ha visto due campagne dell'Inquisizione
+      e le ha entrambe aspettate passare come si aspetta la pioggia.
+      Conosce i segreti di Valnera. Non gli interessa smettere di ignorarli.
+    visual_style: "imposing medieval castle on hilltop above valley, dark stone walls battlements, functional defensive architecture, overcast sky behind castle silhouette, narrow arrow-slit windows, drawbridge and ditch, cold authoritative presence, medieval lord's stronghold"
+    connected_to:
+      - valnera_square
+    available_characters:
+      - lord_aldric
+    available_times:
+      - Morning
+      - Afternoon
+    ambient:
+      Morning: "I cancelli del castello si aprono all'alba per i commercianti di fiducia."
+      Afternoon: "Aldric riceve in udienza nella sala principale. Pragmatico e veloce."
+
+  # ============================================================
+  # VILLAGE CHAPEL — La Cappella Convertita
+  # ============================================================
+  village_chapel:
+    id: "village_chapel"
+    name: "La Cappella dell'Inquisizione"
+    aliases:
+      - cappella
+      - chiesa
+      - inquisizione
+      - comando inquisizione
+      - chapel
+      - church
+      - quartier generale
+    description: |
+      Un tempo era una cappella del villaggio. Ora è il posto di comando
+      dei soldati dell'Ordine Sacro a Valnera. Le panche sono state spostate,
+      rimpiazzate da tavoli con mappe e ordini militari. La croce è ancora
+      sull'altare, ma affiancata dallo stendardo rosso e nero dell'Inquisizione.
+      Qui il Cacciatore riceve i dispacci di Corvus. Qui i soldati pianificano.
+      Qui il conflitto del Cacciatore è più acuto.
+    visual_style: "medieval chapel converted to military command post, stone gothic arches, tactical map tables replacing pews, inquisition soldiers in armor at tables, religious stone iconography with red-and-black inquisition banners hung over, cold grey stone, austere torchlight, military maps and scrolls, clash of sacred and militant"
+    connected_to:
+      - valnera_square
+    available_characters:
+      - inquisitor_soldier
+      - traveling_merchant
+    available_times:
+      - Morning
+      - Afternoon
+    ambient:
+      Morning: "Il cambio della guardia. I soldati al briefing. I dispacci da Corvus arrivano al mattino."
+      Afternoon: "Ordini eseguiti, rapporti scritti. I soldati discutono le voci del villaggio."

@@ -1,0 +1,222 @@
+# ============================================================
+# TENSION CONFIG - Valnera, La Valle delle Streghe
+# Assi di tensione narrativa per il TensionTracker
+#
+# TENSIONI PRINCIPALI:
+# 1. Lealtà frazionaria: Ordine Sacro vs Covile di Valnera
+# 2. Corvus che si avvicina: countdown narrativo
+# 3. Tensione romantica con ogni companion
+# 4. Tensioni ambientali (pattuglie, magia, bosco)
+#
+# growth_rate: quanto cresce per turno (0.01 = lento, 0.05 = veloce)
+# decay_rate: quanto scende dopo che l'evento scatta
+# foreshadow_at: livello per iniziare gli hint (0.0 - 1.0)
+# threshold: livello per scatenare l'evento
+# ============================================================
+
+# ============================================================
+# SISTEMA FAZIONI
+# ============================================================
+tension:
+  enabled: true
+
+  factions:
+    ordine_sacro:
+      name: "Ordine Sacro"
+      starting_value: 50
+      description: "La fedeltà del giocatore all'Inquisizione di Corvus"
+
+    covile:
+      name: "Covile di Valnera"
+      starting_value: 0
+      description: "La fiducia del Covile nel giocatore"
+
+  # Azioni che modificano le tensioni frazionarie
+  faction_shifts:
+    help_witch:
+      ordine_sacro: -10
+      covile: +15
+      description: "Aiuta una strega o nasconde informazioni all'Ordine"
+
+    report_witch:
+      ordine_sacro: +10
+      covile: -20
+      description: "Riferisce all'Ordine informazioni sul Covile"
+
+    protect_coven:
+      ordine_sacro: -15
+      covile: +20
+      description: "Protegge attivamente il Covile da una minaccia dell'Ordine"
+
+    follow_orders:
+      ordine_sacro: +5
+      covile: -5
+      description: "Segue gli ordini di Corvus senza deviare"
+
+    arrest_witch:
+      ordine_sacro: +20
+      covile: -35
+      description: "Arresta un membro del Covile"
+
+    false_report:
+      ordine_sacro: +3
+      covile: +12
+      description: "Manda un rapporto falso a Corvus per proteggere il Covile"
+
+    coven_ritual_participation:
+      ordine_sacro: -20
+      covile: +25
+      description: "Partecipa a un rituale del Covile"
+
+    inform_coven_of_orders:
+      ordine_sacro: -8
+      covile: +18
+      description: "Informa il Covile degli ordini ricevuti da Corvus"
+
+# ============================================================
+# COUNTDOWN DI CORVUS
+# ============================================================
+  corvus_approach:
+    enabled: true
+    start_turn: 10
+    escalation_per_turn: 2
+    max_value: 100
+    description: "Corvus e il suo esercito si avvicinano a Valnera"
+    flavor_texts:
+      - "Le vie di accesso alla valle sono più trafficate del solito"
+      - "I soldati locali sembrano nervosi — hanno ricevuto ordini nuovi"
+      - "Un messaggero è arrivato dalla direzione est, dove passa la strada principale"
+      - "Si sente parlare di 'preparativi' alla cappella, a porte chiuse"
+      - "Un villager ti dice sottovoce che ha visto polvere di marcia all'orizzonte"
+
+  narrative_thresholds:
+    - value: 30
+      event: "I soldati avanzata di Corvus appaiono nei paraggi del paese — esplorazione, non invasione"
+      set_flag: "corvus_scouts_arrived"
+
+    - value: 60
+      event: "Corvus invia un messaggero al paese con istruzioni dirette per il Cacciatore"
+      set_flag: "corvus_messenger_sent"
+
+    - value: 85
+      event: "L'esercito di Corvus è accampato fuori da Valnera — domani potrebbe entrare"
+      set_flag: "corvus_army_at_gates"
+
+    - value: 100
+      event: "Corvus arriva a Valnera — evento finale, nessun ritorno"
+      set_flag: "corvus_arrived"
+      trigger_endgame: true
+
+# ============================================================
+# ASSI DI TENSIONE AMBIENTALE
+# ============================================================
+tension_axes:
+
+  romantique_luna:
+    growth_rate: 0.022
+    decay_rate: 0.18
+    foreshadow_at: 0.35
+    threshold: 0.75
+    cooldown: 12
+    foreshadow_hints:
+      - "Luna ti ha guardato per un secondo di troppo prima di abbassare gli occhi"
+      - "Quando ti avvicini al bancone, Luna smette di respirare per un momento"
+      - "Le sue mani si sono fermate sul mortaio quando sei entrato — si è corretta subito"
+    buildup_hints:
+      - "L'aria nell'apotecario è cambiata ogni volta che siete rimasti soli"
+      - "Luna ha risposto alla tua domanda con una domanda — la prima volta che l'hai vista esitare"
+      - "I segni rituali sulla sua pelle sembrano rispondere quando sei vicino — un calore sottile"
+    events:
+      - "luna_ritual_glimpse"
+      - "luna_forbidden_confession"
+
+  romantique_maria:
+    growth_rate: 0.018
+    decay_rate: 0.20
+    foreshadow_at: 0.40
+    threshold: 0.78
+    cooldown: 15
+    foreshadow_hints:
+      - "Maria ha portato del cibo nella tua stanza senza che tu lo chiedessi"
+      - "Ha mantenuto il contatto visivo un secondo più del necessario"
+      - "Il tono di voce è cambiato — non più transazionale, qualcosa di più morbido"
+    buildup_hints:
+      - "Maria ti chiama per nome invece che 'Cacciatore'"
+      - "Ha aspettato che tutti gli altri clienti andassero via prima di parlarti"
+      - "Le mani — sempre così sicure — hanno tremato appena quando hai toccato il suo braccio"
+    events:
+      - "maria_underground"
+      - "maria_grief_night"
+
+  romantique_stella:
+    growth_rate: 0.028
+    decay_rate: 0.12
+    foreshadow_at: 0.28
+    threshold: 0.72
+    cooldown: 10
+    foreshadow_hints:
+      - "Hai trovato un rametto fresco sul davanzale della finestra questa mattina"
+      - "Una volpe ti ha seguito per mezz'ora nel bosco — troppo deliberatamente per caso"
+      - "Hai sentito un respiro nel buio fuori dalla tua porta. Quando hai aperto, niente."
+    buildup_hints:
+      - "Stella è apparsa dal nulla accanto a te — senza rumore, senza annuncio"
+      - "Il tocco di calma dopo il surge ha lasciato qualcosa tra voi — lei ci pensa continuamente"
+      - "I suoi occhi cambiano colore ogni volta che si avvicina a te. Non quando vede altri."
+    events:
+      - "stella_power_surge"
+      - "stella_forest_claim"
+
+  inquisition_pressure:
+    growth_rate: 0.015
+    decay_rate: 0.25
+    foreshadow_at: 0.30
+    threshold: 0.75
+    cooldown: 20
+    foreshadow_hints:
+      - "Un soldato ti ha guardate le mani — stava cercando segni di magia"
+      - "Il capitano della pattuglia ti ha chiesto un aggiornamento del rapporto 'quando puoi'"
+      - "Due soldati discutevano sottovoce e si sono fermati quando ti sei avvicinato"
+    buildup_hints:
+      - "Il capitano ti ha convocato alla cappella per un 'incontro informale'"
+      - "Un messaggero con il sigillo di Corvus è arrivato al mattino presto"
+      - "I soldati hanno intensificato le pattuglie senza spiegazioni — qualcuno ha mandato ordini"
+    events:
+      - "corvus_messenger"
+      - "inquisition_patrol"
+
+  forest_magic:
+    growth_rate: 0.020
+    decay_rate: 0.30
+    foreshadow_at: 0.35
+    threshold: 0.80
+    cooldown: 8
+    foreshadow_hints:
+      - "I funghi sul margine del bosco brillano leggermente anche di giorno"
+      - "Gli uccelli hanno smesso di cantare in un'area specifica del bosco"
+      - "La tua candela si è abbassata senza vento quando guardavi verso il bosco"
+    buildup_hints:
+      - "Il terreno del bosco è tiepido anche in un mattino gelido"
+      - "Hai sentito il battito di qualcosa di grosso tra gli alberi — regolare, quasi umano"
+      - "Una nebbia dorata si vede tra i rami al tramonto — Stella sta surgendo da qualche parte"
+    events:
+      - "night_howl"
+      - "magical_creature"
+      - "stella_power_surge"
+
+  village_fear:
+    growth_rate: 0.012
+    decay_rate: 0.20
+    foreshadow_at: 0.40
+    threshold: 0.78
+    cooldown: 18
+    foreshadow_hints:
+      - "Un villager ha attraversato la piazza quando ti ha visto — ti evita"
+      - "Si sussurra di qualcosa alla fontana — le voci si interrompono al tuo avvicinarti"
+      - "Il mercato stamattina era insolitamente silenzioso"
+    buildup_hints:
+      - "Qualcuno ha scritto 'traditore' sulla porta della locanda. Maria l'ha cancellato in silenzio."
+      - "Tre villager ti hanno guardate le spalle come se aspettassero qualcuno al tuo seguito"
+      - "Il vecchio Beppe ti ha guardato con un'espressione che non riesci a leggere"
+    events:
+      - "soldier_drunk"
+      - "fugitive_witch"

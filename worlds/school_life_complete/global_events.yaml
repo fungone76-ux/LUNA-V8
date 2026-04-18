@@ -1,0 +1,587 @@
+# ============================================================
+# GLOBAL EVENTS - School Life Complete
+# Eventi atmosferici e situazionali
+# 
+# NOTA: I campi per l'LLM (description, atmosphere_change, narrative_prompt) 
+# devono essere in INGLESE per garantire la migliore comprensione.
+# I campi per il giocatore (title, message) possono essere in italiano.
+# ============================================================
+
+global_events:
+  
+  # --- WEATHER EVENTS ---
+  rainstorm:
+    meta:
+      title: "Temporale Improvviso"           # UI - può essere italiano
+      description: "A heavy rainstorm traps everyone at school"  # LLM context - IN INGLESE
+    
+    trigger:
+      type: "random"
+      chance: 0.35  # Aumentato da 0.15
+      allowed_times: ["Afternoon", "Evening"]
+    
+    effects:
+      duration: 3
+      location_modifiers:
+        - location: "school_entrance"
+          blocked: true
+          message: "La pioggia è troppo forte per uscire."  # Player message - italiano OK
+      
+      visual_tags: ["rain", "wet", "dark_sky", "puddles"]
+      atmosphere_change: "dramatic, trapped, intimate"  # IN INGLESE
+      
+      on_start:
+        - action: "set_flag"
+          key: "rainstorm_active"
+          value: true
+        - action: "set_emotional_state"
+          character: "{current_companion}"
+          state: "flustered"
+      
+      on_end:
+        - action: "set_flag"
+          key: "rainstorm_active"
+          value: false
+    
+    narrative_prompt: "Dark clouds suddenly envelop the school. Thunder rumbles through the halls. Students crowd at the windows in excited chatter. You are trapped at school with {current_companion}, creating an intimate, inescapable atmosphere. The rain drums against the windows, isolating you from the outside world..."
+  
+  # --- BLACKOUT ---
+  blackout:
+    meta:
+      title: "Blackout"
+      description: "The power goes out. Total darkness envelops the school."
+    
+    trigger:
+      type: "random"
+      chance: 0.25  # Aumentato da 0.1
+      allowed_times: ["Evening", "Night"]
+    
+    effects:
+      duration: 2
+      
+      visual_tags: ["darkness", "flashlights", "shadows", "candlelight"]
+      atmosphere_change: "mysterious, intimate, scary"
+      
+      on_start:
+        - action: "set_flag"
+          key: "blackout_active"
+          value: true
+        - action: "set_emotional_state"
+          character: "{current_companion}"
+          state: "nervous"
+      
+      on_end:
+        - action: "set_flag"
+          key: "blackout_active"
+          value: false
+    
+    narrative_prompt: "The lights flicker and die. Total darkness envelops the school. Students laugh nervously in the dark, their voices hushed and intimate. In the darkness, you feel {current_companion}'s hand brush against yours accidentally, creating a moment of electric connection. Flashlights flicker on, casting dancing shadows on the walls..."
+
+  # --- SCHOOL ANNOUNCEMENTS ---
+  morning_announcements:
+    meta:
+      title: "Annunci del Mattino"
+      description: "Il preside parla dall'altoparlante"
+    
+    trigger:
+      type: "scheduled"
+      time: "Morning"
+    
+    effects:
+      duration: 1
+      
+      choices:
+        - text: "Ascolto"
+          effect: "obedient"
+        - text: "Ignoro e parlo sottovoce"
+          effect: "rebel"
+    
+    narrative_prompt: "Un ronzio, poi la voce nasale del preside riempie la scuola.\n'Buongiorno studenti, oggi vi ricordo che...'\nGli studenti intorno a te sospirano all'unisono."
+
+  # --- LUNCH RUSH ---
+  lunch_rush:
+    meta:
+      title: "Ora di Pranzo"
+      description: "La scuola si svuota per la pausa pranzo"
+    
+    trigger:
+      type: "scheduled"
+      time: "Midday"
+    
+    effects:
+      duration: 2
+      
+      choices:
+        - text: "Vado in mensa"
+          effect: "hungry"
+        - text: "Resto in classe a studiare"
+          effect: "nerd"
+        - text: "Esco per prendere aria"
+          effect: "free_spirit"
+    
+    narrative_prompt: "La campanella del pranzo suona.\nUn'esplosione di studenti si riversa nei corridoi.\nAlcuni verso la mensa, altri fuori, alcuni in bagno a fumare."
+
+  # --- CLUB ACTIVITIES ---
+  club_activities:
+    meta:
+      title: "Attività Extracurriculari"
+      description: "I club iniziano le loro attività"
+    
+    trigger:
+      type: "scheduled"
+      time: "Afternoon"
+    
+    effects:
+      duration: 3
+      
+      choices:
+        - text: "Vado a vedere il club di fotografia"
+          effect: "artistic"
+        - text: "Vado in biblioteca"
+          effect: "studious"
+        - text: "Vado a casa"
+          effect: "tired"
+    
+    narrative_prompt: "Dopo le lezioni, la scuola non muore.\nDalla palestra arrivano i palloni da pallavolo.\nDal teatro, prove per la recita.\nDall'aula musica, accordi di chitarra stonati."
+
+  # --- TEACHER OVERTIME ---
+  teacher_overtime:
+    meta:
+      title: "Professori Straordinari"
+      description: "Alcuni professori sono ancora in ufficio"
+    
+    trigger:
+      type: "random"
+      chance: 0.30
+      allowed_times: ["Evening"]
+    
+    effects:
+      duration: 3
+      
+      choices:
+        - text: "Busso all'ufficio"
+          effect: "bold"
+        - text: "Lascio stare"
+          effect: "respectful"
+    
+    narrative_prompt: "Non tutti i professori sono andati via.\nDall'ufficio di {current_companion} filtra luce.\nSta correndo compiti? Preparando la lezione di domani?\nO forse... è solo sola come te?"
+
+  # --- NIGHT SCHOOL ---
+  night_school:
+    meta:
+      title: "Scuola di Notte"
+      description: "La scuola chiusa ha un'atmosfera diversa"
+    
+    trigger:
+      type: "scheduled"
+      time: "Night"
+    
+    effects:
+      duration: 3
+      
+      choices:
+        - text: "Esploro con cautela"
+          effect: "brave"
+        - text: "Mando un messaggio a qualcuno"
+          effect: "connected"
+    
+    narrative_prompt: "Le luci al neon illuminano a intermittenza.\nOgni rumore si amplifica: uno scricchiolio, un passo lontano.\nLa scuola di notte non è più un luogo di studio.\nÈ... qualcos'altro."
+
+  # --- AFTER SCHOOL CLEANING ---
+  after_school_cleaning:
+    meta:
+      title: "Pulizie Pomeridiane"
+      description: "La scuola si svuota, inizia il lavoro di Maria"
+    
+    trigger:
+      type: "scheduled"
+      time: "Evening"
+      conditions:
+        - type: "flag"
+          key: "maria_introduced"
+          value: true
+    
+    effects:
+      duration: 3
+      
+      choices:
+        - text: "Vado a salutare Maria"
+          effect: "friendly"
+        - text: "Me ne vago in silenzio"
+          effect: "respectful"
+    
+    narrative_prompt: "La scuola è quasi vuota ora.\nSenti il rumore di una scopa che raschia il pavimento.\nMaria sta iniziando il suo turno.\nL'atmosfera è diversa... più intima, più silenziosa."
+
+  # --- DETENTION TIME ---
+  detention_time:
+    meta:
+      title: "Ore di Punizione"
+      description: "Alcuni studenti sono in punizione"
+    
+    trigger:
+      type: "random"
+      chance: 0.25
+      allowed_times: ["Afternoon", "Evening"]
+    
+    effects:
+      duration: 3
+      
+      choices:
+        - text: "Aiuto il compagno"
+          effect: "loyal"
+        - text: "Ignoro e vado via"
+          effect: "cautious"
+    
+    narrative_prompt: 'Vedi alcuni studenti seduti in corridoio, facendo compiti in punizione.\nTra loro, una faccia familiare... o forse qualcuno che conosci solo di vista.\n"Ehi, tu!" ti chiama uno. "Hai da fare? Portami qualcosa da mangiare?"'
+
+  # --- FOUND ITEM ---
+  found_item:
+    meta:
+      title: "Oggetto Trovato"
+      description: "Trovi qualcosa per terra"
+    
+    trigger:
+      type: "random"
+      chance: 0.20
+    
+    effects:
+      duration: 3
+      
+      choices:
+        - text: "Lo prendo"
+          effect: "take"
+          set_flags:
+            has_found_item: true
+        - text: "Lascio stare"
+          effect: "ignore"
+    
+    narrative_prompt: "Noti qualcosa luccicante sul pavimento.\nSembra essere... un portafogli? Una chiave? O forse qualcosa di più interessante?"
+
+  # --- PRIVATE TUTORING (Luna Quest Event) ---
+  luna_private_lesson_event:
+    meta:
+      title: "Lezione Privata"
+      description: "Luna is waiting in her office for private tutoring"
+    
+    trigger:
+      type: "conditional"
+      chance: 0.95
+      conditions:
+        - flag: "luna_private_lesson_invited"
+        - location: "school_office_luna"
+    
+    effects:
+      duration: 3
+      location_lock: "school_office_luna"
+      
+      visual_tags: ["office", "private", "intimate", "door_locked"]
+      atmosphere_change: "secretive, seductive, dangerous"
+      affinity_multiplier: 1.5
+      
+      on_start:
+        - action: "set_outfit"
+          character: "Luna"
+          outfit: "private_tutoring"
+        - action: "set_emotional_state"
+          character: "Luna"
+          state: "seductive"
+        - action: "set_flag"
+          key: "luna_private_lesson"
+          value: true
+      
+      on_end:
+        - action: "set_flag"
+          key: "luna_private_lesson_invited"
+          value: false
+    
+    narrative_prompt: "Luna's office is small and intimate. The door clicks shut with a soft sound. 'No one will disturb us,' she says, unbuttoning the first button of her blouse. 'Let's begin... the lesson.' The professional distance has collapsed — she is aware she is crossing a boundary, and she wants it."
+    
+    choices:
+      - text: "Sono uno studente disciplinato"
+        effect: "obedient_student"
+      - text: "Prendo l'iniziativa"
+        effect: "bold_move"
+      - text: "La faccio sentire a suo agio"
+        effect: "gentle_approach"
+
+  # --- STELLA PHOTOSHOOT ---
+  stella_photoshoot_event:
+    meta:
+      title: "Fotoshoot con Stella"
+      description: "Stella is waiting in the gym for her photoshoot"
+    
+    trigger:
+      type: "conditional"
+      chance: 0.95
+      conditions:
+        - flag: "stella_photoshoot_invited"
+        - location: "school_gym"
+    
+    effects:
+      duration: 3
+      location_lock: "school_gym"
+      
+      visual_tags: ["gym", "photoshoot", "posing", "camera"]
+      atmosphere_change: "playful, vulnerable, artistic"
+      
+      on_start:
+        - action: "set_outfit"
+          character: "Stella"
+          outfit: "sport"
+        - action: "set_flag"
+          key: "stella_photoshoot_done"
+          value: true
+      
+      on_end:
+        - action: "set_flag"
+          key: "stella_photoshoot_invited"
+          value: false
+    
+    narrative_prompt: "Stella poses in the empty gym. But when you frame her through the lens, your gaze is different: pure attention, not crude desire. For the first time, she lowers her eyes before you. The camera clicks capture something real beneath her usual arrogance."
+
+  # --- STELLA BASKETBALL CHALLENGE ---
+  stella_basketball_event:
+    meta:
+      title: "Sfida a Basket"
+      description: "Stella is ready for the basketball challenge in the gym"
+    
+    trigger:
+      type: "conditional"
+      chance: 0.95
+      conditions:
+        - flag: "stella_basketball_challenge"
+        - location: "school_gym"
+    
+    effects:
+      duration: 3
+      location_lock: "school_gym"
+      
+      visual_tags: ["gym", "basketball", "sweat", "sportswear"]
+      atmosphere_change: "competitive, energetic, flirtatious"
+      
+      on_start:
+        - action: "set_outfit"
+          character: "Stella"
+          outfit: "sport"
+        - action: "set_emotional_state"
+          character: "Stella"
+          state: "playful"
+      
+      on_end:
+        - action: "set_flag"
+          key: "stella_basketball_challenge"
+          value: false
+    
+    narrative_prompt: "'Think you can beat me?' Stella dribbles the ball, smiling. She wears shorts and tank top, sweat already glistening on her skin. The gym echoes with the sound of bouncing balls and her competitive laughter. Win or lose, there's a dinner bet on the line."
+    
+    choices:
+      - text: "Gioco serio per vincere"
+        effect: "competitive"
+      - text: "Mi faccio battere apposta"
+        effect: "flirtatious"
+      - text: "È solo per divertirsi"
+        effect: "casual"
+
+  # --- MARIA SECRETS ---
+  maria_secrets_event:
+    meta:
+      title: "Segreti nel Deposito"
+      description: "Maria reveals school secrets in the storage room"
+    
+    trigger:
+      type: "conditional"
+      chance: 0.95
+      conditions:
+        - flag: "maria_secrets_invited"
+        - location: "school_storage"
+    
+    effects:
+      duration: 2
+      location_lock: "school_storage"
+      
+      visual_tags: ["storage", "dark", "secrets", "whispering"]
+      atmosphere_change: "mysterious, intimate, conspiratorial"
+      
+      on_start:
+        - action: "set_flag"
+          key: "knows_luna_divorce"
+          value: true
+        - action: "set_flag"
+          key: "knows_stella_insecure"
+          value: true
+      
+      on_end:
+        - action: "set_flag"
+          key: "maria_secrets_invited"
+          value: false
+    
+    narrative_prompt: "Maria brings you to the storage room among brooms and cleaning supplies. 'I know everything about everyone here,' she whispers. 'Professor Luna is divorced, Stella... she's spoiled but insecure.' She shares secrets like precious gifts, trusting you with knowledge that could change everything."
+
+  # --- MARIA HOME DINNER ---
+  maria_home_dinner_event:
+    meta:
+      title: "Cena a Casa di Maria"
+      description: "Maria hosts an intimate dinner at her small apartment"
+    
+    trigger:
+      type: "conditional"
+      chance: 0.95
+      conditions:
+        - flag: "maria_dinner_invited"
+        - location: "maria_home"
+    
+    effects:
+      duration: 3
+      location_lock: "maria_home"
+      
+      visual_tags: ["home", "dinner", "intimate", "casual"]
+      atmosphere_change: "warm, vulnerable, domestic"
+      affinity_multiplier: 1.5
+      
+      on_start:
+        - action: "set_outfit"
+          character: "Maria"
+          outfit: "casual"
+        - action: "set_emotional_state"
+          character: "Maria"
+          state: "nervous_but_happy"
+      
+      on_end:
+        - action: "set_flag"
+          key: "maria_dinner_invited"
+          value: false
+    
+    narrative_prompt: "Maria's apartment is small but cozy. She has put on a nice dress for the occasion. 'No one has ever been here... except myself,' she admits. The pasta al forno steams on the table, and her nervous smile shows how much this moment means to her."
+    
+    choices:
+      - text: "La faccio sentire a suo agio"
+        effect: "gentle"
+      - text: "Ringrazio per la cena"
+        effect: "grateful"
+      - text: "Aiuto a sparecchiare"
+        effect: "helpful"
+
+  # --- MESSAGE NOTIFICATION ---
+  message_notification:
+    meta:
+      title: "Notifica sul Telefono"
+      description: "Ricevi un messaggio mentre sei a casa"
+    
+    trigger:
+      type: "random"
+      chance: 0.30
+      allowed_locations: ["player_home"]
+    
+    effects:
+      duration: 3
+      
+      choices:
+        - text: "Leggo subito"
+          effect: "curious"
+        - text: "Ignoro per ora"
+          effect: "mysterious"
+    
+    narrative_prompt: "Il telefono vibra sul comodino.\nUna notifica... da chi?\n{current_companion}? O qualcun altro?\nLa scuola di notte è chiusa, ma i telefoni sono sempre accesi."
+
+  # --- SUNSET CORRIDOR ---
+  sunset_corridor:
+    meta:
+      title: "Tramonto nel Corridoio"
+      description: "La luce del tramonto colora la scuola"
+    
+    trigger:
+      type: "scheduled"
+      time: "Evening"
+    
+    effects:
+      duration: 3
+      
+      choices:
+        - text: "Mi fermo ad ammirare"
+          effect: "romantic"
+        - text: "Scatto una foto"
+          effect: "memory"
+    
+    narrative_prompt: "I raggi del tramonto entrano dalle finestre della scuola.\nTutto è bagnato di un'arancione dorato.\nPer un attimo, anche il corridoio più squallido sembra magico."
+
+  # --- ALONE IN CLASSROOM (Romantic Event) ---
+  alone_in_classroom:
+    meta:
+      title: "Classe Vuota"
+      description: "Soli in classe dopo le lezioni - momento romantico"
+    
+    trigger:
+      type: "random"
+      chance: 0.25  # Aumentato da 0.1
+      allowed_locations: ["school_classroom"]
+      conditions:
+        - type: "affinity"
+          target: "{current_companion}"
+          operator: "gte"
+          value: 30
+        - type: "time"
+          operator: "eq"
+          value: "Evening"
+        - type: "random"
+          chance: 0.40  # Aumentato da 0.2
+    
+    effects:
+      duration: 3
+      location_lock: "school_classroom"
+      
+      visual_tags: ["sunset_light", "empty_desks", "private"]
+      atmosphere_change: "romantic, isolated, intimate"
+      affinity_multiplier: 1.5
+      
+      on_start:
+        - action: "set_emotional_state"
+          character: "{current_companion}"
+          state: "flustered"
+    
+    narrative_prompt: "The classroom is empty except for you and {current_companion}. Golden sunset light streams through the windows, casting warm hues across the empty desks. She stands near the chalkboard, looking at you expectantly. The isolation creates an intimate, romantic atmosphere where no one will disturb you. The quiet after-hours setting feels like your own private world..."
+
+  # --- GYM SUBSTITUTE (Luna Quest Event) ---
+  luna_gym_substitute_event:
+    meta:
+      title: "Supplenza in Palestra"
+      description: "Luna is substituting for the PE teacher in gym class"
+    
+    trigger:
+      type: "conditional"
+      chance: 0.95  # High chance when conditions are met
+      conditions:
+        - flag: "luna_gym_substitute_available"
+        - location: "school_gym"
+    
+    effects:
+      duration: 3
+      location_lock: "school_gym"
+      
+      visual_tags: ["gym", "sportswear", "athletic", "sweat"]
+      atmosphere_change: "energetic, exposed, vulnerable"
+      
+      on_start:
+        - action: "set_outfit"
+          character: "Luna"
+          outfit: "gym_teacher"
+        - action: "set_flag"
+          key: "luna_gym_substitute_active"
+          value: true
+      
+      on_end:
+        - action: "set_flag"
+          key: "luna_gym_substitute_available"
+          value: false
+        - action: "set_flag"
+          key: "luna_gym_substitute_active"
+          value: false
+    
+    narrative_prompt: "Luna enters the gym wearing fitted sportswear instead of her usual tailored suit. The athletic body she hid under professional clothing is now visible — toned and strong. She handles the class with authority but you notice her occasional self-conscious glances. She knows you are watching her differently now, and a faint blush colors her cheeks when your eyes meet."
+    
+    choices:
+      - text: "Osservo con discrezione"
+        effect: "respectful_admiration"
+      - text: "Le faccio un complimento"
+        effect: "bold_compliment"
+      - text: "Mi alleno con la classe"
+        effect: "participate"

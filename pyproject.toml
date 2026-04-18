@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "luna-rpg8"
+version = "8.0.0"
+description = "Luna RPG v8 - World simulation + complete poker + persistent NPC minds"
+requires-python = ">=3.12"
+dependencies = [
+    # Core
+    "pydantic>=2.8,<3.0",
+    "pyyaml>=6.0,<7.0",
+
+    # UI
+    "PySide6>=6.0,<7.0",
+    "qasync>=0.27,<1.0",
+
+    # Database
+    "sqlalchemy>=2.0,<3.0",
+    "aiosqlite>=0.20,<1.0",
+
+    # HTTP / async
+    "aiohttp>=3.9,<4.0",
+    "aiofiles>=23.0,<25.0",
+    "httpx>=0.27,<1.0",
+    "tenacity>=8.0,<9.0",
+
+    # LLM providers
+    "google-genai>=0.3",
+    "anthropic>=0.30",
+
+    # Media
+    "pillow>=10.0,<11.0",
+
+    # Memory / vectors
+    "chromadb>=0.4,<1.0",
+
+    # Retry / utils
+    "python-dotenv>=1.0,<2.0",
+
+    # Poker engine
+    "eval7>=0.1.10",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0,<9.0",
+    "pytest-asyncio>=0.23,<1.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/luna"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+asyncio_mode = "auto"

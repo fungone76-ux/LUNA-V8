@@ -1,0 +1,81 @@
+# ============================================================
+# TIME SYSTEM - Valnera, La Valle delle Streghe
+# I quattro momenti del giorno medievale oscuro
+# ============================================================
+
+time:
+  Morning:
+    name: "Alba"
+    lighting: "cold grey dawn light, mist rising from valley floor, pale silver sky, torches still burning"
+    ambient_description: |
+      La nebbia mattutina sale dalla valle come fumo di antica battaglia.
+      Il paese si sveglia lentamente, cauto. Le ronde notturne finiscono.
+      Quelle diurne iniziano. È il momento più quieto — e per questo
+      più pericoloso, perché nel silenzio si sentono tutte le voci.
+    atmosphere: "Quiete ingannevole. La magia notturna si ritira. I soldati iniziano i pattugliamenti. Luna chiude la stanza interna. Stella rientra nel bosco."
+    magic_level: "low"
+    danger_level: "medium — patrol visibility high"
+    available_actions:
+      - "mercato_mattutino"
+      - "dispacci_dall_ordine"
+      - "erbe_mattino"
+      - "raccogliere_informazioni"
+
+  Afternoon:
+    name: "Giorno"
+    lighting: "flat overcast daylight, no shadows, grey-white sky, village in full visibility"
+    ambient_description: |
+      Il paese è nel pieno della sua attività. I soldati dell'Inquisizione patroliano
+      la piazza in coppia, controllano documenti, interrogano viaggiatori.
+      L'occhio pubblico è ovunque. Le streghe si nascondono in piena vista —
+      come guaritrice, come locandiera, come contadina.
+      Il Cacciatore deve muoversi con attenzione. Tutto viene visto. Tutto viene riferito.
+    atmosphere: "Esposizione totale. Nessun segreto alla luce del giorno. Le relazioni con il Covile sono rischiose in questo momento. L'Ordine è più attento."
+    magic_level: "suppressed"
+    danger_level: "high — maximum inquisition presence"
+    available_actions:
+      - "pattuglia_inquisizione"
+      - "commercio_mercato"
+      - "udienza_aldric"
+      - "interrogatori"
+
+  Evening:
+    name: "Crepuscolo"
+    lighting: "amber and deep purple sunset, long shadows, torches being lit, mist returning from forest"
+    ambient_description: |
+      Al crepuscolo, il velo tra i mondi si assottiglia.
+      I soldati rientrano, i villager sprangano le porte.
+      La magia di Luna cresce — si sente nell'aria, come prima di un temporale.
+      È il momento di transizione: i segreti iniziano a muoversi,
+      le maschere cadono, le porte private si aprono.
+      Stella inizia a brillare nel bosco. Maria chiude la locanda al pubblico
+      e apre quella parte di sé che nessuno vede.
+    atmosphere: "Il momento della verità. Le guardie sono meno attente. Il bosco si anima. Le protagoniste diventano più reali — più pericolose — al crepuscolo."
+    magic_level: "rising"
+    danger_level: "low for movement, high for discovery"
+    available_actions:
+      - "visita_apotecario_segreto"
+      - "crepuscolo_nel_bosco"
+      - "osteria_chiusa"
+      - "rituali_preparatori"
+
+  Night:
+    name: "Notte"
+    lighting: "near-total darkness, moonlight only, torch pools isolated, deep black shadows, stars hidden by cloud"
+    ambient_description: |
+      La notte a Valnera è assoluta. Non c'è illuminazione pubblica.
+      Solo le torce delle ronde e la luna quando le nuvole si aprono.
+      Questa è l'ora del Covile. Maria percorre i tunnel.
+      Luna guida i rituali al cerchio di pietra o nella grotta.
+      Stella è ovunque nel bosco — e a volte fuori, a guardare la finestra del Cacciatore.
+      La notte è il momento più pericoloso e il più intimo.
+      Qui niente è come sembra. Qui tutto è possibile.
+    atmosphere: "Il Covile è sveglio. La magia è al massimo. Il Cacciatore è più vulnerabile e più potente allo stesso tempo. Le scene più esplicite e intense avvengono di notte."
+    magic_level: "maximum"
+    danger_level: "extreme if discovered, extreme intimacy if trusted"
+    available_actions:
+      - "rituali_del_covile"
+      - "tunnel_con_maria"
+      - "stella_nel_bosco"
+      - "stanza_privata"
+      - "cerchio_di_pietra"

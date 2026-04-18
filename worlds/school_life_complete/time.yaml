@@ -1,0 +1,24 @@
+# ============================================================
+# TIME SYSTEM - School Life Complete
+# ============================================================
+
+time:
+  Morning:
+    name: "Mattina"
+    lighting: "morning sunlight, fresh, golden hour"
+    ambient_description: "L'inizio della giornata scolastica. Studenti arrivano, il caos organizzato."
+    
+  Afternoon:
+    name: "Pomeriggio"
+    lighting: "afternoon bright, clear sky"
+    ambient_description: "Lezioni in corso, il cuore della giornata."
+    
+  Evening:
+    name: "Sera"
+    lighting: "sunset colors, orange sky, golden hour"
+    ambient_description: "Scuola finita, club attivi, incontri segreti."
+    
+  Night:
+    name: "Notte"
+    lighting: "moonlight, dark, city lights"
+    ambient_description: "La scuola è chiusa. Solo messaggi e appuntamenti privati."

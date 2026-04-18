@@ -1,0 +1,340 @@
+# ============================================================
+# DAILY EVENTS - Terra degli Antenati
+# Eventi che accadono una volta al giorno (turno)
+# Rappresentano la vita quotidiana della tribù
+# ============================================================
+
+events:
+  # ============================================================
+  # MATTINA
+  # ============================================================
+  
+  sveglia_villaggio:
+    time: "Morning"
+    frequency: "daily"
+    priority: 1
+    narrative: |
+      Il sole sorge sulla valle. Prime luci filtrano tra le capanne.
+      Gli uccelli iniziano il loro concerto. La tribù si sveglia.
+      Nuovo giorno, nuove sfide. Le 3 Prove ti aspettano.
+    effects:
+      - type: "restore_stat"
+        stat: "energy"
+        value: 30
+      - type: "message"
+        text: "🌅 Nuovo giorno nella Terra degli Antenati"
+
+  preparazione_caccia:
+    time: "Morning"
+    frequency: "daily"
+    location: ["villaggio", "giungla_edge"]
+    priority: 5
+    narrative: |
+      I cacciatori si radunano. Controllano armi, si tingono di terra
+      per mimetizzarsi. Naya è al centro, dà ordini con gesti secchi.
+      "Oggi cerchiamo il grande cervo" dice. Ti guarda. "Vieni?"
+    choices:
+      - text: "Unisciti alla caccia"
+        effect: { start_activity: "hunt", energy: -20 }
+        followup: "Naya annuisce. 'Vediamo se tieni il passo.'"
+      - text: "Osserva e impara"
+        effect: { skill: "hunting", experience: 10 }
+        followup: "Studi le tecniche. Utile per la Prova della Selva."
+      - text: "Declina educatamente"
+        followup: "Naya alza un sopracciglio. 'Paura di sporcarti le mani?'"
+        effect: { affinity_naya: -2 }
+
+  mercato_mattutino:
+    time: "Morning"
+    frequency: "daily"
+    location: ["villaggio"]
+    priority: 3
+    narrative: |
+      Il mercato mattutino è vita. Donne scambiano frutta, pescatori
+      offrono il pescato della notte, artigiani mostrano gioielli d'osso.
+      È caos, colori, odori. Opportunità per chi ha occhio.
+    effects:
+      - type: "market_available"
+        duration: 1
+
+  # ============================================================
+  # POMERIGGIO
+  # ============================================================
+
+  riposo_caldo:
+    time: "Afternoon"
+    frequency: "daily"
+    priority: 1
+    narrative: |
+      Il sole è alto, implacabile. La tribù rallenta. Ombre si accorciano.
+      È tempo di riposo, di sonnellini all'ombra, di storie sotto gli alberi.
+      Anche le bestie tacciono. Solo il caldo parla.
+    effects:
+      - type: "modify_stat"
+        stat: "water"
+        value: -10
+      - type: "message"
+        text: "☀️ Calura pomeridiana. Meglio riposare."
+
+  bambini_lezione:
+    time: "Afternoon"
+    frequency: "daily"
+    location: ["villaggio"]
+    priority: 4
+    narrative: |
+      Un anziano insegna ai piccoli. Come accendere il fuoco, quali
+      erbe curano, come riconoscere le tracce. Lezioni di sopravvivenza.
+      I bambini ti guardano. 'Tu sai queste cose, forestiero?'
+    choices:
+      - text: "Mostra le tue abilità"
+        check: { stat: "mind", difficulty: 10 }
+        success: "Accendi fuoco con due bastoni. Bambini applaudono. 'Maestro!'"
+        effect: { reputation: 5, karma: 5 }
+        failure: "Fai fatica. Bambini ridono. Anziano sospira. 'Ancora tanto da imparare.'"
+      - text: "Ascolta e impara"
+        effect: { skill: "survival", experience: 15 }
+        followup: "Ogni tribù ha i suoi segreti. Questi potrebbero salvarti la vita."
+
+  visita_kara:
+    time: "Afternoon"
+    frequency: "daily"
+    location: ["caverna"]
+    condition:
+      affinity_kara: ">=20"
+    narrative: |
+      Kara è nel suo elemento. Erbe che essiccano, pozioni che bollono,
+      canti sussurrati. Ti sente arrivare ma non si volta.
+      "L'hai sentito anche tu, vero? Il richiamo."
+    choices:
+      - text: "Chiedi una pozione"
+        condition: { item: "conchiglie", quantity: 5 }
+        effect: { remove_item: "conchiglie:5", add_item: "pozione_cura" }
+        followup: "Ti dà una fiasca fumante. 'Bevi solo se necessario. Non è dolce.'"
+      - text: "Chiedi di imparare"
+        effect: { affinity_kara: 5, time: +2 }
+        followup: "Ti mostra erbe. 'Questa cura. Questa uccide. Questa... ti fa vedere.'"
+      - text: "Resta in silenzio"
+        followup: "Kara annuisce. 'Il silenzio è risposta. Ricordalo.'"
+
+  # ============================================================
+  # SERA
+  # ============================================================
+
+  tramonto_rosso:
+    time: "Evening"
+    frequency: "daily"
+    priority: 1
+    narrative: |
+      Il sole scende dietro le colline. Il cielo si tinge di rosso, arancio,
+      viola. Uno spettacolo quotidiano, ma sempre nuovo. La tribù si raduna.
+      È tempo di racconti, di cibo, di comunità.
+    effects:
+      - type: "restore_stat"
+        stat: "mind"
+        value: 10
+      - type: "message"
+        text: "🌅 Tramonto sulla valle. La tribù si riunisce."
+
+  racconti_fuoco:
+    time: "Evening"
+    frequency: "daily"
+    location: ["villaggio"]
+    priority: 5
+    narrative: |
+      Intorno al fuoco centrale, qualcuno racconta. Oggi tocca a un anziano.
+      Storie di eroi, di mostri, di amori impossibili. Tutti ascoltano,
+      ipnotizzati. Anche tu. Le storie sono vita, sono memoria.
+    effects:
+      - type: "restore_stat"
+        stat: "mind"
+        value: 15
+      - type: "random_knowledge"
+        chance: 30
+    choices:
+      - text: "Ascolta rapito"
+        effect: { knowledge: 10, mind: 10 }
+        followup: "La storia parla di uno che superò le Prove. Con astuzia, non forza."
+      - text: "Racconta qualcosa del tuo popolo"
+        effect: { reputation: 5, charisma: 2 }
+        followup: "Tutti amano storie nuove. 'Il tuo mondo è strano' dice qualcuno."
+      - text: "Osserva le reazioni"
+        effect: { perception: 10 }
+        followup: |
+          Noti chi ride, chi piange, chi guarda chi. Kara sembra lontana.
+          Zara osserva te. Naya sta vicino al fuoco, irrequieta.
+
+  cena_zara:
+    time: "Evening"
+    frequency: "daily"
+    location: ["tenda_capo"]
+    condition:
+      affinity_zara: ">=40"
+    narrative: |
+      Zara ti invita a cena. Non nel grande banchetto, ma in privato.
+      Cibo semplice, vino di palma. Lei è diversa senza la corona.
+      Più giovane, più... vera.
+    choices:
+      - text: "Parla di lei"
+        effect: { affinity_zara: 10, time: +2 }
+        followup: "Parla del peso del potere. 'Nessuno mi vede. Solo la Figlia del Capo.'"
+      - text: "Parla di te"
+        effect: { affinity_zara: 5, trust: 10 }
+        followup: "Le interessa il tuo mondo. 'Deve essere... libero.'"
+      - text: "Flirta delicatamente"
+        check: { stat: "charisma", difficulty: 12 }
+        success: "Ride. Un suono raro. 'Sei audace. Mi piace.'"
+        effect: { affinity_zara: 15 }
+        failure: "Ti guarda fredda. 'Non sono una conquista, forestiero.'"
+        effect_failure: { affinity_zara: -10 }
+
+  # ============================================================
+  # NOTTE
+  # ============================================================
+
+  buio_totale:
+    time: "Night"
+    frequency: "daily"
+    priority: 1
+    narrative: |
+      Il buio è totale. Fuori dal villaggio, senza fuoco, non vedi nulla.
+      Suoni strani provengono dalla giungla. I predatori cacciano.
+      È il loro momento. Il tuo è riposare, se osi chiudere gli occhi.
+    effects:
+      - type: "restore_stat"
+        stat: "energy"
+        value: 50
+      - type: "modify_stat"
+        stat: "food"
+        value: -10
+      - type: "modify_stat"
+        stat: "water"
+        value: -10
+      - type: "message"
+        text: "🌙 La notte avvolge la valle. Tempo di riposo."
+
+  guardia_notturna:
+    time: "Night"
+    frequency: "daily"
+    location: ["villaggio", "confine_tribale"]
+    priority: 5
+    narrative: |
+      I guerrieri di guardia ti riconoscono. 'Non dormi, forestiero?'
+      Parlano a bassa voce, occhi sempre verso l'oscurità.
+      'I Lupi Neri attaccano di notte. O i felini. Mai abbassare la guardia.'
+    choices:
+      - text: "Aiuta a vigilare"
+        effect: { energy: -20, reputation: 5, affinity_all: 3 }
+        followup: "Apprezzano la compagnia. Ti raccontano storie di notti di battaglia."
+      - text: "Chiedi informazioni sui nemici"
+        effect: { knowledge: 15 }
+        followup: |
+          'Lupi Neri: crudeli, numerosi. Ma superstiziosi. Temono la caverna.
+          Temono Kara. Usalo, se serve.'
+      - text: "Prosegui per i tuoi affari"
+        followup: "Ti lasciano andare. 'Coraggio, o follia?'"
+
+  visita_segreta_naya:
+    time: "Night"
+    frequency: "daily"
+    location: ["giungla", "fiume"]
+    condition:
+      affinity_naya: ">=50"
+    narrative: |
+      La trovi sola, al chiaro di luna. Si bagna nel fiume, o medita
+      su una roccia. Sembra... diversa. Più morbida. Senza le difese.
+      Ti sente. Non scappa. 'Non dormo mai' sussurra. 'Troppi pensieri.'
+    choices:
+      - text: "Siediti con lei"
+        effect: { affinity_naya: 10, time: +3 }
+        followup: |
+          Parla di sua madre. Morta da caccia. Di suo padre, che voleva
+          un figlio maschio. 'Devo essere migliore di tutti. Sempre.'"
+      - text: "Sfida a gara notturna"
+        check: { stat: "strength", difficulty: 13 }
+        success: |
+          Correre, arrampicarsi, nuotare. Perdi, ma di poco.
+          'Bene' dice, sorpresa. 'Davvero bene.' Sorride.
+        effect: { affinity_naya: 15, energy: -15 }
+        failure: "Vince facilmente. 'Ancora troppo debole. Ma hai provato.'"
+      - text: "Offrile compagnia silenziosa"
+        effect: { affinity_naya: 8, trust: 15 }
+        followup: "Restate in silenzio. Lei si avvicina lentamente. Affida la testa alla tua spalla."
+
+  rituali_notturni:
+    time: "Night"
+    frequency: "daily"
+    location: ["caverna"]
+    condition:
+      affinity_kara: ">=30"
+    narrative: |
+      Kara è in trance. Canti ancestrali, tamburi lontani, fumo denso.
+      Ti aveva detto di non venire di notte. Ma sei qui.
+      Gli spiriti sono vicini. Molto vicini.
+    choices:
+      - text: "Partecipa al rituale"
+        effect: { affinity_kara: 15, mind: -10, set_flag: "vision_possible" }
+        followup: |
+          Bevi quello che ti offre. Il mondo si dissolve. Vedi cose...
+          Passato? Futuro? Il volto di Kara che ride, che piange, che aspetta.
+      - text: "Osserva da lontano"
+        effect: { knowledge: 10 }
+        followup: "Vedi senza essere visto. Impari. Ma non provi."
+      - text: "Vai via"
+        followup: "Kara apre un occhio. 'Saggio. Alcune cose non si guardano.'"
+
+  # ============================================================
+  # EVENTI SPECIALI GIORNALIERI (Settimanali/variabili)
+  # ============================================================
+
+  giorno_mercato:
+    day_of_week: 3  # Ogni 3 giorni
+    frequency: "weekly"
+    location: ["villaggio"]
+    narrative: |
+      Oggi è il Giorno del Mercato! Tribù vicine arrivano per commerciare.
+      È caos, colori, lingue strane. Mercanti, giocolieri, stregoni.
+      Opportunità uniche... e pericoli.
+    effects:
+      - type: "special_market"
+        duration: 1
+      - type: "rare_items_available"
+    choices:
+      - text: "Cerca oggetti rari"
+        effect: { gold: -20 }
+        random_item: ["mappa_tesoro", "amuleto_raro", "arma_speciale", "pozione_strana"]
+      - text: "Ascolta i pettegolezzi"
+        effect: { knowledge: 20 }
+        followup: |
+          Notizie da lontano. Altre tribù. E... 'Uno come te è passato,
+          settimane fa. Cercava le stesse cose. Non è tornato...'
+      - text: "Sfida a giochi"
+        check: { stat: "mind", difficulty: 12 }
+        success: "Vinci! Conchiglie, oggetti, rispetto."
+        failure: "Perdi. Ma impari qualcosa sugli inganni."
+
+  luna_piena:
+    day_of_cycle: 20
+    frequency: "monthly"
+    narrative: |
+      La Luna è piena, gigante, argentea. I lupi ululano. La tribù
+      si raccoglie. Kara presiede il rituale sacro. È notte di magia,
+      di trasformazioni, di promesse. Qualcosa cambierà stanotte.
+    effects:
+      - type: "moon_bonus"
+        all_affinities: 10
+      - type: "special_interactions"
+        available: true
+    choices:
+      - text: "Partecipa al rituale"
+        effect: { affinity_kara: 20, set_flag: "moon_blessing" }
+        followup: "Kara ti unge di sangue e cenere. 'Sei protetto. Per ora.'"
+      - text: "Caccia con Naya"
+        effect: { affinity_naya: 20, add_item: "preda_luna" }
+        followup: |
+          'Le bestie sono strane stanotte' dice. 'Più pericolose. Ma
+          anche più audaci.' La caccia è epica.
+      - text: "Cena con Zara"
+        effect: { affinity_zara: 20, set_flag: "zara_openness" }
+        followup: |
+          La luna la rende malinconica. 'Mia madre amava queste notti.
+          Mi raccontava storie...' Si fida di te. Finalmente.

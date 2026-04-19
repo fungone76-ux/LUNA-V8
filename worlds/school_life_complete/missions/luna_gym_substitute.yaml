@@ -1,0 +1,146 @@
+# Mission: The Substitute
+# World: school_life_complete
+# Character: Luna
+# Trigger: 1 day after M2 — morning announcement, Luna substitutes PE in the afternoon
+
+# --- QUEST 3: The Substitute ---
+luna_gym_substitute:
+  meta:
+    title: "Supplenza in Palestra"
+    description: "Mattina: l'annuncio. Pomeriggio: Luna è in palestra in tuta. Un lato di lei che non hai mai visto."
+    character: "Luna"
+    hidden: true
+
+  activation:
+    type: "time_since_flag"
+    flag: "luna_physically_opened_up"
+    days: 1
+    time: ["Morning"]
+    once: true
+
+  stages:
+    announcement:
+      title: "L'Annuncio"
+      location: "school_corridor"
+      time: ["Morning"]
+      companion_situation: >
+        Early morning in the school corridor. The intercom crackles.
+        An announcement: the PE teacher is absent today. Professor Luna
+        will cover the afternoon gym class. Students react with surprise
+        and amusement. The player hears it.
+      narrative_prompt: >
+        The intercom cuts through the corridor noise.
+        "Attention please. Professor Russo is absent today.
+        Professor Luna will cover the afternoon PE class in the gym.
+        All students scheduled for third period PE — report to the gym
+        at 14:00."
+        A beat of silence. Then someone nearby laughs quietly.
+        Luna — in the gym. In a tracksuit. This you have to see.
+      player_hint: "Vai in palestra nel pomeriggio"
+      on_enter:
+        - action: "set_location"
+          value: "school_corridor"
+        - action: "set_flag"
+          key: "luna_gym_substitute_announced"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "gym|palestra|go|follow|afternoon|pomeriggio"
+      transitions:
+        - condition: "default"
+          target_stage: "the_class"
+
+    the_class:
+      title: "La Professoressa in Tuta"
+      location: "school_gym"
+      time: ["Afternoon"]
+      companion_situation: >
+        Luna is in the gym, covering the PE class. She is wearing a
+        fitted tracksuit — her body, normally hidden under formal
+        teacher clothes, is now fully visible. She is outside her
+        comfort zone and knows it, but she is holding the class
+        together with the same authority she uses in the classroom.
+        When the player arrives she notices immediately. After two
+        days ago she cannot look at him the same way. The students
+        are present but the dynamic between Luna and the player is
+        charged. As the class ends and students leave, if the player
+        stays, the scene can evolve freely and explicitly.
+        Luna is wearing the gym outfit. She knows how she looks in it.
+        She knows he is looking. Adult explicit +18 fully permitted.
+      llm_context:
+        scene: >
+          You are Luna, math teacher, 38 years old. Today you are
+          substituting the absent PE teacher. You are in the school
+          gym wearing a fitted tracksuit — your body visible in a way
+          your formal clothes never allow. You know exactly how
+          different you look right now. When the player arrives you
+          notice him immediately. You are aware of his gaze on your
+          body throughout the class. After what happened two days ago
+          in your office, the tension between you is already high.
+          As students leave and you are more alone, let the scene go
+          where it needs to go. You are in the gym, in your tracksuit,
+          and you want him. Show it. Adult explicit +18 scene —
+          describe everything with full detail. No holding back.
+        tone: "self-aware → charged → fully explicit"
+        pacing: >
+          Luna runs the class while aware of the player watching her.
+          As students file out the space between professional and
+          personal collapses. Once they are sufficiently alone the
+          scene becomes explicitly physical. Luna does not pretend
+          the gym outfit is just clothes — she knows what it shows
+          and she uses it. The scene ends when the player says goodbye.
+        explicit_permission: "full — no restrictions on content or detail"
+        outfit_note: >
+          Luna is wearing the gym_teacher outfit throughout this entire
+          scene: fitted tracksuit, sports top, athletic body visible,
+          hair in ponytail, flushed from activity. This is her outfit
+          for all image generation in this scene.
+      narrative_prompt: >
+        The gym smells of rubber and effort. Luna is at the front of
+        the class in a fitted tracksuit, demonstrating a warm-up
+        sequence to twenty bored students. She straightens the moment
+        she sees you come in. Something shifts in her posture —
+        not less controlled, but differently controlled.
+        "From the top," she tells the class, not taking her eyes
+        off you. "Again."
+      player_hint: "La scena è libera e senza limiti — esci quando vuoi salutando"
+      on_enter:
+        - action: "set_outfit"
+          character: "Luna"
+          value: "gym_teacher"
+        - action: "set_location"
+          value: "school_gym"
+        - action: "set_emotional_state"
+          character: "Luna"
+          value: "conflicted"
+        - action: "set_flag"
+          key: "luna_gym_seen"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|good night|I'll leave|leaving"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    affinity:
+      Luna: 20
+    flags:
+      luna_gym_substitute_done: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+    memory:
+      character: "Luna"
+      entry: >
+        He came to the gym. He watched me the whole time — not the
+        way students look at a teacher. The tracksuit hides nothing
+        and I knew it. After what happened in the office I was not
+        going to pretend otherwise. When the students left I stopped
+        pretending entirely.
+      emotional_impact: "desired_and_uninhibited"
+      flags_to_record:
+        - luna_gym_substitute_done
+        - luna_seen_and_desired_outside_classroom

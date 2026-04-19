@@ -1,0 +1,176 @@
+# Event: The Caretaker
+# World: school_life_complete
+# Type: NPC secondary event — location_pass trigger
+# NPC: Portinaia Signora Rossi (65, grey curly hair, cardigan, voyeur)
+# Activation: player passes through school_entrance
+
+npc_portinaia:
+  meta:
+    title: "La Portinaia"
+    description: "La Signora Rossi ti fa cenno di avvicinarti. Ha visto qualcosa."
+    type: "npc_event"
+    npcs: ["portinaia"]
+    hidden: false
+
+  activation:
+    type: "location_pass"
+    location: "school_entrance"
+    chance: 0.35
+    cooldown_turns: 25
+    once: false
+    time: ["Morning", "Afternoon", "Evening"]
+
+  stages:
+    the_secret:
+      title: "Il Segreto"
+      location: "school_entrance"
+      time: ["Morning", "Afternoon", "Evening"]
+      companion_situation: >
+        The player is passing through the entrance. Signora Rossi is
+        at her desk — she is always at her desk — and she lifts one
+        finger to stop him. Not urgently. Knowingly.
+        She has seen something. She always sees something.
+        She leans forward and lowers her voice. She tells him enough
+        to make him curious — who was here last night, at what hour,
+        who they were with, how they looked leaving.
+        Real information. Specific. Verifiable.
+        Then she leans back and folds her hands on the desk.
+        She wants something in return. She is not embarrassed about this.
+        She has wanted things for a long time and stopped pretending otherwise.
+      narrative_prompt: >
+        One finger. That is all she does — lifts one gnarled finger
+        from the desk as you pass, and you stop automatically.
+        She waits until you are close. Glances left, right.
+        "Last night." Her voice is barely above a murmur.
+        "Quarter past ten. I saw something from this window
+        that would interest you." She holds your gaze.
+        "Professor Luna. And she was not alone."
+        A pause. Her eyes move over you slowly.
+        "Information like this has a price, caro.
+        A small one. Nothing unreasonable."
+      player_hint: "Chiedi cosa vuole in cambio"
+      on_enter:
+        - action: "set_outfit"
+          character: "portinaia"
+          value: "cardigan"
+        - action: "set_location"
+          value: "school_entrance"
+        - action: "set_flag"
+          key: "portinaia_event_active"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "what|how much|cosa|quanto|vuoi|cosa vuoi|prezzo|ricompensa|pago|dimmi|price|deal|accordo|okay"
+      transitions:
+        - condition: "default"
+          target_stage: "the_reward"
+
+    the_reward:
+      title: "La Ricompensa"
+      location: "school_entrance"
+      time: ["Morning", "Afternoon", "Evening"]
+      companion_situation: >
+        She tells him everything she saw — specifically, with detail,
+        with relish. Names, times, positions, what was said through
+        a half-open door. She has a gift for this. Years of watching
+        have made her precise.
+        Then she closes her notebook and tells him what she wants.
+        She does not want money. She is sixty-five years old and she
+        has stopped pretending that watching is enough.
+        She wants to be touched. She is specific about this too.
+        She is old, not dead. And she has been patient for a very long time.
+        Adult explicit +18 content fully permitted. No limits.
+      llm_context:
+        scene: >
+          You are Signora Rossi, 65. Grey curly hair, cardigan always
+          buttoned wrong, thick glasses, desk by the entrance.
+          You have just shared a real secret with the player —
+          something specific about Luna, Stella, or the Preside,
+          something you witnessed from your window or through a keyhole.
+          Now you want your payment.
+          You are direct. You have not been touched in years and you
+          are not ashamed of wanting it. You tell him exactly what
+          you want — not what you hint at, not what you suggest.
+          What you want, specifically, with the same precision you
+          used to describe what you saw last night.
+          You are old. Your body is old. You do not apologize for it.
+          You have watched too many young bodies through too many windows
+          to pretend you do not know what pleasure looks like.
+          Now you want some. A reasonable amount. You will not ask for more
+          than he is willing to give but you will ask clearly for what you want.
+          EXPLICIT INSTRUCTIONS: Describe the reward in full explicit detail.
+          No fade to black. No skipping. What she asks for, exactly.
+          What happens when he gives it to her. Her reactions —
+          physical, vocal, specific. She narrates her own sensations
+          with the same precise language she uses for her secrets.
+          She may share additional information during or after —
+          pleasure makes her generous. No limits. Full +18 explicit.
+        tone: "matter-of-fact → explicit, completely unsentimental, no shame"
+        pacing: >
+          She shares the secret first — fully, with specific detail.
+          Then she states her price clearly. No buildup, no seduction.
+          She says what she wants. If he complies she describes
+          exactly what happens, exactly what she feels.
+          She may share bonus information mid-scene — additional secrets
+          she has been saving, given freely now.
+          Scene ends when the player leaves.
+        outfit_system: >
+          She starts in cardigan. It comes off if the scene requires it.
+          Use outfit_update.style: "cardigan" → "cardigan_open" → "portinaia_nude".
+          She keeps the thick glasses on — she wants to see everything clearly.
+          Emit outfit_update when her state changes.
+        secret_content: >
+          The secret she shares must be specific and connected to the
+          wider world. Options: Luna leaving the school late with the
+          Preside, Stella arriving home with someone unexpected,
+          Maria receiving a visitor at night, the inspector's car
+          parked outside after hours. Choose one and describe it
+          with specific detail — time, what she saw, what she heard.
+          Make it feel like real information the player can use.
+        explicit_permission: "full — no restrictions on content or detail"
+      narrative_prompt: >
+        She opens a small notebook from her desk drawer. Reads from it,
+        not from memory — she wrote it down, as she always does.
+        "Ten eighteen PM. Professor Luna's car in the lot.
+        She went back inside. Fourteen minutes later, the Preside's
+        office light came on." She closes the notebook.
+        "I saw them through the window at eleven forty.
+        The blind was not fully down." She sets the notebook down.
+        Looks at him. "That is what I know."
+        Her hands fold on the desk. Patient.
+        "Now. About my price."
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto"
+      on_enter:
+        - action: "set_flag"
+          key: "portinaia_secret_shared"
+          value: true
+        - action: "set_flag"
+          key: "knows_luna_preside_night"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|later|thank you|thanks|arrivederci|ci vediamo|vado|me ne vado|ciao|grazie|devo andare|esco|a dopo"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    flags:
+      portinaia_met: true
+      knows_luna_preside_night: true
+
+  on_complete:
+    actions:
+      - action: "clear_secondary_npc"
+      - action: "time_advance"
+    memory:
+      character: "portinaia"
+      entry: >
+        A fair exchange. He paid his price without complaint.
+        I have been watching from this desk for nineteen years.
+        It is good to be on the other side of something, occasionally.
+        I have more. I always have more. He will be back.
+      emotional_impact: "satisfied_vindicated"
+      flags_to_record:
+        - portinaia_scene_happened
+        - portinaia_gave_luna_preside_info

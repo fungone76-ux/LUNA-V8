@@ -190,10 +190,32 @@ class IntentHandlersMixin:
             logger.warning("[Orchestrator] NPC template activation failed: %s", e)
 
     async def _handle_event_choice(self, intent, game_state, raw_input) -> TurnResult:
+        choice_idx = intent.event_choice_index
+
+        # Primary: GlobalEventManager (active event system in the pipeline)
+        if self.engine.event_manager:
+            primary = self.engine.event_manager.get_primary_event()
+            if primary and primary.effects.get('choices'):
+                choices = primary.effects['choices']
+                if 0 <= choice_idx < len(choices):
+                    choice = choices[choice_idx]
+                    if isinstance(choice, dict):
+                        text = choice.get('followup') or choice.get('text', f"Opzione {choice_idx + 1} scelta.")
+                        for char, amount in choice.get('affinity_change', {}).items():
+                            if self.engine.gameplay_manager and self.engine.gameplay_manager.affinity:
+                                self.engine.gameplay_manager.affinity.change_affinity(
+                                    char, amount, "event_choice"
+                                )
+                    else:
+                        text = str(choice)
+                    return TurnResult(
+                        text=text, user_input=raw_input,
+                        turn_number=game_state.turn_count, provider_used="system",
+                    )
+
+        # Fallback: DynamicEventManager
         if self.engine.gameplay_manager:
-            result = self.engine.gameplay_manager.process_event_choice(
-                intent.event_choice_index, game_state
-            )
+            result = self.engine.gameplay_manager.process_event_choice(choice_idx, game_state)
             text = getattr(result, "narrative", "") or getattr(result, "message", "")
         else:
             text = "Scelta registrata."

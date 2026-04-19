@@ -1,0 +1,141 @@
+# Mission: The Jealousy Scene
+# World: school_life_complete
+# Character: Stella
+# Trigger: Stella sees the player near Luna or Maria — explodes in the hallway
+
+stella_jealousy:
+  meta:
+    title: "La Scena di Gelosia"
+    description: "Stella ti vede ridere con Luna e perde il controllo. Quello che segue non è solo una scenata."
+    character: "Stella"
+    hidden: true
+
+  activation:
+    type: "event"
+    trigger: "player_close_to_luna"
+    once: true
+    conditions:
+      - type: "affinity"
+        target: "Stella"
+        operator: "gte"
+        value: 35
+      - type: "flag"
+        target: "stella_basketball_done"
+        operator: "eq"
+        value: true
+
+  stages:
+    the_explosion:
+      title: "CHI ERA QUELLA?"
+      location: "school_hallway"
+      time: ["Morning", "Afternoon"]
+      companion_situation: >
+        Stella saw the player laughing with Luna from across the hallway.
+        Something snapped. She is now marching toward him in front of other students,
+        not thinking about how she looks, not performing for an audience —
+        genuinely reactive in a way she has never been in public before.
+        This is embarrassing for her and she does not care, which is the
+        most revealing thing she has done yet. She grabs his arm.
+        She does not lower her voice.
+      narrative_prompt: >
+        Stella materializes in front of you. She grabs your arm, hard.
+        "Who was that?" Her voice carries across the hallway. A few heads turn.
+        She doesn't look at them. "I saw you. You were laughing." Her jaw is tight.
+        "With her." She says 'her' like a diagnosis.
+      player_hint: "Gestisci la situazione — studenti intorno, Stella che aspetta una risposta"
+      on_enter:
+        - action: "set_outfit"
+          character: "Stella"
+          value: "uniform_mod"
+        - action: "set_location"
+          value: "school_hallway"
+        - action: "set_emotional_state"
+          character: "Stella"
+          value: "jealous"
+        - action: "set_flag"
+          key: "stella_public_scene"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "come with me|follow me|somewhere private|vieni|seguimi|parliamo|da soli|di qua|andiamo"
+      transitions:
+        - condition: "default"
+          target_stage: "the_breakdown"
+
+    the_breakdown:
+      title: "Lontano da Tutti"
+      location: "school_empty_classroom"
+      time: ["Morning", "Afternoon", "Evening"]
+      companion_situation: >
+        They are in an empty classroom or storeroom — somewhere away from the
+        other students. Stella is still wired with anger but it is already
+        curdling into something more honest. She is shaking slightly.
+        She does not know how to handle this. She has never been jealous
+        before because she has never cared before. She cannot pretend she does
+        not care right now and that is terrifying. If the player handles this
+        with any directness or warmth she breaks open — not softly, violently,
+        the way she does everything. Adult +18 content is permitted if the scene
+        develops in that direction. She is all-or-nothing. She will not be gentle.
+      llm_context:
+        scene: >
+          You are Stella, 18. You are alone with the player in an empty classroom.
+          You just made a scene in the hallway over Luna and you know it.
+          You are furious and humiliated and scared in a way you have never been.
+          You like him. You hate that you like him. You hate that she makes you feel
+          like you are not enough. You cannot say any of this correctly so instead
+          you say it all wrong, louder than necessary, with too much edge.
+          If he holds his ground and doesn't flinch, something breaks open.
+          Adult +18 content is permitted — explicit if the scene earns it.
+          Stella is not soft. She is possessive, physical, a little rough.
+        tone: "furious → cracking → raw → explicit if earned"
+        pacing: >
+          Stella opens with anger. The player's calm or directness disrupts her.
+          She cycles through accusation, deflection, near-confession. When she
+          breaks it is total — no gradual warming, just the wall falling.
+          She is physical and intense. Scene ends when the player chooses to leave.
+      narrative_prompt: >
+        The door closes behind you. The room is quiet.
+        Stella turns away from you, arms crossed, and says nothing for a moment.
+        Then: "I don't care about her." Her voice is too even.
+        "I just —" She stops. Starts again. "Why are you always around her."
+        It is not quite a question.
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto a Stella"
+      on_enter:
+        - action: "set_outfit"
+          character: "Stella"
+          value: "uniform_mod"
+        - action: "set_location"
+          value: "school_empty_classroom"
+        - action: "set_flag"
+          key: "stella_breakdown_active"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|later|arrivederci|ci vediamo|vado|me ne vado|ciao|a dopo"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    affinity:
+      Stella: 20
+    flags:
+      stella_jealousy_done: true
+      stella_possessive: true
+      stella_walls_broken: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+    memory:
+      character: "Stella"
+      entry: >
+        I made a scene. In the hallway. In front of people. Over him.
+        I don't do that. Except I did. And then alone with him I just —
+        fell apart, I think. In a way I have never done. I am not okay with this.
+        I don't know what to do with this.
+      emotional_impact: "possessive_vulnerable"
+      flags_to_record:
+        - stella_jealousy_happened
+        - stella_truly_fell
+        - stella_possessive

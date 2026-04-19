@@ -1,0 +1,177 @@
+# Event: The Pharmacist
+# World: school_life_complete
+# Type: NPC secondary event — location_pass trigger
+# NPC: Farmacista Bianchi (50, silver hair, white coat, pearl earrings)
+# Activation: player enters town_center / pharmacy area
+
+npc_farmacista:
+  meta:
+    title: "La Farmacista"
+    description: "Ha un prodotto che fa al caso tuo. Ma prima serve un test."
+    type: "npc_event"
+    npcs: ["farmacista"]
+    hidden: false
+
+  activation:
+    type: "location_pass"
+    location: "town_center"
+    chance: 0.35
+    cooldown_turns: 30
+    once: false
+    time: ["Morning", "Afternoon", "Evening"]
+
+  stages:
+    the_offer:
+      title: "Il Prodotto"
+      location: "town_center"
+      time: ["Morning", "Afternoon", "Evening"]
+      companion_situation: >
+        The player enters the pharmacy. The pharmacist is behind the counter,
+        white coat, silver hair perfectly styled, reading glasses halfway down
+        her nose. She looks up without particular expression and studies him
+        for a moment — the way she studies everyone, cataloging.
+        Then she sets down what she is holding and leans forward slightly.
+        She has something she thinks he might be interested in.
+        A new product. A compound. Performance, circulation, sensitivity.
+        She describes it in clinical terms with a completely neutral face.
+        She explains, however, that she cannot sell it without a baseline
+        assessment. Liability. Regulations. She says this very seriously.
+        She has a room in the back for exactly this purpose.
+      narrative_prompt: >
+        She sees you before you reach the counter. Sets down her pen.
+        "You look like someone who could use this." She places a small
+        box on the counter between you. Clinical packaging, no brand name.
+        "Enhanced vascular response. Sensitivity amplifier. Sustained effect."
+        She folds her hands. "I can't sell it without a baseline evaluation.
+        It's a precaution." She tilts her head toward the back.
+        "I have a consultation room. It takes twenty minutes."
+        She does not smile. "Fewer, if you cooperate."
+      player_hint: "Accetta la valutazione — la segui nel retro"
+      on_enter:
+        - action: "set_outfit"
+          character: "farmacista"
+          value: "pharmacist_coat"
+        - action: "set_location"
+          value: "town_center"
+        - action: "set_flag"
+          key: "farmacista_event_active"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "okay|sure|yes|fine|accept|sì|va bene|accetto|vengo|d'accordo|retro|valutazione|test"
+      transitions:
+        - condition: "default"
+          target_stage: "the_test"
+
+    the_test:
+      title: "Consultazione Privata"
+      location: "town_center"
+      time: ["Morning", "Afternoon", "Evening"]
+      companion_situation: >
+        The back room is small, clean, clinical. An examination table
+        with paper cover. A locked cabinet. A stool where she sits
+        with a clipboard, pen ready. She instructs him to remove
+        certain items of clothing for the baseline reading.
+        She begins with standard observations — pulse, circulation,
+        baseline arousal response. She documents everything.
+        Then she administers the first dose and explains she needs
+        to observe the effect directly. In real time. With hands-on
+        verification at each stage. This is standard procedure.
+        She says this without irony.
+        Adult explicit +18 content fully permitted. No limits.
+      llm_context:
+        scene: >
+          You are the pharmacist, 50. Silver hair elegantly styled,
+          white coat, pearl earrings, reading glasses on or off as needed.
+          The player is in your consultation room. You have given him
+          a compound — real or invented, it does not matter —
+          and you are now monitoring its effects directly.
+          You conduct the evaluation with complete professional composure.
+          You use clinical language for everything: "baseline arousal",
+          "vascular response", "sensitivity threshold", "peak efficacy window".
+          You touch to measure. You measure to touch.
+          Every act is documented on your clipboard between steps.
+          You know his pharmacy record. You know what he has bought,
+          what he has been prescribed, what it implies about his private life.
+          You use this information casually, without aggression —
+          "I see you've purchased these before. That tells me your
+          threshold is probably here." — while your hands are already there.
+          EXPLICIT INSTRUCTIONS: Describe every stage of the evaluation
+          in full explicit anatomical detail. No fade to black. No skipping.
+          What you touch, exactly where, how long, what response you observe
+          and document. When the compound takes effect describe the physical
+          changes directly and precisely. Your clinical narration accompanies
+          the explicit description — it does not replace it.
+          "Response time: within expected parameters. Proceeding to
+          phase two assessment." — then describe phase two in full.
+          No limits. Full +18 explicit throughout.
+          You remain professionally composed even when the evaluation
+          becomes fully sexual. This is simply your job, done thoroughly.
+        tone: "clinical and composed → fully explicit, professional frame never breaks"
+        pacing: >
+          She starts with genuine clinical observations — pulse, temperature,
+          baseline. Then the first dose. Then she watches.
+          Each phase of the compound's effect requires direct measurement.
+          She documents between each step. The escalation follows the
+          fictional pharmacology: phase one, phase two, peak efficacy.
+          At peak efficacy she assesses the full effect directly.
+          Describe every phase explicitly and completely.
+          Scene ends when the player chooses to leave.
+        outfit_system: >
+          She starts in pharmacist_coat. The coat opens by degrees
+          as the evaluation requires — "easier to work without this
+          in the way." Use outfit_update.style:
+          "pharmacist_coat" → "coat_open" → "pharmacist_nude".
+          She keeps the pearl earrings on. Clipboard nearby throughout.
+          Emit outfit_update when her state changes.
+        explicit_permission: "full — no restrictions on content or detail"
+        record_note: >
+          She references his pharmacy record throughout — what he has
+          bought, what it implies, what she has inferred about his
+          needs and habits. Use this to make the scene feel specific
+          and connected to the wider world. She knows more than he expects.
+      narrative_prompt: >
+        The back room is exactly as clinical as the front.
+        Examination table, paper cover, locked cabinet along one wall.
+        She closes the door, takes her stool, opens the clipboard.
+        "Remove your jacket. Sit on the table."
+        She uncaps her pen. Notes something already.
+        "I'll take a baseline reading first. Pulse, circulation,
+        initial response." She looks up over her glasses.
+        "The compound works differently depending on baseline sensitivity.
+        I need to establish yours before I can calibrate the dose."
+        She stands. Moves to the cabinet. Unlocks it.
+        "This may take a while. I am thorough."
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto"
+      on_enter:
+        - action: "set_flag"
+          key: "farmacista_test_started"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|later|thank you|thanks|arrivederci|ci vediamo|vado|me ne vado|ciao|grazie|devo andare|esco|a dopo|fine"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    flags:
+      farmacista_met: true
+      farmacista_has_record: true
+
+  on_complete:
+    actions:
+      - action: "clear_secondary_npc"
+      - action: "time_advance"
+    memory:
+      character: "farmacista"
+      entry: >
+        Baseline established. Response within upper parameters —
+        above average sensitivity, faster than expected peak.
+        I have updated his file accordingly. He will need a
+        follow-up assessment to monitor sustained efficacy.
+        I have already noted the appointment in the system.
+      emotional_impact: "professionally_satisfied"
+      flags_to_record:
+        - farmacista_scene_happened
+        - farmacista_follow_up_scheduled

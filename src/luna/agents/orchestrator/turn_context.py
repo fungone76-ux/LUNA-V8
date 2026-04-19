@@ -72,6 +72,9 @@ class TurnContext:
     npc_route_target: Optional["RouteResult"] = None  # Step 0.3: routing to NPC
     npc_goal_hint: Optional["GoalHint"] = None        # Step 0.6: NPC goal hint
 
+    # ── GlobalEvents attivati questo turno (Step 2.8) ───────────────────────
+    new_global_events: list = field(default_factory=list)
+
     # ── Fase world state (Steps 2.5–3) ──────────────────────────────────────
     directive: Optional[Any] = None           # TurnDirective da WorldSimulator
     directive_summary: Optional[Dict[str, Any]] = None

@@ -686,7 +686,10 @@ class EventHandler:
         w._current_dynamic_event = event_id
         w._current_event_choices = choices_data
 
-        choice_texts = [c.get('text', f'Opzione {i+1}') for i, c in enumerate(choices_data)]
+        choice_texts = [
+            c.get('text', f'Opzione {i+1}') if isinstance(c, dict) else str(c)
+            for i, c in enumerate(choices_data)
+        ]
 
         w.event_widget.show_event_choices(
             event_title=event_id.replace('_', ' ').title(),

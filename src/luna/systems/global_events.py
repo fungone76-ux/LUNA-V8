@@ -395,7 +395,14 @@ class GlobalEventManager:
                     self.on_event_changed(None)
     
     def has_pending_event(self) -> bool:
-        """Return True if there is at least one active event."""
+        """Return True if there is an active event awaiting numeric player choice."""
+        return any(
+            bool(evt.effects.get('choices'))
+            for evt in self.active_events.values()
+        )
+
+    def has_active_event(self) -> bool:
+        """Return True if there is at least one active event (passive or with choices)."""
         return bool(self.active_events)
 
     def get_primary_event(self) -> Optional[GlobalEventInstance]:

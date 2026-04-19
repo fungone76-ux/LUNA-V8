@@ -144,7 +144,7 @@ class InteractionRuleset:
 
         for npc in present_npcs:
             logger.debug(f"[RULESET DEBUG] Checking npc={npc}, active={active_npc}")
-            if npc == active_npc:
+            if npc.lower().strip() == active_npc.lower().strip():
                 logger.debug(f"[RULESET DEBUG]   Skipping - same as active")
                 continue
 

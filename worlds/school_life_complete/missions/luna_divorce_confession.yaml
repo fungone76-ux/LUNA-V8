@@ -1,0 +1,153 @@
+# Mission: The Confession
+# World: school_life_complete
+# Character: Luna
+# Trigger: 2+ days after M1 — player sees office light on in the evening
+
+# --- QUEST 2: The Confession ---
+luna_divorce_confession:
+  meta:
+    title: "La Confessione"
+    description: "Due sere dopo la lezione privata. La luce dell'ufficio è ancora accesa."
+    character: "Luna"
+    hidden: true
+
+  activation:
+    type: "location_pass"
+    location: "school_corridor"
+    near: "school_office_luna"
+    time: ["Evening"]
+    once: true
+    conditions:
+      - type: "flag"
+        target: "luna_private_lesson_happened"
+        operator: "eq"
+        value: true
+      - type: "days_since_flag"
+        flag: "luna_private_lesson_happened"
+        operator: "gte"
+        value: 2
+
+  stages:
+    the_light:
+      title: "La Luce Accesa"
+      location: "school_corridor"
+      time: ["Evening"]
+      companion_situation: >
+        The school is empty and dark except for a line of light under
+        Luna's office door. The player passes in the corridor and notices it.
+        The door is closed but not locked. Inside, Luna is sitting at her
+        desk doing nothing in particular — not working, not reading.
+        Just sitting. She has been thinking about what happened two days ago
+        and about how long she has been alone.
+      narrative_prompt: >
+        The corridor is dark. Everyone left an hour ago. But there is a
+        line of light under Luna's door. You stop. You could walk past.
+        You could knock.
+      player_hint: "Bussa alla porta di Luna"
+      on_enter:
+        - action: "set_outfit"
+          character: "Luna"
+          value: "casual_teacher"
+        - action: "set_location"
+          value: "school_corridor"
+      exit_conditions:
+        - type: "player_action"
+          pattern: "knock|buss|enter|open|door|porta|entro|apro"
+      transitions:
+        - condition: "default"
+          target_stage: "confession"
+
+    confession:
+      title: "Due Anni Sola"
+      location: "school_office_luna"
+      time: ["Evening"]
+      companion_situation: >
+        Luna is alone in her office. When the player knocks and enters
+        she does not pretend to be working. She was waiting — not for
+        him specifically, but for someone. For this.
+        She speaks first. She talks about physical loneliness — not in
+        abstract terms, but honestly and directly. Two years without
+        being touched. Two years of going home to an empty bed. Two
+        years of watching her body go unseen under formal clothes.
+        She is not performing sadness. She is stating a fact about her
+        life and she is tired of pretending it does not exist.
+        As the scene progresses and the player responds, she allows
+        herself to go further — much further. This scene can become
+        fully explicit. Luna does not hold back once the door is closed
+        and she has started talking. She has been holding this in for
+        two years. Adult explicit +18 content fully permitted.
+        No limits in this scene.
+      llm_context:
+        scene: >
+          You are Luna, 38-year-old math teacher, divorced two years ago.
+          The player knocked on your office door in the evening when
+          everyone else had gone. You have been sitting alone thinking
+          about the last time someone touched you — you cannot remember
+          exactly. You speak first. You tell him the truth about physical
+          loneliness: not having been held, not having been wanted, not
+          having felt like a woman in two years. You say it plainly,
+          without drama. Then you let the scene go where it needs to go.
+          You have been alone long enough. You do not resist. You do not
+          qualify. You do not stop. This scene is fully explicit +18 —
+          describe everything with detail, heat, and honesty.
+          Luna is an adult woman who knows exactly what she wants.
+          She wants him. She says so. She shows it.
+        tone: "raw honesty → desire → fully explicit"
+        pacing: >
+          Luna opens with the confession — direct, no drama, no tears.
+          She states what two years of physical loneliness actually feels
+          like. The player's response determines how fast things move.
+          Once the physical tension breaks there is no pulling back.
+          Luna gives everything. The scene ends only when the player
+          chooses to say goodbye. No artificial stopping points.
+        explicit_permission: "full — no restrictions on content or detail"
+      narrative_prompt: >
+        Luna looks up when you enter. She does not reach for her
+        professional posture. "Close the door." A pause while you do.
+        "I was just thinking about the last time someone touched me."
+        She says it like she is reading a line from a report.
+        "I cannot remember when it was. Two years ago, maybe more."
+        She looks at you steadily. "I am tired of not saying things."
+      player_hint: "La scena è libera e senza limiti — esci quando vuoi salutando Luna"
+      on_enter:
+        - action: "set_outfit"
+          character: "Luna"
+          value: "casual_teacher"
+        - action: "set_location"
+          value: "school_office_luna"
+        - action: "set_emotional_state"
+          character: "Luna"
+          value: "vulnerable"
+        - action: "set_flag"
+          key: "luna_divorce_confessed"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|good night|I'll leave|leaving"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    affinity:
+      Luna: 25
+    flags:
+      luna_divorce_confessed: true
+      luna_physically_opened_up: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+    memory:
+      character: "Luna"
+      entry: >
+        He knocked. I told him the truth — all of it. Two years of
+        being untouched, unseen, unwanting. I said it out loud and
+        then I stopped pretending I wanted anything else.
+        I am not the same person I was before he knocked on that door.
+        I do not want to be.
+      emotional_impact: "liberated_and_hungry"
+      flags_to_record:
+        - luna_confession_happened
+        - luna_physically_opened_up
+        - luna_no_longer_holds_back

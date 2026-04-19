@@ -1,0 +1,21 @@
+pip install sqlalchemy aiohttp fastapi uvicorn pillow torch torchvision torchaudio
+pip install chromadb sentence-transformers
+pip install opencv-python opencv-contrib-python gitpython gguf
+pip install imageio imageio-ffmpeg moviepy av
+pip install accelerate toml ftfy
+pip install comfy-aimdo==0.1.7
+pip install diffusers transformers einops timm
+pip install -r requirements.txt
+pip install -r ComfyUI-KJNodes/requirements.txt
+pip install torchsde
+cd /workspace/ComfyUI && pip install -r requirements.txt
+pip install color-matcher
+pkill -f "python main.py" && sleep 3
+ulimit -n 1048576
+cd /workspace/ComfyUI && python main.py --listen 0.0.0.0 --port 8188
+
+Buongiorno sono Andrea De Logos e sono nuovo...spero di ambientarmi bene nella sua classe!
+gemini api : AIzaSyC_NmECWo-Z4jYgOpQ_e8JKW7yC5gHVQqo
+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
+
+D:\luna-rpg-v6\.venv\Scripts\python.exe -m luna

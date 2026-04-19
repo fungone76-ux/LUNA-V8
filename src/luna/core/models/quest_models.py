@@ -4,7 +4,7 @@ Quest definitions, instances, conditions, and actions.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from pydantic import Field
 
@@ -16,12 +16,15 @@ class QuestCondition(LunaBaseModel):
     """Typed condition - no eval(), explicit operators only."""
     type: Literal[
         "affinity", "location", "time", "flag", "turn_count",
-        "inventory", "companion", "quest_status", "action"
+        "inventory", "companion", "quest_status", "action", "player_action",
+        "days_since_flag"
     ]
     target: Optional[str] = None
     operator: Literal["eq", "gt", "lt", "gte", "lte", "contains", "not_eq"] = "eq"
     value: Any = None
     pattern: Optional[str] = None  # regex for action matching
+    flag: Optional[str] = None     # flag name for days_since_flag condition
+    days: Optional[int] = None     # threshold for days_since_flag condition
 
 
 class QuestAction(LunaBaseModel):
@@ -29,7 +32,8 @@ class QuestAction(LunaBaseModel):
     action: Literal[
         "set_location", "set_outfit", "set_flag", "add_flag",
         "change_affinity", "increment_stat", "set_emotional_state",
-        "set_time", "start_quest", "complete_quest", "fail_quest"
+        "set_time", "start_quest", "complete_quest", "fail_quest",
+        "time_advance", "set_secondary_npc", "clear_secondary_npc"
     ]
     character: Optional[str] = None
     target: Optional[str] = None
@@ -52,6 +56,7 @@ class QuestStage(LunaBaseModel):
     # Shown in the Quest Journal UI — what the player should do to advance.
     # Separate from narrative_prompt (that goes to the LLM, this goes to the UI).
     player_hint: str = ""
+    llm_context: Dict[str, Any] = Field(default_factory=dict)
     on_enter: List[QuestAction] = Field(default_factory=list)
     on_exit: List[QuestAction] = Field(default_factory=list)
     on_fail: List[QuestAction] = Field(default_factory=list)
@@ -78,7 +83,10 @@ class QuestDefinition(LunaBaseModel):
     character: Optional[str] = None
 
     # Activation
-    activation_type: Literal["auto", "manual", "trigger", "choice"] = "auto"
+    activation_type: Literal[
+        "auto", "manual", "trigger", "choice",
+        "event", "random", "time_since_flag", "companion_initiative", "location_pass"
+    ] = "auto"
     activation_conditions: List[QuestCondition] = Field(default_factory=list)
     trigger_event: Optional[str] = None
     hidden: bool = False
@@ -107,6 +115,7 @@ class QuestDefinition(LunaBaseModel):
     start_stage: str = "start"
 
     rewards: QuestRewards = Field(default_factory=QuestRewards)
+    on_complete: List[QuestAction] = Field(default_factory=list)
 
 
 class QuestInstance(LunaBaseModel):

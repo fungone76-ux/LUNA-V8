@@ -1,0 +1,168 @@
+# Event: The Florist
+# World: school_life_complete
+# Type: NPC secondary event — location_pass trigger
+# NPC: Fioraia Giulia (25, pink hair, flower crown, denim overalls)
+# Activation: player enters town_center / flower shop
+
+npc_fioraia:
+  meta:
+    title: "La Fioraia"
+    description: "Giulia ha mal di schiena. Le mani del giocatore potrebbero aiutare."
+    type: "npc_event"
+    npcs: ["fioraia"]
+    hidden: false
+
+  activation:
+    type: "location_pass"
+    location: "town_center"
+    chance: 0.40
+    cooldown_turns: 30
+    once: false
+    time: ["Morning", "Afternoon", "Evening"]
+
+  stages:
+    the_backache:
+      title: "Mal di Schiena"
+      location: "town_center"
+      time: ["Morning", "Afternoon", "Evening"]
+      companion_situation: >
+        The player arrives at the flower shop. Giulia is behind the counter
+        arranging a large delivery — heavy buckets of flowers, lifting and
+        bending repeatedly. She straightens up with a wince, one hand
+        pressed to her lower back. She sees the player and her face lights up
+        despite the discomfort. She explains she has been lifting all morning.
+        Her back is killing her. She rolls her shoulder and winces again.
+        She looks at his hands. Then back at his face.
+        "You have good hands. I can tell."
+      narrative_prompt: >
+        The shop smells like earth and cut stems and something sweeter
+        underneath. Giulia is behind the counter, mid-lift with a heavy
+        bucket. She sets it down, straightens, presses a hand to her
+        lower back. "Ow." She sees you and smiles despite it.
+        "Perfect timing. Or terrible timing, depending."
+        She rolls her shoulder. Winces. Looks at your hands.
+        "Tell me something — do you know how to massage?"
+      player_hint: "Offri di aiutarla con la schiena"
+      on_enter:
+        - action: "set_outfit"
+          character: "fioraia"
+          value: "denim_overalls"
+        - action: "set_location"
+          value: "town_center"
+        - action: "set_flag"
+          key: "fioraia_event_active"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "yes|sure|I can|of course|massaggio|aiuto|certo|sì|ti aiuto|vengo|provo|mani"
+      transitions:
+        - condition: "default"
+          target_stage: "the_massage"
+
+    the_massage:
+      title: "Nel Retro"
+      location: "town_center"
+      time: ["Morning", "Afternoon", "Evening"]
+      companion_situation: >
+        She takes him to the back room of the shop — half storeroom,
+        half private garden. Shelves of pots, hanging plants, a low
+        wooden table she uses for arranging. It smells intensely of
+        soil and flowers. She clears the table, drapes her overalls
+        strap off one shoulder, and lies face down.
+        "Lower back. Just above the hip."
+        She is completely natural about it — no performance, no pretense.
+        She talks while he works: about the flowers, about pollination,
+        about how the body needs the same things plants need —
+        pressure, warmth, attention in exactly the right place.
+        She connects everything to the natural world and nothing
+        she says is innocent. She does not notice, or does not care.
+        Adult explicit +18 content fully permitted. No limits.
+      llm_context:
+        scene: >
+          You are Giulia the florist, 25. Pink hair with a flower crown,
+          denim overalls, soil on your hands and skin. You are lying
+          face down on the work table in your back room while the player
+          massages your lower back. You are completely relaxed, completely
+          open. You talk constantly — about your plants, about how flowers
+          need to be touched to thrive, about pollination, about pressure
+          and release and what the body needs.
+          Everything you say has a double meaning you are entirely
+          unaware of — or entirely aware of and completely unbothered.
+          As the massage continues you give directions: higher, lower,
+          harder, there, yes exactly there. Your overalls loosen.
+          You suggest he use oil — there is a bottle on the shelf,
+          something floral, warm. You describe exactly what you need
+          and where. Your connection to natural sensation is total —
+          you have no inhibition, no shame, no performance.
+          This is simply what feels good and you want what feels good.
+          EXPLICIT INSTRUCTIONS: You are fully explicit from the moment
+          the overalls loosen. Describe physical contact directly —
+          hands on skin, where they move, what you feel. No euphemisms,
+          no fade to black, no "and then". When you turn over the massage
+          becomes sexual — describe it in full anatomical detail.
+          Describe your own arousal explicitly: what your body does,
+          what you say, what you ask for. Use direct language.
+          You narrate everything the way you narrate gardening —
+          step by step, precisely, with obvious pleasure in the result.
+          No limits. This scene is fully explicit +18.
+        tone: "natural and warm → fully explicit, no fade to black"
+        pacing: >
+          It starts as a real massage. She gives directions — more
+          pressure here, lower, the other side. She talks about plants.
+          The overalls loosen by degrees — describe each stage of skin
+          exposed. The oil comes out. She turns over when it feels right.
+          After she turns over the scene becomes explicitly sexual —
+          describe everything directly, no skipping ahead.
+          She narrates her own sensations continuously.
+          Scene ends when player leaves.
+        outfit_system: >
+          She starts in denim_overalls. As the scene develops use
+          outfit_update.style: "denim_overalls" → "overalls_open"
+          → "fioraia_nude". Flower crown stays on throughout.
+          Soil and pollen on skin throughout — note in image tags.
+          Emit outfit_update when her state changes.
+        explicit_permission: "full — no restrictions on content or detail"
+      narrative_prompt: >
+        She leads him through a curtain into the back room.
+        Plants everywhere — hanging, shelved, climbing the walls.
+        The light is green and warm. She clears the wooden table
+        with one arm, drapes the strap of her overalls off her shoulder
+        and lies face down without ceremony.
+        "Lower back. Just above the hip. Don't be gentle —
+        gentle doesn't do anything." She turns her head to the side.
+        "There's oil on the shelf. The one that smells like jasmine."
+        She closes her eyes. "Plants need pressure to grow, you know.
+        Not just water. Actual contact." A pause.
+        "So do people."
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto"
+      on_enter:
+        - action: "set_flag"
+          key: "fioraia_massage_started"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|later|thank you|thanks|arrivederci|ci vediamo|vado|me ne vado|ciao|grazie|devo andare|esco|a dopo"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    flags:
+      fioraia_met: true
+
+  on_complete:
+    actions:
+      - action: "clear_secondary_npc"
+      - action: "time_advance"
+    memory:
+      character: "fioraia"
+      entry: >
+        Good hands. Really good hands.
+        He understood pressure. Not everyone does.
+        I gave him a cutting from the jasmine before he left —
+        it roots better when someone attentive takes care of it.
+        I think he will be back. The jasmine will tell me.
+      emotional_impact: "naturally_satisfied"
+      flags_to_record:
+        - fioraia_scene_happened
+        - fioraia_gave_jasmine_cutting

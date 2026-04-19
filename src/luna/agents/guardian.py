@@ -92,6 +92,19 @@ class StateGuardian:
     # Affinity
     # -------------------------------------------------------------------------
 
+    def _resolve_companion_id(self, name: str) -> Optional[str]:
+        """Return the canonical companion ID for a given name, case-insensitive.
+
+        Returns None if no match found.
+        """
+        if name in self.world.companions:
+            return name
+        lower = name.lower().strip()
+        for key in self.world.companions:
+            if key.lower() == lower:
+                return key
+        return None
+
     def _apply_affinity(
         self,
         narrative: NarrativeOutput,
@@ -103,8 +116,9 @@ class StateGuardian:
             return
 
         for character, delta in narrative.affinity_change.items():
-            # Validate character exists in world
-            if character not in self.world.companions:
+            # Resolve canonical ID (case-insensitive) to avoid "Luna" vs "luna" mismatches
+            canonical = self._resolve_companion_id(character)
+            if canonical is None:
                 logger.debug(
                     "[Guardian] Ignoring affinity for unknown character: %s", character
                 )
@@ -115,19 +129,19 @@ class StateGuardian:
             if clamped != delta:
                 logger.debug(
                     "[Guardian] Affinity delta clamped: %s %+d → %+d",
-                    character, delta, clamped,
+                    canonical, delta, clamped,
                 )
 
-            # Apply
-            old_val = game_state.affinity.get(character, 0)
+            # Apply using canonical key
+            old_val = game_state.affinity.get(canonical, 0)
             new_val = max(0, min(100, old_val + clamped))
-            game_state.affinity[character] = new_val
+            game_state.affinity[canonical] = new_val
 
             if clamped != 0:
-                changes["affinity_changes"][character] = clamped
+                changes["affinity_changes"][canonical] = clamped
                 logger.debug(
                     "[Guardian] Affinity %s: %d → %d (%+d)",
-                    character, old_val, new_val, clamped,
+                    canonical, old_val, new_val, clamped,
                 )
 
     # -------------------------------------------------------------------------
@@ -211,19 +225,31 @@ class StateGuardian:
         game_state: GameState,
         changes: Dict[str, Any],
     ) -> None:
-        """Apply quest activations and completions."""
-        # New quests
+        """Apply quest activations and completions.
+
+        QuestEngine.update() runs first every turn and is the authoritative source.
+        Guardian only applies what QuestEngine hasn't already handled.
+        """
+        terminated = set(game_state.completed_quests) | set(game_state.failed_quests)
+
+        # New quests — skip if already terminated or active (QuestEngine owns lifecycle)
         for quest_id in (narrative.new_quests or []):
             if quest_id not in self.world.quests:
                 logger.debug("[Guardian] Unknown quest: %s", quest_id)
+                continue
+            if quest_id in terminated:
+                logger.debug("[Guardian] Skipping new_quest '%s' — already terminated", quest_id)
                 continue
             if quest_id not in game_state.active_quests:
                 game_state.active_quests.append(quest_id)
                 changes["quests_started"].append(quest_id)
                 logger.info("[Guardian] Quest started: %s", quest_id)
 
-        # Completed quests
+        # Completed quests — skip if QuestEngine already completed it this turn
         for quest_id in (narrative.complete_quests or []):
+            if quest_id in game_state.completed_quests:
+                logger.debug("[Guardian] Skipping complete_quest '%s' — already completed by QuestEngine", quest_id)
+                continue
             if quest_id in game_state.active_quests:
                 game_state.active_quests.remove(quest_id)
             if quest_id not in game_state.completed_quests:

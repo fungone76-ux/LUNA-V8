@@ -1,0 +1,149 @@
+# Mission: You Are Mine
+# World: school_life_complete
+# Character: Stella
+# Trigger: companion_initiative — Stella corners the player at the lockers, evening, school nearly empty
+
+stella_confession:
+  meta:
+    title: "Sei Mio"
+    description: "Sera tardi, scuola vuota. Stella ti spinge contro i lockers. Non è una dichiarazione. È una presa di possesso."
+    character: "Stella"
+    hidden: true
+
+  activation:
+    type: "companion_initiative"
+    once: true
+    conditions:
+      - type: "affinity"
+        target: "Stella"
+        operator: "gte"
+        value: 65
+      - type: "flag"
+        target: "stella_jealousy_done"
+        operator: "eq"
+        value: true
+
+  stages:
+    the_lockers:
+      title: "I Lockers"
+      location: "school_hallway"
+      time: ["Evening"]
+      companion_situation: >
+        The school is nearly empty — late afternoon has gone to evening,
+        a few teachers' cars in the parking lot, nothing else.
+        Stella has been waiting. She intercepts the player at his locker
+        and puts herself between him and the exit. She is in her uniform,
+        slightly disheveled from a long day. She has been thinking about
+        what to say for days and has decided she is not going to say it
+        at all — she is going to do it.
+      narrative_prompt: >
+        You are reaching for your bag when Stella steps in front of you.
+        She puts one hand flat on the locker beside your head and looks at you.
+        Not the performance. Not the act. Just her.
+        "I'm not going to say it's complicated." Her voice is low.
+        "It's not complicated. You are mine." A pause.
+        "I'm not asking."
+      player_hint: "Rispondi a Stella — la scuola è vuota, siete soli"
+      on_enter:
+        - action: "set_outfit"
+          character: "Stella"
+          value: "uniform_mod"
+        - action: "set_location"
+          value: "school_hallway"
+        - action: "set_emotional_state"
+          character: "Stella"
+          value: "devoted"
+        - action: "set_flag"
+          key: "stella_confession_active"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "somewhere|take me|come with me|show me|take you|vieni|portami|andiamo|seguimi|a casa|da te"
+      transitions:
+        - condition: "default"
+          target_stage: "her_terms"
+
+    her_terms:
+      title: "Solo Noi"
+      location: "stella_home"
+      time: ["Evening", "Night"]
+      companion_situation: >
+        Stella has taken the player to her home — her parents are away,
+        as they often are. The house is large and too quiet.
+        This is the first time she has brought anyone here that she actually
+        wanted to bring. She is no longer performing. She has decided
+        what she wants and what she wants is everything.
+        She is possessive, direct, slightly rough in the way she handles this —
+        not cruel, but absolutely certain. This is a full explicit +18 scene.
+        No softening, no fade to black. Stella has shed every layer of
+        the social performance she maintains at school. She is entirely real,
+        entirely wanting, and entirely focused on the player.
+      llm_context:
+        scene: >
+          You are Stella, 18. You have brought the player to your home.
+          Your parents are never here. You have wanted this for a long time
+          and now that it is happening you are not nervous — you are decided.
+          You are possessive, intense, physically demanding. You do not do
+          things by half measures. You tell him what you want directly,
+          without euphemism. You are not gentle but you are real in a way
+          you never are at school. This is a full explicit +18 scene.
+          No limits. No fade to black. Describe everything directly.
+          Stella's voice: raw, possessive, a little rough.
+          She says what she wants. She takes what she wants.
+        tone: "possessive → explicit → completely devoted"
+        pacing: >
+          Stella sets the terms immediately. She does not wait for permission —
+          she creates the situation and invites the player to match her.
+          The scene escalates without hesitation. She is vocal throughout.
+          Physical, explicit, intense. Scene ends when the player chooses to leave.
+      narrative_prompt: >
+        Stella unlocks the front door and pulls you inside without turning on
+        the main lights. The house smells like something expensive.
+        She turns to face you in the hallway and reaches up to loosen her tie.
+        "No one's coming home tonight." She drops the tie on the floor.
+        "So." Her eyes don't leave yours.
+        "We have time."
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto a Stella"
+      on_enter:
+        - action: "set_outfit"
+          character: "Stella"
+          value: "nude"
+        - action: "set_location"
+          value: "stella_home"
+        - action: "set_emotional_state"
+          character: "Stella"
+          value: "devoted"
+        - action: "set_flag"
+          key: "stella_home_scene"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|later|I need to leave|arrivederci|ci vediamo|vado|me ne vado|ciao|devo andare|a domani"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    affinity:
+      Stella: 30
+    flags:
+      stella_confession_done: true
+      stella_confessed_love: true
+      stella_absolute: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+    memory:
+      character: "Stella"
+      entry: >
+        He came home with me. I said what I meant and he stayed.
+        For once I didn't care about seeming cool or looking stupid or
+        what anyone would think. I just — wanted. And I took it.
+        I don't know what this makes me. I don't actually care.
+        He is mine. That's enough.
+      emotional_impact: "complete_devoted_possession"
+      flags_to_record:
+        - stella_confession_happened
+        - stella_truly_his
+        - stella_confessed_love

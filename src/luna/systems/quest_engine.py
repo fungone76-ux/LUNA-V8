@@ -139,6 +139,14 @@ class ConditionEvaluator:
                 return True
             return False
 
+        if t == "player_action":
+            pattern = c.pattern if hasattr(c, "pattern") and c.pattern else str(c.value)
+            if not pattern:
+                return False
+            import re as _re
+            player_input = gs.flags.get("_last_player_input", "")
+            return bool(player_input and _re.search(pattern, player_input, _re.IGNORECASE))
+
         logger.warning("Unknown condition type: %s", t)
         return False
 
@@ -295,7 +303,13 @@ class QuestEngine:
             logger.info("[QuestAction] set_emotional_state %s → %s (quest-forced)", companion, state_value)
 
         elif act == "change_affinity":
-            companion = char or game_state.active_companion
+            companion_raw = char or game_state.active_companion
+            # Normalize to canonical key (case-insensitive match against world companions)
+            companion = companion_raw
+            if engine:
+                companions = getattr(getattr(engine, "world", None), "companions", {})
+                lower = companion_raw.lower().strip()
+                companion = next((k for k in companions if k.lower() == lower), companion_raw)
             delta = int(value) if value else 0
             current = game_state.affinity.get(companion, 0)
             game_state.affinity[companion] = max(0, min(100, current + delta))
@@ -313,6 +327,33 @@ class QuestEngine:
                 game_state.active_quests.remove(qid)
             if qid not in game_state.completed_quests:
                 game_state.completed_quests.append(qid)
+
+        elif act == "set_secondary_npc":
+            npc_id = str(value or char or "")
+            if npc_id:
+                game_state.flags["_secondary_npc"] = npc_id
+                game_state.flags["_scene_mode"] = "multi_char"
+                logger.info("[QuestAction] set_secondary_npc → %s", npc_id)
+
+        elif act == "clear_secondary_npc":
+            game_state.flags.pop("_secondary_npc", None)
+            game_state.flags["_scene_mode"] = "single_char"
+            logger.info("[QuestAction] clear_secondary_npc")
+
+        elif act == "time_advance":
+            try:
+                from luna.systems.phase_clock import PhaseAdvanceReason
+                phase_clock = getattr(engine, "phase_clock", None) if engine else None
+                if phase_clock:
+                    event = phase_clock.force_advance(
+                        PhaseAdvanceReason.FORCED, game_state.turn_count
+                    )
+                    if event:
+                        game_state.time_of_day = event.new_phase
+                        logger.info("[QuestAction] time_advance: %s -> %s", event.old_phase, event.new_phase)
+                        return [event.message]
+            except Exception as e:
+                logger.warning("[QuestAction] time_advance failed: %s", e)
 
         return []
 
@@ -423,6 +464,22 @@ class QuestEngine:
                 parts.append(f"[Quest: {quest_def.title}] {stage.narrative_prompt}")
             if stage.companion_situation and not situation_override:
                 situation_override = stage.companion_situation
+            if stage.llm_context:
+                ctx = stage.llm_context
+                if ctx.get("scene"):
+                    parts.append(f"=== SCENE INSTRUCTIONS ===\n{ctx['scene']}")
+                if ctx.get("tone"):
+                    parts.append(f"[Scene tone: {ctx['tone']}]")
+                if ctx.get("pacing"):
+                    parts.append(f"[Pacing: {ctx['pacing']}]")
+                if ctx.get("explicit_permission"):
+                    parts.append(f"[Explicit content permitted: {ctx['explicit_permission']}]")
+                if ctx.get("voyeur_mechanic"):
+                    parts.append(f"[Voyeur mechanic: {ctx['voyeur_mechanic']}]")
+                if ctx.get("dual_character"):
+                    parts.append(f"[Dual character scene: {ctx['dual_character']}]")
+                if ctx.get("outfit_note"):
+                    parts.append(f"[Outfit/image note: {ctx['outfit_note']}]")
         return "\n".join(parts), situation_override
 
     # -------------------------------------------------------------------------
@@ -554,6 +611,9 @@ class QuestEngine:
             if quest_id not in game_state.completed_quests:
                 game_state.completed_quests.append(quest_id)
             self._apply_rewards(quest_def, game_state)
+            if quest_def.on_complete:
+                self.execute_actions(quest_def.on_complete, game_state, self._engine)
+                logger.info("[QuestEngine] on_complete for '%s': %d actions", quest_id, len(quest_def.on_complete))
             logger.info("Quest '%s' completed", quest_id)
             return QuestUpdateResult(
                 quest_id=quest_id,

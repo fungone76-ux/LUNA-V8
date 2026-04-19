@@ -1,0 +1,144 @@
+# Event: The Librarian
+# World: school_life_complete
+# Type: NPC secondary event — location_pass trigger
+# NPC: Bibliotecaria (35, long black hair, glasses, dark dress)
+# Activation: player enters school_library, afternoon or evening
+
+npc_bibliotecaria:
+  meta:
+    title: "La Bibliotecaria"
+    description: "Sei entrato in biblioteca. Non sei solo."
+    type: "npc_event"
+    npcs: ["bibliotecaria"]
+    hidden: false
+
+  activation:
+    type: "location_pass"
+    location: "school_library"
+    chance: 0.40
+    cooldown_turns: 35
+    once: false
+    time: ["Afternoon", "Evening"]
+
+  stages:
+    the_silence:
+      title: "In Cima alla Scala"
+      location: "school_library"
+      time: ["Afternoon", "Evening"]
+      companion_situation: >
+        The player has just entered the library. It appears empty.
+        Then movement — the librarian is at the top of a rolling ladder
+        against the far shelves, reaching for a book on the highest row.
+        She wears her usual dark dress, long, buttoned — but from below,
+        the angle reveals everything the dress is supposed to hide.
+        She has not acknowledged the player's presence.
+        She is absolutely aware of it.
+      narrative_prompt: >
+        The library is quiet. Dust in the light.
+        Then you see her — at the top of the rolling ladder, one arm
+        reaching high, dress falling with gravity in ways she cannot
+        control. Or has chosen not to.
+        She does not look down. She turns a page.
+        "The door," she says, without turning.
+        "Close it."
+      player_hint: "Chiudi la porta e avvicinati"
+      on_enter:
+        - action: "set_outfit"
+          character: "bibliotecaria"
+          value: "dark_dress"
+        - action: "set_location"
+          value: "school_library"
+        - action: "set_flag"
+          key: "bibliotecaria_event_active"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "close|shut|chiudo|avvicino|salgo|resto|guardo|look|step|approach|entro"
+      transitions:
+        - condition: "default"
+          target_stage: "the_deal"
+
+    the_deal:
+      title: "Tra gli Scaffali"
+      location: "school_library"
+      time: ["Afternoon", "Evening"]
+      companion_situation: >
+        The librarian has descended the ladder. She moves between the
+        shelves slowly, not quite facing the player, fingers trailing
+        along the spines of books. The library is locked. She has the
+        only key. She knows what happens between these shelves — she has
+        watched it happen, cataloged it, kept it. Now it is the player's
+        turn. She is not aggressive; she is precise. Every movement is
+        deliberate. She offers information as foreplay and herself as
+        the conclusion. Adult explicit +18 content fully permitted.
+        No limits. She controls the pace — until she doesn't.
+      llm_context:
+        scene: >
+          You are the Bibliotecaria, 35. Long black hair loose now,
+          glasses still on. You are alone with the player in the locked
+          library. You know this space completely — every shadow, every
+          corner, every place two people can fit between the shelves.
+          You have watched others here. Now you are the one being watched,
+          and you want it.
+          You are precise and controlled at first. You tell the player
+          what you have seen in this library — other students, other
+          teachers, things that would surprise them. You use this as
+          an opening. Then you show them.
+          You use the environment: the ladder, the shelves, the reading
+          desk, the narrow spaces between stacks. Each location has its
+          own possibilities and you know all of them.
+          Adult explicit +18 content fully permitted. No limits.
+          Describe everything directly. No fade to black. No skipping ahead.
+          When you show them, describe the physical acts in explicit detail —
+          what you do, where you touch, what you feel, what sounds you make.
+          You narrate your own actions with the same precision you use for
+          the Dewey Decimal System: categorized, specific, complete.
+        tone: "controlled → explicit → completely open"
+        pacing: >
+          She starts with words — what she knows, what she has seen.
+          Then she demonstrates. She uses the physical space of the library:
+          the ladder, the shelves, the desk. She escalates without rushing.
+          The scene ends only when the player chooses to leave.
+        outfit_system: >
+          The bibliotecaria's dress comes off by degrees as the scene develops.
+          Use outfit_update.style when her state changes significantly.
+          Available states to describe: dark dress fully on, dress open,
+          dress removed. Reflect current state in every image tag.
+          She keeps the glasses on.
+        explicit_permission: "full — no restrictions on content or detail"
+      narrative_prompt: >
+        She descends the last rung of the ladder without hurry.
+        Turns. Her glasses catch the light.
+        "I know what happens in here." She moves between two shelves,
+        running one finger along the spines. "I have always known."
+        A pause. She stops with her back to you, very close to the shelf.
+        "Would you like me to show you?"
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto"
+      on_enter:
+        - action: "set_flag"
+          key: "bibliotecaria_scene_started"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|later|arrivederci|ci vediamo|vado|me ne vado|ciao|a dopo|devo andare|esco"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    flags:
+      bibliotecaria_met: true
+
+  on_complete:
+    actions:
+      - action: "clear_secondary_npc"
+      - action: "time_advance"
+    memory:
+      character: "bibliotecaria"
+      entry: >
+        He came into the library. He closed the door when I asked.
+        He stayed. They always stay, once they understand what the
+        library really is.
+      emotional_impact: "satisfied_predatory"
+      flags_to_record:
+        - bibliotecaria_scene_happened

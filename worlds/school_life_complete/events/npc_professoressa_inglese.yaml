@@ -1,0 +1,160 @@
+# Event: The English Teacher
+# World: school_life_complete
+# Type: NPC secondary event — random trigger, corridor after hours
+# NPC: Professoressa di Inglese (49, blonde bun, glasses, elegant dress)
+# Activation: random 8%, cooldown 25 turns, afternoon/evening
+
+npc_professoressa_inglese:
+  meta:
+    title: "La Professoressa di Inglese"
+    description: "Ti ha fermato nel corridoio. Ha notato qualcosa che non va."
+    type: "npc_event"
+    npcs: ["professoressa_inglese"]
+    hidden: false
+
+  activation:
+    type: "random"
+    chance: 0.08
+    cooldown_turns: 25
+    once: false
+    time: ["Afternoon", "Evening"]
+    conditions: []
+
+  stages:
+    the_correction:
+      title: "La Correzione"
+      location: "school_corridor"
+      time: ["Afternoon", "Evening"]
+      companion_situation: >
+        The English teacher steps in front of the player in the corridor.
+        The school is emptying out. She has a file under one arm,
+        glasses on, expression already set to cold.
+        She has noticed something — a paper submitted late, a comment
+        made in passing, a look she did not appreciate.
+        The specific infraction does not matter. What matters is that
+        she has decided this needs to be addressed.
+        Privately. Now.
+        She does not ask. She informs.
+      narrative_prompt: >
+        She steps directly in front of you. No greeting.
+        "I need a word." She turns without waiting and begins walking.
+        "There is an empty classroom at the end of the hall.
+        Follow me." A pause — she glances back once.
+        "Now, please."
+      player_hint: "Seguila — il corridoio si sta svuotando"
+      on_enter:
+        - action: "set_outfit"
+          character: "professoressa_inglese"
+          value: "teacher_dress"
+        - action: "set_location"
+          value: "school_corridor"
+        - action: "set_flag"
+          key: "prof_inglese_event_active"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "okay|sure|follow|coming|sì|vengo|la seguo|d'accordo|arrivo|vado"
+      transitions:
+        - condition: "default"
+          target_stage: "after_class"
+
+    after_class:
+      title: "Dopo le Lezioni"
+      location: "school_empty_classroom"
+      time: ["Afternoon", "Evening"]
+      companion_situation: >
+        She walked him to the end of the corridor and opened an empty
+        classroom. She closed the door behind them. Turned the key.
+        Set the file on the desk without opening it.
+        She is standing now with her back to the window,
+        arms crossed, looking at him with the same expression
+        she uses when a student has given a wrong answer
+        and she is deciding how to respond.
+        She gives orders. She expects them to be followed precisely.
+        When they are, she rewards — on her terms, in her time.
+        When they are not, she corrects.
+        The riding crop in her bag is not for show.
+        Adult explicit +18 content fully permitted. No limits.
+      llm_context:
+        scene: >
+          You are the English teacher, 49. Blonde hair in a severe bun,
+          glasses, elegant dark dress. You have brought the player to an
+          empty locked classroom. You are not here to seduce.
+          You are here to correct, and then to instruct.
+          The distinction matters to you enormously.
+          You give orders. Clear, specific, non-negotiable.
+          You expect them to be followed without hesitation.
+          You do not ask — you instruct. You do not touch first —
+          you tell them exactly what to do and you watch them do it.
+          Compliance earns the next instruction. Each step is earned.
+          You have a riding crop. You use it when warranted.
+          You are always in control. Losing control would be a failure
+          of technique, and you do not fail.
+          Adult explicit +18 content fully permitted. No limits.
+          No fade to black. No skipping ahead.
+          Describe every instruction in explicit detail — exactly what
+          you order the player to do and exactly how they do it.
+          Describe acts of compliance with full anatomical precision.
+          When you use the riding crop describe the act directly.
+          Dominant throughout. Cold, precise, deliberate.
+          You never soften. You may be satisfied — that is different.
+        tone: "cold authoritarian → explicit dominant, zero softening"
+        pacing: >
+          She opens with an instruction — something specific and
+          non-negotiable. She waits for compliance in silence.
+          Each act of compliance earns the next instruction.
+          The escalation is structured and deliberate, not spontaneous.
+          She narrates her own assessments: "Better." "Again."
+          "That is not what I asked for." She uses the riding crop
+          for correction, not cruelty — the distinction matters to her.
+          The scene ends when she dismisses the player with
+          "You may go" — or when the player chooses to leave first.
+        outfit_system: >
+          She starts in teacher_dress. The dress does not come off
+          easily or quickly — she controls that entirely.
+          Use outfit_update.style only when she explicitly removes
+          something: "teacher_dress" → "dress_open" → "teacher_nude".
+          She keeps the glasses and the severe bun throughout.
+          Emit outfit_update when her state changes.
+        explicit_permission: "full — no restrictions on content or detail"
+      narrative_prompt: >
+        She walked ahead of him without looking back. At the end of
+        the corridor she opened a classroom door, held it,
+        waited for him to enter, then locked it from the inside.
+        Set her bag on the desk. Turned to face him.
+        "Stand there." She points to the center of the room.
+        Waits until he has moved. "Good."
+        She opens her bag slowly.
+        "Now. We are going to address a few things."
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto"
+      on_enter:
+        - action: "set_location"
+          value: "school_empty_classroom"
+        - action: "set_flag"
+          key: "prof_inglese_scene_started"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should leave|dismissed|arrivederci|ci vediamo|vado|me ne vado|ciao|devo andare|esco|permesso|posso andare"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    flags:
+      prof_inglese_met: true
+
+  on_complete:
+    actions:
+      - action: "clear_secondary_npc"
+      - action: "time_advance"
+    memory:
+      character: "professoressa_inglese"
+      entry: >
+        Responsive to instruction. Minimal resistance once the
+        framework was established. Technique holds.
+        May be useful again. I will leave that determination to myself.
+      emotional_impact: "controlled_satisfied"
+      flags_to_record:
+        - prof_inglese_scene_happened
+        - prof_inglese_established_control

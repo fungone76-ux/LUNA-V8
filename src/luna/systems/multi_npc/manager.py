@@ -103,9 +103,12 @@ class MultiNPCManager:
             if game_state.flags.get("disable_multi_npc", False):
                 return False
         
-        # Per-NPC check
+        # Per-NPC check (case-insensitive lookup)
         if active_npc and self.world:
-            companion = self.world.companions.get(active_npc)
+            npc_lower = active_npc.lower().strip()
+            companion = self.world.companions.get(active_npc) or next(
+                (v for k, v in self.world.companions.items() if k.lower() == npc_lower), None
+            )
             if companion:
                 allow = getattr(companion, 'allow_multi_npc_interrupts', True)
                 if not allow:
@@ -135,7 +138,8 @@ class MultiNPCManager:
         
         # Get all companions + npc_templates except active
         all_npcs = list(self.world.companions.keys()) + list(self.world.npc_templates.keys())
-        potential_npcs = [n for n in all_npcs if n != active_npc]
+        active_npc_lower = active_npc.lower().strip()
+        potential_npcs = [n for n in all_npcs if n.lower().strip() != active_npc_lower]
         
         # V4.5: Filter by location using schedule manager
         present = []
@@ -309,9 +313,10 @@ class MultiNPCManager:
         player_input_lower = player_input.lower()
         current_turn = getattr(game_state, 'turn_count', 0)
         player_location = getattr(game_state, 'current_location', None) if game_state else None
+        active_npc_lower = (active_npc or "").lower().strip()
         
         for npc_name in present_npcs:
-            if npc_name == active_npc:
+            if npc_name.lower().strip() == active_npc_lower:
                 continue
             
             # Check cooldown

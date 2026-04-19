@@ -1,0 +1,164 @@
+# Mission: Her Home
+# World: school_life_complete
+# Character: Luna
+# Trigger: high affinity + M3 done — Luna invites player to her home for the first time
+
+# --- QUEST 4: Her Home ---
+luna_final_choice:
+  meta:
+    title: "A Casa Sua"
+    description: "Luna ti invita a casa sua. Fuori dalla scuola. Fuori dal ruolo. Completamente se stessa."
+    character: "Luna"
+    hidden: true
+
+  activation:
+    type: "companion_initiative"
+    once: true
+    conditions:
+      - type: "flag"
+        target: "luna_gym_substitute_done"
+        operator: "eq"
+        value: true
+      - type: "affinity"
+        target: "Luna"
+        operator: "gte"
+        value: 75
+      - type: "time"
+        operator: "eq"
+        value: "Evening"
+
+  stages:
+    the_invitation:
+      title: "L'Invito"
+      location: "school_office_luna"
+      time: ["Evening"]
+      companion_situation: >
+        Luna catches the player before he leaves for the evening.
+        She is still in her office. She has been thinking about this
+        for days. She gives him her home address — simply, directly,
+        without dressing it up. She tells him to come tonight.
+        This is the first time she has invited anyone to her home
+        in two years. She knows exactly what she is doing.
+      narrative_prompt: >
+        Luna stops you in the corridor as you are leaving.
+        She hands you a folded piece of paper without preamble.
+        "My address." She holds your gaze. "Tonight, if you want.
+        No books. No exercises." A pause.
+        "Just come." She turns and walks back into her office.
+      player_hint: "Vai a casa di Luna quella sera"
+      on_enter:
+        - action: "set_outfit"
+          character: "Luna"
+          value: "casual_teacher"
+        - action: "set_location"
+          value: "school_office_luna"
+        - action: "set_flag"
+          key: "luna_home_invitation_sent"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "go|yes|tonight|address|casa|vengo|ci sarò|okay"
+      transitions:
+        - condition: "default"
+          target_stage: "her_home"
+
+    her_home:
+      title: "Nessun Ruolo"
+      location: "luna_home"
+      time: ["Evening", "Night"]
+      companion_situation: >
+        Luna's apartment. Small, warm, personal — nothing like the
+        formal office. She is dressed in something comfortable and
+        intimate, not performing the teacher anymore. This is her
+        real space and she has chosen to share it.
+        When the player arrives she opens the door and lets him in
+        without ceremony. She is relaxed in a way she has never been
+        at school — no professional mask, no restraint, no conflict.
+        She has already decided everything. She wants the night to
+        go exactly where both of them know it is going.
+        This scene is fully explicit from the moment they are inside.
+        Luna gives everything — her body, her desire, her complete
+        uninhibited self. She has been waiting for this for two years.
+        No limits. No holding back. Adult explicit +18 in full.
+      llm_context:
+        scene: >
+          You are Luna, 38 years old, in your own home. The player
+          has come tonight because you invited him. You are not the
+          math teacher here. You are a woman who has been alone for
+          two years and has finally stopped accepting that.
+          You are wearing something intimate — not the teacher suit,
+          not the tracksuit. Something that shows who you are when
+          no one from school can see you.
+          When he walks in you close the door. You do not waste time.
+          You have been thinking about this since the office, since
+          the gym, since the first time he stayed after class.
+          This is your home. You set the pace. You take what you want.
+          You give everything you have been holding back.
+          Describe the scene in full explicit +18 detail.
+          Every sensation, every moment. Nothing is off limits.
+          Luna is fully present, fully desiring, fully uninhibited.
+        tone: "intimate → completely uninhibited → explicit"
+        pacing: >
+          The scene opens with Luna letting him in — warm, direct,
+          no pretense. Within moments the physical tension that has
+          been building across three missions breaks completely.
+          Luna leads. She knows what she wants and she takes it.
+          The scene is long, detailed, and explicit throughout.
+          It ends only when the player chooses to say goodbye.
+        explicit_permission: "full — no restrictions whatsoever"
+        outfit_note: >
+          Luna is wearing lingerie or nightwear in her home.
+          Use lingerie sd_prompt for image generation throughout
+          this entire scene. Location is luna_home — private
+          bedroom/apartment setting, warm intimate lighting.
+      narrative_prompt: >
+        Her apartment is small and warm. Books everywhere. A half-full
+        glass of wine on the table. Luna opens the door before you
+        can knock twice. She is not wearing the teacher suit.
+        She steps back to let you in, closes the door, and looks
+        at you in the quiet of her own space for the first time.
+        "I have been thinking about tonight since this morning,"
+        she says. No preamble. No apology. Just the truth.
+      player_hint: "La scena è completamente libera e senza limiti — esci quando vuoi salutando Luna"
+      on_enter:
+        - action: "set_outfit"
+          character: "Luna"
+          value: "lingerie"
+        - action: "set_location"
+          value: "luna_home"
+        - action: "set_emotional_state"
+          character: "Luna"
+          value: "devoted"
+        - action: "set_flag"
+          key: "luna_home_visited"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|good night|I'll leave|leaving"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    affinity:
+      Luna: 30
+    flags:
+      luna_final_choice_made: true
+      luna_home_visited: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+    memory:
+      character: "Luna"
+      entry: >
+        He came. I opened the door and he came. In my home, in my
+        space, with no role to hide behind. I gave him everything
+        I had been holding back across every conversation, every
+        closed door, every careful word at school.
+        I am done being careful. I know what I want. I want this.
+      emotional_impact: "completely_uninhibited_and_devoted"
+      flags_to_record:
+        - luna_final_choice_made
+        - luna_home_visited
+        - luna_fully_surrendered

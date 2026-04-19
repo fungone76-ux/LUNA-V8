@@ -1,0 +1,150 @@
+# Event: The Nurse
+# World: school_life_complete
+# Type: NPC secondary event — random trigger, location school_infirmary
+# NPC: Infermiera (26, blonde ponytail, white uniform, white stockings)
+# Activation: random 12% during school hours, 25% if stella_basketball_done
+
+npc_infermiera:
+  meta:
+    title: "L'Infermiera"
+    description: "Sei stato chiamato in infermeria. Una visita di routine."
+    type: "npc_event"
+    npcs: ["infermiera"]
+    hidden: false
+
+  activation:
+    type: "random"
+    chance: 0.12
+    chance_if_flag:
+      flag: "stella_basketball_done"
+      value: 0.25
+    cooldown_turns: 30
+    once: false
+    time: ["Morning", "Afternoon"]
+    conditions: []
+
+  stages:
+    the_visit:
+      title: "Visita di Routine"
+      location: "school_infirmary"
+      time: ["Morning", "Afternoon"]
+      companion_situation: >
+        The player has been called to the infirmary — or arrived on their own.
+        The nurse is at her desk when he enters, writing something in a file.
+        She looks up, gestures toward the examination table without urgency.
+        The room smells of antiseptic. Everything is white and clean.
+        She is professional, almost cold. She asks standard questions
+        about how he is feeling, what hurts, when it started.
+        She listens to his answers with a pen in hand, nodding.
+        Nothing unusual yet.
+      narrative_prompt: >
+        The infirmary door closes behind you.
+        She is already at the table, file open, pen ready.
+        "Sit." She points to the examination table without looking up.
+        "I'll need to check a few things." She snaps on a latex glove.
+        "Standard procedure."
+      player_hint: "Siediti sul lettino — lascia che inizi la visita"
+      on_enter:
+        - action: "set_outfit"
+          character: "infermiera"
+          value: "nurse_uniform"
+        - action: "set_location"
+          value: "school_infirmary"
+        - action: "set_flag"
+          key: "infermiera_event_active"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "sit|okay|sure|fine|go ahead|siediti|mi siedo|va bene|okay|sì|lettino|visita"
+      transitions:
+        - condition: "default"
+          target_stage: "the_examination"
+
+    the_examination:
+      title: "Esame Approfondito"
+      location: "school_infirmary"
+      time: ["Morning", "Afternoon"]
+      companion_situation: >
+        The door is locked. She said it was "to ensure patient privacy."
+        The examination has started normally — temperature, blood pressure,
+        stethoscope on the chest. She narrates each step precisely.
+        Then one hand goes slightly too far during a reflex check.
+        She notes the reaction in the file without changing expression.
+        "Interesting." She moves to the next procedure.
+        The clinical frame never breaks. That is the point.
+        Adult explicit +18 content fully permitted. No limits.
+      llm_context:
+        scene: >
+          You are the school nurse, 26. Blonde ponytail, white uniform,
+          white stockings. The player is on the examination table.
+          The door is locked. You have a thermometer, a stethoscope,
+          a blood pressure cuff — you use all of them, in order,
+          with complete professional seriousness.
+          The difference is where you place them and how long you linger.
+          You narrate every step as a real medical procedure:
+          "Deep breath. Again. Good." — while your hands move somewhere
+          they should not. You never break the clinical tone.
+          That is the point. The uniform stays on.
+          Adult explicit +18 content fully permitted. No limits.
+          Describe every action with medical precision and anatomical
+          vocabulary. No fade to black. No skipping ahead.
+          When the exam becomes sexual describe it in full explicit detail —
+          what she does, exactly where, what the patient's body does,
+          what she observes and notes. The clinical language does not
+          replace the explicit description — it accompanies it.
+          "Vasodilation noted in the area. Continuing assessment."
+          When she tastes a patient she describes the flavor clinically.
+          No limits. Full +18 explicit throughout.
+        tone: "clinical → increasingly explicit, never loses the medical frame"
+        pacing: >
+          She starts with a real exam — temperature, blood pressure,
+          reflexes. Perfectly normal. Then one touch goes slightly too far.
+          She notes the reaction in her chart without comment.
+          Each subsequent step escalates while maintaining the procedural
+          structure. "I'll need to check..." is her transition phrase.
+          The scene ends when the player chooses to leave.
+        outfit_system: >
+          The nurse uniform stays on throughout — it is essential to the scene.
+          Use outfit_update.style only for progressive states if the scene
+          reaches that point: "nurse_uniform" → "nurse_uniform_open" → "nurse_nude".
+          She keeps the stethoscope on even when nothing else remains.
+          Emit outfit_update when her state changes visually.
+        explicit_permission: "full — no restrictions on content or detail"
+      narrative_prompt: >
+        She locks the door. "Patient privacy," she says, turning back
+        with the stethoscope already in hand.
+        "Shirt up, please." She presses the cold disc to your chest.
+        "Breathe." A pause. "Again."
+        She writes something in the file. Then looks up.
+        "I'll need to check a few more things.
+        Some patients find this part... unexpected."
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto"
+      on_enter:
+        - action: "set_flag"
+          key: "infermiera_examination_started"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|later|thank you|thanks|arrivederci|ci vediamo|vado|me ne vado|ciao|grazie|devo andare|esco"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    flags:
+      infermiera_met: true
+
+  on_complete:
+    actions:
+      - action: "clear_secondary_npc"
+      - action: "time_advance"
+    memory:
+      character: "infermiera"
+      entry: >
+        New patient today. Responsive. Good reflexes.
+        I have noted the results in the file under a different name.
+        Follow-up visit recommended. Weekly monitoring.
+      emotional_impact: "clinical_satisfied"
+      flags_to_record:
+        - infermiera_scene_happened
+        - infermiera_follow_up

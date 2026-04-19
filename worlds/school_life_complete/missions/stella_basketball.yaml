@@ -1,0 +1,137 @@
+# Mission: Basketball Challenge
+# World: school_life_complete
+# Character: Stella
+# Trigger: companion_initiative — Stella challenges the player to a one-on-one game
+
+stella_basketball:
+  meta:
+    title: "Sfida a Basket"
+    description: "Stella ti sfida a una partita di basket nel pomeriggio. Ha una scommessa in mente."
+    character: "Stella"
+    hidden: true
+
+  activation:
+    type: "companion_initiative"
+    once: true
+    conditions:
+      - type: "affinity"
+        target: "Stella"
+        operator: "gte"
+        value: 25
+      - type: "flag"
+        target: "stella_photoshoot_done"
+        operator: "eq"
+        value: true
+
+  stages:
+    the_challenge:
+      title: "La Sfida"
+      location: "school_hallway"
+      time: ["Afternoon"]
+      companion_situation: >
+        Stella stops the player in the hallway before the afternoon break.
+        She has been thinking about this since the gym session and needs to
+        reset the dynamic — she challenged him, she is in control, this is
+        her territory. The challenge is casual on the surface but she
+        clearly wants to win and she clearly wants him there.
+        A bet is involved. She has not thought through what happens if she loses.
+      narrative_prompt: >
+        Stella leans against the wall and crosses her arms.
+        "Okay so. I need to settle something." She holds up two fingers.
+        "One. I am better at basketball than you. Two." She tilts her head.
+        "If you win, I owe you one. If I win, you owe me one.
+        Deal?" She says 'one' like it could mean anything.
+      player_hint: "Accetta la sfida — campo da basket, dopo le lezioni"
+      on_enter:
+        - action: "set_outfit"
+          character: "Stella"
+          value: "uniform_mod"
+        - action: "set_location"
+          value: "school_hallway"
+        - action: "set_flag"
+          key: "stella_basketball_challenge"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "deal|accept|sure|okay|fine|I'm in|ci sto|accetto|va bene|d'accordo|sfida|gioco"
+      transitions:
+        - condition: "default"
+          target_stage: "the_game"
+
+    the_game:
+      title: "Il Campo"
+      location: "school_basketball_court"
+      time: ["Afternoon", "Evening"]
+      companion_situation: >
+        They are at the outdoor basketball court behind the school building.
+        It is late afternoon, golden light, no one else around.
+        Stella is in her sport outfit. She is genuinely good — athletic,
+        competitive, a little dirty with elbows and footwork.
+        The physical contact of the game, the sweat, her flushed face
+        when she's losing are all there. She is not thinking about being
+        the popular girl right now — she is just playing.
+        If the player is competitive and physical she responds with energy.
+        At some point the game stops mattering and something else does.
+        Adult +18 content is permitted if the scene develops that way.
+      llm_context:
+        scene: >
+          You are Stella, 18. You are playing one-on-one basketball with the player
+          at the school court. Late afternoon, just the two of you.
+          You are in your sports outfit — shorts, sports bra or tank top, hair up.
+          You are sweaty, competitive, actually trying to win.
+          The physical closeness of the game is affecting you more than you
+          expected. Every time he gets past you, every time you block him,
+          the tension ratchets up one notch. You do not know if you want
+          to win or lose the bet anymore. Adult +18 content is permitted
+          if the scene goes there — describe it directly.
+        tone: "competitive → physically charged → explicit if earned"
+        pacing: >
+          Game starts seriously. Physical contact escalates naturally.
+          Stella gets flushed and distracted. If the player reads the moment
+          the game stops and something else begins. She is not passive —
+          she initiates as much as she receives. Scene ends when the player leaves.
+      narrative_prompt: >
+        The court is warm from the afternoon sun. Stella bounces the ball
+        once, twice, then gives you a look that says she's already won.
+        "First to twenty." She passes the ball to you. "And don't go easy on me.
+        I hate that."
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto a Stella"
+      on_enter:
+        - action: "set_outfit"
+          character: "Stella"
+          value: "sport"
+        - action: "set_location"
+          value: "school_basketball_court"
+        - action: "set_emotional_state"
+          character: "Stella"
+          value: "tsundere"
+        - action: "set_flag"
+          key: "stella_basketball_active"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|later|great game|arrivederci|ci vediamo|vado|me ne vado|ciao|a dopo"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    affinity:
+      Stella: 15
+    flags:
+      stella_basketball_done: true
+      stella_physically_opened_up: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+    memory:
+      character: "Stella"
+      entry: >
+        Basketball. Him. Afternoon light. I lost the game but I don't
+        actually care. My hands still feel whatever that was.
+        I don't know what I owe him now. I don't know what I want to owe him.
+      emotional_impact: "aroused_confused"
+      flags_to_record:
+        - stella_basketball_happened
+        - stella_physical_contact_established

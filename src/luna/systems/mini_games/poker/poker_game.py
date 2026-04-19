@@ -371,7 +371,7 @@ class PokerGame:
             if self._poker.street == "showdown":
                 narrative += await self._resolve_showdown(game_state)
                 all_strip = npc_strip + self._check_strip_after_hand(game_state)
-                
+
                 # Check if any NPC just hit the custom focus trigger
                 focus_event = next((e for e in all_strip if e.get("old_level") == 5 and e.get("lost_hand")), None)
                 if focus_event:
@@ -589,28 +589,28 @@ class PokerGame:
 
         if act == "fold":
             self._poker.act_fold()
-            return f"♠️ {npc_name} decide di fare **Fold (Passare)**.\n"
+            return f"♠️ {npc_name} decide di fare **Fold (Passare)** buttando via le carte.\n"
         elif act == "call":
             self._poker.act_call()
-            return f"♠️ {npc_name} decide di fare **Call (Vedere)**.\n"
+            return f"♠️ {npc_name} batte le fiches sul tavolo e fa **Call (Vedere)** per pareggiare la tua puntata.\n"
         elif act == "check":
             self._poker.act_check()
-            return f"♠️ {npc_name} sceglie il **Check (Bussare)**.\n"
+            return f"♠️ {npc_name} dà due leggeri colpetti sul panno verde: **Check (Bussare)**.\n"
         elif act == "allin":
             self._poker.act_allin()
-            return f"♠️ {npc_name} va in **ALL-IN** (Punta tutto)!\n"
+            return f"♠️ {npc_name} ti guarda dritta negli occhi e spinge avanti tutte le sue fiches: **ALL-IN**!\n"
         elif act == "bet":
             amount = decision.get("amount", self._poker.cfg.big_blind)
             self._poker.act_bet(amount)
-            return f"♠️ {npc_name} sceglie di **Puntare (Bet)**: mette **{amount} chips** sul piatto.\n"
+            return f"♠️ {npc_name} prende l'iniziativa e sceglie di **Puntare (Bet)** **{amount} chips**.\n"
         elif act == "raise":
             amount = decision.get("amount",
                                   self._poker.current_bet + self._poker.min_raise_size)
             self._poker.act_raise(amount)
-            return f"♠️ {npc_name} decide di **Rilanciare (Raise)** il piatto fino a **{amount} chips**.\n"
+            return f"♠️ {npc_name} decide di alzare la posta e fa **Raise (Rilancio)** fino a **{amount} chips**!\n"
         else:
             self._poker.act_fold()
-            return f"♠️ {npc_name} decide di fare **Fold (Passare)**.\n"
+            return f"♠️ {npc_name} guarda la sua mano, sospira e fa **Fold (Passare)**.\n"
 
     async def _resolve_showdown(self, game_state: "GameState") -> str:
         """Run showdown, distribute pot, return summary."""
@@ -696,10 +696,11 @@ class PokerGame:
                 comp["strip_level"] = 5
                 strip_events.append({
                     "npc_name": name,
-                    "old_level": new_level if leveled else comp["strip_level"],
+                    "old_level": old_level if leveled else comp["strip_level"],
                     "new_level": 5,
                     "current_stack": 0,
                     "eliminated": True,
+                    "lost_hand": True
                 })
 
         return strip_events

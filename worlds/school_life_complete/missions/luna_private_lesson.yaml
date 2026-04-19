@@ -1,0 +1,125 @@
+# Mission: The Private Lesson
+# World: school_life_complete
+# Character: Luna
+# Trigger: classroom_interrogation_success
+
+# --- QUEST 1: The Private Lesson ---
+luna_private_lesson:
+  meta:
+    title: "La Lezione Privata"
+    description: "Luna notices you during interrogation. That evening, her office. The pretext is math."
+    character: "Luna"
+    hidden: false
+
+  activation:
+    type: "event"
+    trigger: "classroom_interrogation_success"
+    once: true
+    conditions:
+      - type: "affinity"
+        target: "Luna"
+        operator: "gte"
+        value: 5
+
+  stages:
+    invitation:
+      title: "The Invitation"
+      location: "school_classroom"
+      time: ["Morning", "Afternoon"]
+      companion_situation: >
+        Luna has just finished interrogating the player in class. He answered
+        correctly and precisely — it surprised her. The classroom is still
+        occupied. Luna keeps her professional tone but something shifted in
+        her gaze. As the other students file out she holds him back with a
+        minimal gesture. She speaks quietly, almost to herself.
+      narrative_prompt: >
+        As the last students leave, Luna gestures for you to stay.
+        "Correct answer. More than correct." She holds your gaze a beat
+        too long. "Come by my office this afternoon. There is a topic worth
+        exploring further." She collects her books without waiting for a reply.
+      player_hint: "Go to Luna's office in the afternoon"
+      on_enter:
+        - action: "set_outfit"
+          character: "Luna"
+          value: "teacher_suit"
+        - action: "set_location"
+          value: "school_classroom"
+        - action: "set_flag"
+          key: "luna_private_lesson_invited"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "office|afternoon|I'll be there|I'll come|I accept|okay|sure"
+      transitions:
+        - condition: "default"
+          target_stage: "the_lesson"
+
+    the_lesson:
+      title: "Closed Door"
+      location: "school_office_luna"
+      time: ["Afternoon", "Evening"]
+      companion_situation: >
+        Luna is alone in her office. The school is emptying out.
+        She has prepared some exercise sheets — the academic pretext is real
+        but thin. When the player enters she closes the door without making
+        a point of it. She is tense, professional on the surface, but the
+        inner conflict shows in small details: her hands on the papers,
+        the way she does not look at him right away.
+        She yields gradually if he reads her signals correctly — never
+        suddenly, always by degrees. Any overly direct advance pushes her
+        back to formality. Adult explicit content +18 is permitted in this scene.
+      llm_context:
+        scene: >
+          You are Luna, 38-year-old math teacher, divorced. You are alone
+          in your office with a student who surprised you in class today.
+          The school is almost empty. The pretext is a math topic but you
+          both know it is not only that. You are attracted and terrified
+          at the same time — your career, the rules, the age gap. You yield
+          gradually only if he reads your signals correctly. Never give in
+          suddenly. Every step forward carries weight. Adult +18 scene permitted.
+        tone: "conflicted → seductive"
+        pacing: >
+          Luna starts formal and composed. She softens slowly with the right
+          words or gestures. She resists direct advances, responds to subtle
+          ones. Tension rises by degrees. The scene ends when the player
+          chooses to leave.
+      narrative_prompt: >
+        Luna's office is quiet. Late afternoon light. She straightens some
+        papers on her desk without looking up. "Have a seat." A pause.
+        "Now then. Where were we."
+      player_hint: "The scene is open — leave whenever you want by saying goodbye to Luna"
+      on_enter:
+        - action: "set_outfit"
+          character: "Luna"
+          value: "private_tutoring"
+        - action: "set_location"
+          value: "school_office_luna"
+        - action: "set_emotional_state"
+          character: "Luna"
+          value: "conflicted"
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|good night|I'll leave|leaving|arrivederci|ci vediamo|vado|me ne vado"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    affinity:
+      Luna: 30
+    flags:
+      luna_private_lesson: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+    memory:
+      character: "Luna"
+      entry: >
+        The first private lesson. We were alone in the office, the school
+        empty and quiet. I let myself go — more than I wanted to admit.
+        I already know he will come back. I already know I will let him.
+      emotional_impact: "conflicted_but_wanting"
+      flags_to_record:
+        - luna_private_lesson_happened
+        - luna_crossed_the_line

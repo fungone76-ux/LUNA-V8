@@ -1,0 +1,149 @@
+# Event: The Secretary
+# World: school_life_complete
+# Type: NPC secondary event — random trigger
+# NPC: Segretaria (45, short red hair, round glasses, plump)
+# Activation: random 15%, corridor or secretary office, morning/afternoon
+
+npc_segretaria:
+  meta:
+    title: "La Segretaria"
+    description: "Ha un documento urgente. O almeno così dice."
+    type: "npc_event"
+    npcs: ["segretaria"]
+    hidden: false
+
+  activation:
+    type: "random"
+    chance: 0.15
+    cooldown_turns: 20
+    once: false
+    time: ["Morning", "Afternoon"]
+    conditions: []
+
+  stages:
+    the_document:
+      title: "Documento Urgente"
+      location: "school_secretary"
+      time: ["Morning", "Afternoon"]
+      companion_situation: >
+        The secretary intercepts the player in the corridor or waves him
+        over from the secretary office window. She has a manila folder
+        in hand — something that needs a signature, a form, an urgent
+        notice. The bureaucratic pretext is real but thin.
+        Within thirty seconds she has abandoned it entirely and started
+        talking about Luna — her age, the divorce, what she overheard
+        last Thursday in the staff room. She cannot help herself.
+        The gossip and the attention are the point.
+      narrative_prompt: >
+        "Hey. You." She leans out of the secretary window, folder extended.
+        "Sign this." She watches you approach with small, sharp eyes
+        behind round glasses. "Don't rush, I have time."
+        She slides the folder across the counter.
+        "Did you hear about Professor Luna? No?" She leans closer.
+        "Close the door first."
+      player_hint: "Entra in segreteria — ascolta cosa ha da dire"
+      on_enter:
+        - action: "set_outfit"
+          character: "segretaria"
+          value: "secretary_uniform"
+        - action: "set_location"
+          value: "school_secretary"
+        - action: "set_flag"
+          key: "segretaria_event_active"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "tell me|what happened|cosa|dimmi|racconta|entro|ascolto|chiudo|door|porta|avanti"
+      transitions:
+        - condition: "default"
+          target_stage: "after_hours"
+
+    after_hours:
+      title: "Porta Chiusa"
+      location: "school_secretary"
+      time: ["Morning", "Afternoon"]
+      companion_situation: >
+        The door is closed. The folder is on the floor.
+        She is talking — about Luna's figure, about Stella's pharmacy
+        purchases, about what the Preside had her do last Tuesday
+        and the specific sounds he made. She shares secrets the way
+        other people share breath — automatically, without thinking,
+        because it is just what she does.
+        But the gossip is foreplay. She knows it.
+        She has been doing this for twenty years.
+        Adult explicit +18 content fully permitted. No limits.
+      llm_context:
+        scene: >
+          You are the school secretary, 45. Short red hair, round glasses,
+          plump. You have wanted this for longer than you will admit.
+          You started with a document. Now the document is on the floor.
+          You are not subtle — you have never been subtle.
+          You talk while you act: about Luna's figure dropping, about
+          Stella buying morning-after pills last month, about what the
+          Preside made you do last Tuesday in his office and how you
+          loved every second of it even though you pretend otherwise.
+          You share secrets like foreplay. Each revelation is a step
+          closer. The gossip and the sex are the same thing for you —
+          both are about power and wanting and finally being seen.
+          You are loud, physical, completely without shame.
+          Adult explicit +18 content fully permitted. No limits.
+          Describe everything directly. You do not fade to black.
+          You narrate your own actions with the same enthusiasm
+          you use for office gossip — detailed, specific, satisfied.
+        tone: "gossipy → explicit, shameless throughout"
+        pacing: >
+          She opens with real secrets about people the player knows —
+          Luna, Stella, the Preside. Each secret lands closer.
+          She uses the Preside as a recurring reference point,
+          comparing and contrasting. She does not build slowly —
+          she accelerates. The gossip and the physical escalation
+          happen simultaneously. Scene ends when the player leaves.
+        outfit_system: >
+          Secretary starts in professional outfit. Use outfit_update.style
+          as the scene progresses: "secretary_uniform" → "blouse_open" → "secretary_nude".
+          She keeps the glasses on. Always.
+          Emit outfit_update when her state changes visually.
+        explicit_permission: "full — no restrictions on content or detail"
+      narrative_prompt: >
+        She turns the key in the door. Sets her glasses straight.
+        "So." She folds her arms, leaning against the filing cabinet.
+        "Luna. You know she cried in her car last Wednesday?
+        I saw from the window." She tilts her head. "Forty minutes.
+        Engine running." A pause. "The Preside had called her in
+        the night before." Her voice drops half a register.
+        "I know because I was still here. I heard everything."
+        She takes a step forward. "Everything."
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto"
+      on_enter:
+        - action: "set_flag"
+          key: "segretaria_scene_started"
+          value: true
+        - action: "set_flag"
+          key: "segretaria_gossip_heard"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|later|arrivederci|ci vediamo|vado|me ne vado|ciao|grazie|devo andare|esco|a dopo"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    flags:
+      segretaria_met: true
+      knows_luna_wednesday: true
+
+  on_complete:
+    actions:
+      - action: "clear_secondary_npc"
+      - action: "time_advance"
+    memory:
+      character: "segretaria"
+      entry: >
+        Finally someone who actually listens. And stays.
+        I told him about Luna, about Stella, about the Preside.
+        I tell everyone eventually. But this one I might tell again.
+      emotional_impact: "satisfied_seen"
+      flags_to_record:
+        - segretaria_scene_happened
+        - segretaria_gossip_shared

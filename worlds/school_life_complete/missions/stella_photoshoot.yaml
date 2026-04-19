@@ -1,0 +1,142 @@
+# Mission: The Photoshoot
+# World: school_life_complete
+# Character: Stella
+# Trigger: companion_initiative — Stella stops the player and asks for fashion advice
+
+stella_photoshoot:
+  meta:
+    title: "Il Servizio Fotografico"
+    description: "Stella ha un evento importante e — per la prima volta — chiede davvero il tuo parere."
+    character: "Stella"
+    hidden: false
+
+  activation:
+    type: "companion_initiative"
+    once: true
+    conditions:
+      - type: "affinity"
+        target: "Stella"
+        operator: "gte"
+        value: 10
+
+  stages:
+    the_ask:
+      title: "Il Consiglio"
+      location: "school_hallway"
+      time: ["Morning", "Afternoon"]
+      companion_situation: >
+        Stella intercepts the player in the hallway between classes.
+        She has her phone out showing several outfits. This is unusual for her —
+        she never asks anyone for real opinions, only validation. Something about
+        an upcoming gala or event has made her uncertain, and the player is the
+        one person she trusts not to just tell her what she wants to hear.
+        She frames the request as a favor to herself, not a moment of vulnerability.
+      narrative_prompt: >
+        Stella steps in front of you with her phone shoved in your face.
+        Three photos — three different looks. "Don't say they're all good.
+        That's useless." She watches you with narrowed eyes.
+        "I need an actual opinion. There's a thing Saturday. Important.
+        So. Which one."
+      player_hint: "Guarda le foto e dai un parere onesto a Stella"
+      on_enter:
+        - action: "set_outfit"
+          character: "Stella"
+          value: "uniform_mod"
+        - action: "set_location"
+          value: "school_hallway"
+        - action: "set_flag"
+          key: "stella_asked_for_advice"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "photo|shoot|show me|let me see|try it on|provalo|mostrami|fotografo|fotografa|scatta|vieni"
+      transitions:
+        - condition: "default"
+          target_stage: "the_shoot"
+
+    the_shoot:
+      title: "Dietro l'Obiettivo"
+      location: "school_gym"
+      time: ["Afternoon", "Evening"]
+      companion_situation: >
+        Stella has taken the player to the gym after hours — it's empty,
+        good light, her idea. She has a bag with three outfit changes.
+        She starts performing for the camera but the player's attention,
+        genuinely focused and not sleazy, disarms her. She starts
+        actually trying to look good for him specifically, not for the
+        abstract audience of the event. The dynamic shifts.
+        The gym is locked. They are alone. Adult +18 content is permitted
+        if the scene develops in that direction.
+      llm_context:
+        scene: >
+          You are Stella, 18. You are alone in the school gym with the player,
+          after hours. You asked him for fashion advice and somehow this turned
+          into an impromptu photoshoot. You are changing outfits behind a row
+          of lockers, coming out each time to be evaluated.
+          You started this as a performance — you always perform.
+          But something about the way he actually looks at you, not just
+          leering, is throwing you off. You are still tsundere, still prickly,
+          but the armor is cracking. Each outfit change leaves you slightly
+          more exposed — emotionally, and possibly physically if the scene develops.
+          Adult +18 content is permitted. Explicit if the player pushes correctly.
+        tone: "tsundere → genuinely flustered → possibly explicit"
+        pacing: >
+          Stella starts confident and performative. Each outfit change makes
+          her slightly more self-conscious and real. If the player is attentive
+          rather than crude she softens noticeably. The scene ends when the
+          player says goodbye or leaves.
+        outfit_system: >
+          When Stella changes outfit — whether the player requests it or the
+          scene develops naturally — always emit outfit_update.style using the
+          exact wardrobe key. Available keys for Stella:
+          "uniform_mod", "cheerleader", "swimsuit", "sport", "prom_dress", "pajamas", "nude".
+          Example: if the player says "put on the swimsuit" or Stella decides to
+          change, emit outfit_update: {style: "swimsuit"}.
+          The first outfit is already set to "cheerleader" by the scene.
+          Progress toward "nude" only if the player earns it through the scene.
+      narrative_prompt: >
+        The gym smells of floor wax and faint sweat. Stella dumps her bag
+        on a bench. "Right. First one." She disappears behind a row of lockers.
+        You hear the rustle of fabric. Then she steps out — cheerleader uniform,
+        hands on hips, expression daring you to say the wrong thing.
+        "Well?"
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto a Stella"
+      on_enter:
+        - action: "set_outfit"
+          character: "Stella"
+          value: "cheerleader"
+        - action: "set_location"
+          value: "school_gym"
+        - action: "set_emotional_state"
+          character: "Stella"
+          value: "tsundere"
+        - action: "set_flag"
+          key: "stella_photoshoot_active"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|see you tomorrow|later|arrivederci|ci vediamo|vado|me ne vado|a domani|ciao"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    affinity:
+      Stella: 20
+    flags:
+      stella_photoshoot_done: true
+      stella_physically_aware: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+    memory:
+      character: "Stella"
+      entry: >
+        He saw me in the gym. Three outfit changes. He didn't drool or make
+        it weird — he just looked, really looked. It made me feel stupid.
+        Good stupid. I hate that.
+      emotional_impact: "confused_attracted"
+      flags_to_record:
+        - stella_photoshoot_happened
+        - stella_player_sees_her

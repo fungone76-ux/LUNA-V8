@@ -50,8 +50,8 @@ class PhaseHandlersMixin:
 
         # ── Step 0: Intent classification ────────────────────────────────────
         has_event = bool(
-            self.engine.event_manager
-            and self.engine.event_manager.has_pending_event()
+            (self.engine.event_manager and self.engine.event_manager.has_pending_event())
+            or (self.engine.gameplay_manager and self.engine.gameplay_manager.has_pending_event())
         )
         ctx.intent = self._intent_router.analyze(text, game_state, has_event)
         logger.debug("[Orchestrator] Intent: %s", ctx.intent.primary)
@@ -297,6 +297,7 @@ class PhaseHandlersMixin:
             try:
                 new_events = self.engine.event_manager.check_and_activate_events(game_state)
                 if new_events:
+                    ctx.new_global_events = new_events
                     for evt in new_events:
                         logger.info("[Orchestrator] GlobalEvent activated: %s", evt.name)
             except Exception as e:
@@ -702,6 +703,21 @@ class PhaseHandlersMixin:
                 if getattr(ctx, "npc_goal_hint", None) and self.engine.npc_goal_evaluator
                 else None,
         )
+
+        # ── GlobalEvent payload ───────────────────────────────────────────────
+        if self.engine.event_manager:
+            primary = self.engine.event_manager.get_primary_event()
+            if primary:
+                result.active_event = primary.to_dict()
+                result.new_event_started = bool(ctx.new_global_events)
+                # If event has choices, populate dynamic_event for UI button display
+                choices = primary.effects.get('choices')
+                if choices:
+                    result.dynamic_event = {
+                        'event_id': primary.event_id,
+                        'narrative': primary.description or primary.narrative_prompt,
+                        'choices': choices,
+                    }
 
         # ── TurnLogger ────────────────────────────────────────────────────────
         if ctx.turn_logger:

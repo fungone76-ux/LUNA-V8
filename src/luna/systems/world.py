@@ -208,6 +208,23 @@ class WorldLoader:
                 except Exception as e:
                     logger.warning("Error loading %s: %s", yaml_file.name, e)
 
+            # Load missions/ and events/ subfolders
+            for subfolder in ("missions", "events"):
+                sub_path = folder_path / subfolder
+                if sub_path.exists():
+                    for yaml_file in sorted(sub_path.glob("*.yaml")):
+                        try:
+                            file_data = yaml.safe_load(yaml_file.read_text(encoding="utf-8"))
+                            if not file_data:
+                                continue
+                            # Wrap bare quest definitions into a quests dict
+                            if not any(k in file_data for k in ("quests", "companion", "companions", "locations")):
+                                file_data = {"quests": file_data}
+                            self._merge_file(merged, file_data, yaml_file.name)
+                            logger.debug("Loaded %s/%s", subfolder, yaml_file.name)
+                        except Exception as e:
+                            logger.warning("Error loading %s/%s: %s", subfolder, yaml_file.name, e)
+
             return self._process_world_data(merged, world_id)
         except Exception as e:
             logger.error("Error loading modular world %s: %s", world_id, e)

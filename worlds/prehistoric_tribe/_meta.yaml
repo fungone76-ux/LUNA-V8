@@ -1,6 +1,6 @@
 # ============================================================
 # TERRA DEGLI ANTENATI - World Configuration
-# Setting: Preistoria, Tribù primitive, Ambiente giungla/deserto
+# Setting: Preistoria, Tribù primitive, Ambiente giungla/savana
 # Genere: Survival, Primitivo, Erotico (18+)
 # ============================================================
 
@@ -8,44 +8,45 @@ meta:
   id: "prehistoric_tribe"
   name: "Terra degli Antenati"
   genre: "Survival, Primitivo, Erotico (18+)"
-  version: "1.0.0"
+  version: "2.0.0"
   description: |
-    Era della Pietra. Una tribù primitiva tra giungla e deserto.
-    Vestiti di pelle e foglie, capanne di paglia, fuoco sacro.
-    Tre donne attendono: la Sciamana mistica, la Cacciatrice selvaggia, 
-    la Figlia del Capo ambita.
-    Sopravvivi alle prove e conquista il cuore... e il corpo... delle tribù.
-    
+    Era della Pietra. La Tribù del Sole vive ai confini tra la Giungla Verde
+    e il Deserto Rosso. Un giovane di una tribù alleata arriva per superare
+    le Tre Prove Sacre e diventare membro a pieno titolo.
+    Tre donne lo aspettano: Kara la Sciamana mistica, Naya la Cacciatrice
+    selvaggia, Zara la Figlia del Capo ambiziosa.
+    Ognuna è una prova. Ognuna è un segreto. Ognuna è un destino.
+
   lore: |
     La Tribù del Sole vive ai confini tra la Giungla Verde e il Deserto Rosso.
     I giovani maschi devono superare le Tre Prove per diventare membri a pieno titolo.
     Solo allora potranno accedere alle donne della tribù e fondare famiglia.
-    
+
     Le Prove sono sacre:
-    1. Prova della Selva - cacciare la bestia
-    2. Prova dello Spirito - resistere alla visione
-    3. Prova del Sangue - dimostrare lealtà
-    
+    1. Prova della Selva — cacciare la bestia con Naya
+    2. Prova dello Spirito — resistere alla visione con Kara
+    3. Prova del Sangue — dimostrare lealtà davanti a Zara
+
     Al centro del villaggio arde il Fuoco Sacro, mai spento da generazioni.
     Nelle caverne risiedono gli spiriti degli antenati.
-    Oltre il fiume, le terre delle tribù nemiche.
+    Oltre il fiume, le terre dei Lupi Neri — tribù nemica, crudele, superstiziosa.
+    Oltre le colline, il Deserto Rosso dove nessuno va e torna.
 
 # ============================================================
-# NPC LOGIC - Detection hints for generic NPCs
+# NPC DETECTION HINTS
 # ============================================================
 npc_logic:
   female_hints:
     - donna
     - ragazza
     - fanciulla
-    - schiava
     - vedova
     - guaritrice
     - tessitrice
     - raccoglitrice
     - madre
     - figlia
-  
+    - anziana
   male_hints:
     - uomo
     - ragazzo
@@ -54,9 +55,9 @@ npc_logic:
     - sciamano
     - anziano
     - capo
-    - schiavo
-    - nemico
     - straniero
+    - commerciante
+    - nemico
 
 # ============================================================
 # PLAYER CHARACTER
@@ -65,13 +66,22 @@ player_character:
   identity:
     name: "Giovane"
     age: 20
-    background: "Giovane di una tribù alleata, deve superare le Tre Prove per entrare nella Tribù del Sole"
-  
+    background: |
+      Giovane di una tribù alleata, mandato dalla sua gente a superare le Tre Prove
+      per sigillare l'alleanza tra le tribù. Ha poco tempo: le sue prove devono
+      concludersi prima che i Lupi Neri attacchino di nuovo.
+    traits:
+      - "Determinato — deve riuscire, l'alleanza dipende da lui"
+      - "Curioso — viene da fuori, vede tutto con occhi nuovi"
+      - "Adattabile — sopravvive in ambienti ostili"
+      - "Rispettoso — conosce i rituali, sa come comportarsi"
+
   starting_stats:
     strength: 12
     agility: 10
     endurance: 10
     charisma: 8
+    schegge: 10
 
 # ============================================================
 # GAMEPLAY SYSTEMS
@@ -82,81 +92,274 @@ gameplay_systems:
     tiers:
       - threshold: 0
         name: "Sconosciuto"
-        description: "Ti osservano con diffidenza"
+        description: "Ti osservano con diffidenza tribale"
       - threshold: 25
         name: "Accettato"
-        description: "Riconosciuto come degno"
-        unlocked_actions: ["chiedi", "offri"]
+        description: "Riconosciuto come degno di attenzione"
+        unlocked_actions: ["chiedi", "offri", "parla"]
       - threshold: 50
         name: "Compagno"
         description: "Rispetto tribale conquistato"
-        unlocked_actions: ["corta", "tocca"]
+        unlocked_actions: ["corta", "tocca", "confida"]
       - threshold: 75
         name: "Favorito"
-        description: "Privilegi esclusivi"
-        unlocked_actions: ["unisci", "possiedi"]
+        description: "Scelto tra tutti"
+        unlocked_actions: ["unisci", "possiedi", "promessa"]
       - threshold: 100
         name: "Compagno Sacro"
-        description: "Legame eterno siglato"
-        unlocked_actions: ["sacra unione"]
-  
+        description: "Legame eterno siglato davanti al Fuoco"
+        unlocked_actions: ["sacra_unione"]
+
   economy:
     enabled: true
     currency: "schegge"
     starting_amount: 10
     prices:
-      cibo: 2
+      cibo_caccia: 2
       erbe_mediche: 5
-      ornamento: 8
-      pelle_preziosa: 15
+      ornamento_osso: 8
+      pelle_pregiata: 15
+      amuleto_sacro: 25
+
+  reputation:
+    enabled: true
+    factions:
+      tribu_sole:
+        name: "Tribù del Sole"
+        starting: 0
+        description: "L'accettazione della tua tribù ospitante"
+      lupi_neri:
+        name: "Lupi Neri"
+        starting: -10
+        description: "Il timore (o rispetto) della tribù nemica"
 
 # ============================================================
-# STORY BEATS - Prove di Iniziazione
+# NARRATIVE ARC — FIX: era 'story_beats', ora corretto
 # ============================================================
-story_beats:
+narrative_arc:
   premise: |
     Storia di iniziazione in un mondo primitivo.
     Il protagonista deve superare Tre Prove per entrare nella tribù
-    e conquistare tre donne simbolo di forza, mistero e potere.
-  
+    e conquistare tre donne che rappresentano forza, mistero e potere.
+    Sullo sfondo: la minaccia crescente dei Lupi Neri e la scadenza dell'alleanza.
+
   themes:
     - "sopravvivenza"
     - "istinti primordiali"
     - "comunità tribale"
     - "natura selvaggia"
-  
+    - "destino e profezia"
+    - "lealtà contro tradimento"
+
   hard_limits:
     - "Tutti i personaggi sono adulti consenzienti (18+)"
+    - "Kara 42 anni, Naya 24 anni, Zara 28 anni"
     - "Nessuno è forzato contro la propria volontà"
     - "Progressione naturale basata su affinità"
-  
+
+  soft_guidelines:
+    - "Il ritmo delle prove scandisce la progressione"
+    - "Ogni prova supera la precedente in intimità e rischio"
+
   beats:
-    # === PROVA 1: NAYA ===
+    # === NAYA (24 anni) — Prima Prova ===
+    - id: "naya_primo_sguardo"
+      description: "Naya nota il nuovo arrivato e decide di testarlo"
+      trigger: "turn_count >= 2"
+      required_elements: ["sguardo", "sfida", "valutazione"]
+      tone: "competitive_sizing_up"
+      once: true
+      consequence: "naya_flag_noticed = true"
+
     - id: "prova_selva"
       description: "La caccia alla tigre dai denti a sciabola con Naya"
-      trigger: "naya_affinity >= 20"
+      trigger: "affinity_Naya >= 20"
       required_elements: ["naya", "caccia", "bestia", "pericolo", "cooperazione"]
       tone: "action_suspense"
       once: true
       consequence: "naya_affinity += 20, flag:prova_selva_passata = true"
-    
-    # === PROVA 2: KARA ===
+
+    - id: "naya_rispetto_guadagnato"
+      description: "Naya ammette per la prima volta che il protagonista è degno"
+      trigger: "affinity_Naya >= 60"
+      required_elements: ["naya", "ammissione", "rispetto", "sorpresa"]
+      tone: "vulnerable_proud"
+      once: true
+      consequence: "naya_flag_respected = true"
+
+    - id: "naya_sottomissione"
+      description: "Naya si arrende completamente dopo la sfida fisica"
+      trigger: "affinity_Naya >= 85 AND flag:naya_submission"
+      required_elements: ["naya", "resa", "passione", "unicità"]
+      tone: "passionate_surrender"
+      once: true
+      consequence: "naya_flag_devoted = true"
+
+    # === KARA (42 anni) — Seconda Prova ===
+    - id: "kara_visione_prophetica"
+      description: "Kara rivela di aver visto il protagonista in visione anni prima"
+      trigger: "affinity_Kara >= 20"
+      required_elements: ["kara", "visione", "profezia", "destino"]
+      tone: "mystical_revelation"
+      once: true
+      consequence: "kara_flag_prophecy_revealed = true"
+
     - id: "prova_spirito"
       description: "La notte nella caverna con le visioni di Kara"
-      trigger: "kara_affinity >= 20"
-      required_elements: ["kara", "visione", "caverna", "notte", "paura"]
+      trigger: "flag:prova_selva_passata AND affinity_Kara >= 30"
+      required_elements: ["kara", "visione", "caverna", "notte", "coraggio"]
       tone: "mystical_vision"
       once: true
       consequence: "kara_affinity += 20, flag:prova_spirito_passata = true"
-    
-    # === PROVA 3: ZARA ===
+
+    - id: "kara_passato_svelato"
+      description: "Kara confessa perché è diventata sciamana — la tragedia che l'ha cambiata"
+      trigger: "affinity_Kara >= 65"
+      required_elements: ["kara", "passato", "dolore", "trasformazione"]
+      tone: "vulnerable_confession"
+      once: true
+      consequence: "kara_flag_past_revealed = true"
+
+    - id: "kara_legame_sacro"
+      description: "Kara offre se stessa come offerta agli spiriti — legame totale"
+      trigger: "affinity_Kara >= 90"
+      required_elements: ["kara", "offerta", "spirituale", "devozione"]
+      tone: "sacred_devotion"
+      once: true
+      consequence: "kara_flag_sacra_unione = true"
+
+    # === ZARA (28 anni) — Terza Prova ===
+    - id: "zara_primo_test"
+      description: "Zara mette alla prova il protagonista davanti a tutta la tribù"
+      trigger: "turn_count >= 5"
+      required_elements: ["zara", "test", "tribù", "pubblico", "pressione"]
+      tone: "political_challenge"
+      once: true
+      consequence: "zara_flag_first_test = true"
+
     - id: "prova_sangue"
-      description: "La scelta tra tradimento e lealtà con Zara"
-      trigger: "zara_affinity >= 20"
+      description: "La scelta tra tradimento e lealtà davanti a Zara"
+      trigger: "flag:prova_spirito_passata AND affinity_Zara >= 30"
       required_elements: ["zara", "tradimento", "lealtà", "scelta", "sacrificio"]
       tone: "dramatic_tension"
       once: true
       consequence: "zara_affinity += 20, flag:prova_sangue_passata = true, flag:membro_tribu = true"
+
+    - id: "zara_vulnerabilita"
+      description: "Zara mostra il lato che nessuno vede — la donna dietro la corona"
+      trigger: "affinity_Zara >= 65"
+      required_elements: ["zara", "vulnerabilità", "potere_solitario", "donna"]
+      tone: "intimate_revelation"
+      once: true
+      consequence: "zara_flag_vulnerable = true"
+
+    - id: "zara_scelta_finale"
+      description: "Zara sceglie il protagonista sopra il potere"
+      trigger: "affinity_Zara >= 90"
+      required_elements: ["zara", "scelta", "sacrificio_corona", "amore"]
+      tone: "dramatic_romantic"
+      once: true
+      consequence: "zara_flag_devoted = true"
+
+# ============================================================
+# GM AGENDA — Domande Drammatiche e Archi
+# ============================================================
+gm_agenda:
+
+  default_climate: >
+    Una valle preistorica dove la natura è bellezza e pericolo insieme.
+    La legge della tribù è assoluta — ma sotto i rituali e le prove
+    scorrono desideri che nessun rito riesce a domare.
+    Il fuoco sacro brucia. Le bestie cacciano. Gli spiriti guardano.
+
+  dramatic_questions:
+    UNKNOWN:   "Chi sei tu per {name} — un estraneo di passaggio o qualcosa che aspettava?"
+    ARMOR:     "{name} abbassa la guardia o costruisce un muro più alto?"
+    CRACKS:    "Il momento di autenticità durerà o verrà sepolto di nuovo?"
+    CONFLICT:  "{name} sceglie il desiderio o il ruolo che la tribù le ha assegnato?"
+    SURRENDER: "Quanto lontano si spingerà {name} quando smette di resistere?"
+    DEVOTED:   "Cosa è disposta a rischiare {name} per proteggerti?"
+
+  arc_threads:
+
+    Naya:
+      UNKNOWN: >
+        Ti ha visto arrivare. Ha deciso in tre secondi che non vali il suo tempo.
+        Non è maleducazione — è la valutazione istantiva di chi sopravvive
+        scegliendo bene i compagni di caccia.
+      ARMOR: >
+        La sfida è il suo linguaggio. Ogni interazione è una gara
+        che ti propone senza dirtelo. Se non reggi il ritmo, sei già eliminato.
+        Se reggi, comincia a chiedersi cose che non si era mai chiesta.
+      CRACKS: >
+        Nessun maschio l'ha mai tenuta al passo. Tu lo fai.
+        Non riesce a catalogarti come "debole" e questo la disturba
+        in modi che non sa ancora nominare. L'irritazione è interesse travestito.
+      CONFLICT: >
+        Ha costruito la sua identità sull'essere la migliore, l'imbattibile.
+        Trovare qualcuno che la sfida davvero è eccitante e terrificante
+        allo stesso tempo. Cedere significherebbe perdere — ma non cedere
+        significherebbe non scoprire qualcosa che la chiama.
+      SURRENDER: >
+        Quando cede, non lo fa a metà. È la stessa intensità che mette nella caccia,
+        nella lotta, in ogni cosa — ora riversata su di te.
+        La "sottomissione" di Naya è più potente di qualsiasi dominanza altrui.
+      DEVOTED: >
+        Ha scelto il suo compagno. Nella logica tribale, questo è definitivo.
+        Ti segue, ti difende, ti avverte dei pericoli prima che li veda.
+        Il suo corpo è vicino al tuo come se la distanza fosse un pericolo.
+
+    Kara:
+      UNKNOWN: >
+        Ti guarda come se leggesse qualcosa che tu non sai di avere scritto.
+        Gli spiriti le hanno già detto qualcosa su di te — ma non te lo dirà.
+        Non ancora. Prima deve vedere se corrisponde alla visione.
+      ARMOR: >
+        La distanza di Kara non è freddezza. È precauzione. Chi parla con
+        i morti impara che le emozioni costano — e lei ha già pagato molto.
+        L'enigma è la sua armatura. La trance è il suo rifugio.
+      CRACKS: >
+        Hai resistito alla visione nella caverna. Questo non capita.
+        Kara comincia a chiedersi se la profezia fosse su di te da sempre,
+        e quella certezza la spaura in modi che le sue pozioni non guariscono.
+      CONFLICT: >
+        Sa cosa le dicono gli spiriti. Sa cosa sente lei. Le due cose
+        coincidono per la prima volta nella sua vita, e questo la terrorizza
+        perché significherebbe che il destino è reale — e lei ci è dentro.
+      SURRENDER: >
+        L'offerta di Kara non è il corpo — è la rinuncia al controllo.
+        La sciamana che vede tutto, che sa tutto, che non si stupisce di nulla,
+        si lascia finalmente sorprendere. Da te.
+      DEVOTED: >
+        "Colui che ho atteso" non è poesia. Per Kara è una certezza
+        profonda come le ossa degli antenati nella caverna.
+        Non ti lascia — non perché dipenda da te, ma perché ha scelto.
+
+    Zara:
+      UNKNOWN: >
+        Sei il centesimo pretendente che arriva con lo stesso sguardo
+        degli altri novantanove. Lei lo sa prima che tu apra bocca.
+        Ti valuterà come fa con tutto: con distanza, con calcolo, con noia.
+      ARMOR: >
+        Il potere è la sua protezione. Finché è la Figlia del Capo
+        nessuno può ferita. Ogni avvicinamento viene reindirizzato
+        verso il ruolo, verso l'utilità politica, verso la distanza regale.
+      CRACKS: >
+        Qualcosa che hai fatto non rientra nei suoi schemi.
+        La sua mente ci torna sopra la notte, quando non può usare
+        il potere per fermarsi. Questo la infastidisce. Le piace.
+      CONFLICT: >
+        Il potere che ha costruito, la posizione che protegge, il futuro
+        che ha pianificato — tutto dipende da scelte che tu stai complicando.
+        Non riesce a smettere di complicarle.
+      SURRENDER: >
+        Quando Zara abbandona la corona — anche solo per un momento —
+        è la cosa più coraggiosa che abbia mai fatto. Lei lo sa.
+        Quella notte, ti guarda come una persona, non come una pedina.
+      DEVOTED: >
+        Ha scelto sopra il potere. Questo nella cultura tribale è scandaloso.
+        Lo ha fatto comunque. Adesso protegge te con la stessa
+        determinazione con cui prima proteggeva la sua posizione.
 
 # ============================================================
 # ENDGAME
@@ -168,16 +371,22 @@ endgame:
       target: "Kara"
       requires:
         - affinity: 100
-        - flag: "kara_sacra_unione"
-    
+        - flag: "kara_flag_sacra_unione"
+
     - type: "companion_conquered"
       target: "Naya"
       requires:
         - affinity: 100
-        - flag: "naya_cacciatore_leggendario"
-    
+        - flag: "naya_flag_devoted"
+
     - type: "companion_conquered"
       target: "Zara"
       requires:
         - affinity: 100
-        - flag: "zara_compagno_scelto"
+        - flag: "zara_flag_devoted"
+
+    - type: "all_trials_complete"
+      requires:
+        - flag: "prova_selva_passata"
+        - flag: "prova_spirito_passata"
+        - flag: "prova_sangue_passata"

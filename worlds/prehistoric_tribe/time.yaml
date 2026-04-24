@@ -1,0 +1,64 @@
+# ============================================================
+# TIME SYSTEM - Terra degli Antenati
+# Le quattro fasi del giorno tribale
+# ============================================================
+
+time:
+  Morning:
+    name: "Alba"
+    lighting: "golden dawn light, mist on the valley, warm early sun"
+    ambient_description: |
+      Il sole sorge sulla valle. La nebbia si alza dalla giungla.
+      Animali svegli, cacciatori pronti, fuochi accesi.
+      La tribù inizia la giornata con rituali di ringraziamento al Sole.
+    danger_level: "basso"
+    typical_activities:
+      - "Preparazione armi e trappole"
+      - "Cerimonia del mattino al Fuoco Sacro"
+      - "Partenza per la caccia"
+      - "Raccolta erbe medicinali"
+
+  Afternoon:
+    name: "Mezzogiorno"
+    lighting: "harsh tropical sun, deep shadows, heat haze"
+    ambient_description: |
+      Il sole è alto, implacabile. La valle ribolle di caldo.
+      Bestie riposano all'ombra, cacciatori più attivi.
+      È il momento migliore per muoversi nella giungla senza essere
+      sorpresi — i predatori dormono.
+    danger_level: "medio"
+    typical_activities:
+      - "Caccia attiva nella giungla"
+      - "Politica tribale e consiglio"
+      - "Scambi commerciali con mercanti"
+      - "Addestramento guerrieri"
+
+  Evening:
+    name: "Tramonto"
+    lighting: "dramatic sunset, orange and red sky, long shadows, firelight"
+    ambient_description: |
+      Il sole scende. Il cielo brucia di rosso e arancio.
+      La tribù si raccoglie. Fuochi vengono accesi, prede cucinate.
+      È il momento dei racconti, dei rituali, delle decisioni tribali.
+      I predatori si risvegliano — stare fuori diventa rischioso.
+    danger_level: "medio-alto"
+    typical_activities:
+      - "Banchetto comune e condivisione caccia"
+      - "Racconti e trasmissione della tradizione"
+      - "Cerimonie e riti di Kara"
+      - "Riunioni del Consiglio sotto le stelle"
+
+  Night:
+    name: "Notte"
+    lighting: "full moon or darkness, firelight, bioluminescence, stars"
+    ambient_description: |
+      Il buio è totale oltre il cerchio dei fuochi.
+      I predatori cacciano. Gli spiriti si avvicinano.
+      Kara dice che il velo tra i mondi è più sottile di notte.
+      Solo i temerari e gli iniziati si muovono nell'oscurità.
+    danger_level: "alto"
+    typical_activities:
+      - "Riti sciamanici di Kara nella caverna"
+      - "Guardia armata ai confini del villaggio"
+      - "Incontri segreti e confidenze"
+      - "Visioni e sogni profetici"

@@ -52,11 +52,15 @@ companion:
       description: "Cute and casual pajamas, intimate bedroom atmosphere"
       sd_prompt: "cute pajama set, short shorts and tank top or oversized t-shirt, bedroom setting, messy bed, soft lighting, casual relaxed pose, no makeup natural look, intimate atmosphere, smartphone in hand"
     
+    casual:
+      description: "Casual everyday clothes, stylish but relaxed, off-duty look"
+      sd_prompt: "casual streetwear, trendy jeans or mini skirt, crop top or fitted t-shirt, sneakers or ankle boots, stylish accessories, blonde hair loose or in messy bun, social setting like a bar or shopping area, confident relaxed pose"
+
     nude:
       description: "Nude, young natural body, shy but curious"
       sd_prompt: "nude young woman, natural athletic body, shy pose covering partially with hands or sheet, bedroom setting, soft lighting, blonde hair loose, youthful beauty"
       special: true
-  
+
   # ============================================================
   # PERSONALITY SYSTEM V2
   # ============================================================
@@ -172,23 +176,23 @@ companion:
   schedule:
     Morning:
       preferred_location: "school_classroom"
-      outfit: "school_uniform_mod"
-      activity: "Lezioni in classe con il protagonista"
-    
+      outfit: "uniform_mod"
+      activity: "Segue lezioni in classe, prende appunti"
+
     Afternoon:
       preferred_location: "school_gym"
       outfit: "sport"
-      activity: "Allenamento pallavolo/cheeleading"
-    
+      activity: "Allenamento basket in palestra, corre e salta"
+
     Evening:
       preferred_location: "bar_town"
       outfit: "casual"
-      activity: "Con le amiche al bar"
-    
+      activity: "Si rilassa al bar con amici dopo l'allenamento"
+
     Night:
       preferred_location: "stella_home"
-      outfit: "intimate"
-      activity: "A casa, manda messaggi"
+      outfit: "pajamas"
+      activity: "A casa, studia o guarda TV prima di dormire"
 
 # ============================================================
 # QUESTS - STELLA
@@ -450,18 +454,6 @@ npc_relationships:
 # v7 — GOAL TEMPLATES
 # ============================================================
 goal_templates:
-  - id: "jealous_confrontation"
-    goal: "Vuole confrontarti sulla tua vicinanza con Luna perché le dai fastidio"
-    goal_type: "confrontation"
-    target: "player"
-    urgency_start: 0.6
-    growth_rate: 0.08
-    context: "Ti ha visto parlare con Luna, è gelosa ma non capisce perché, si arrabbia in modo infantile"
-    conditions:
-      unspoken: "Luna"
-      flags_not: ["stella_possessive"]
-      affinity: ">30"
-
   - id: "copy_homework"
     goal: "Vuole copiare i compiti da te perché non ha capito niente"
     goal_type: "social"
@@ -483,17 +475,6 @@ goal_templates:
     conditions:
       need_purpose: "<0.2"
       random_chance: 0.3
-
-  - id: "challenge_gym"
-    goal: "Ti sfida a una gara in palestra"
-    goal_type: "proposal"
-    target: "player"
-    urgency_start: 0.4
-    growth_rate: 0.05
-    context: "Si annoia e vuole competere"
-    conditions:
-      time: "Afternoon"
-      need_social: ">0.5"
 
   - id: "demand_attention"
     goal: "Vuole tutta la tua attenzione, è gelosa"
@@ -631,6 +612,24 @@ auto_states:
     priority: 30
     conditions:
       affinity_gte: 76
+  - state: aware
+    priority: 8
+    conditions:
+      affinity_lt: 21
+      flag: "stella_photoshoot_done"
+
+  - state: jealous
+    priority: 18
+    conditions:
+      affinity_lt: 51
+      flag: "stella_jealousy_done"
+
+  - state: devoted
+    priority: 28
+    conditions:
+      affinity_lt: 76
+      flag: "stella_absolute"
+
 
 avoid_topics_unless_asked: []
 

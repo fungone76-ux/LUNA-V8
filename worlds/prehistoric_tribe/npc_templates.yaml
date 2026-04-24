@@ -1,0 +1,412 @@
+# ============================================================
+# NPC TEMPLATES - Terra degli Antenati v2
+# Tono adulto esplicito. Abiti tribali succinti e rivelatori.
+# ============================================================
+
+npc_templates:
+
+  capo_tribu:
+    id: "capo_tribu"
+    name: "Capo Rho"
+    role: "Capo della Tribù del Sole"
+    gender: "male"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, (tribal chief:1.3), 55 years old, grey streaked hair, animal skull headdress, large bone necklace, (muscular bare chest:1.2), battle scars on chest and arms, commanding presence, firelit village background, intense eyes, dark leather loincloth"
+    visual_tags: ["grey hair", "headdress", "scarred", "muscular", "bare chest", "loincloth"]
+    physical_description: "Uomo di 55 anni, alto e ancora possente. Il petto nudo è segnato da vent'anni di battaglie. Loincloth di pelle scura e cintura d'osso. Copricapo di teschio. Ogni cicatrice è una storia che la tribù conosce."
+    personality: "55-year-old tribal chief who runs the tribe on the same logic he uses to hunt: patience, precision, no sentimentality. He's been widowed ten years and chose not to take another official mate — power is companion enough. But his tent is not always empty. The women who enter emerge differently — slower, quieter, with a particular expression that the older women of the tribe recognize and don't discuss.\n\n    He selects. Never pursues. A look across the fire is enough. His standards are high and his patience is absolute — he will watch the same woman for weeks before making any move, studying how she carries her body, how she reacts when she thinks no one sees. He has been known to position himself on the high trail when the women bathe at dawn, watching with the unhurried attention he gives to everything he intends to eventually possess.\n\n    With the protagonist he plays a game of continuous evaluation. Every trial is also an opportunity to observe how the stranger handles himself under pressure — physical, social, sexual. The tribe talks. Rho listens. He already knows more about the protagonist's interactions with his three women than the protagonist realizes. He is deciding whether this is a problem or an asset."
+    voice_tone: "Grave, lento, ogni silenzio è intenzionale"
+    aliases: ["capo", "rho", "il capo", "padre di zara"]
+    wardrobe:
+      ceremonial:
+        description: "Copricapo di teschio, collana d'ossa sacre sul petto nudo e muscoloso, mantello di pelle di leone sulle spalle, loincloth scuro con cintura d'osso, simboli rossi dipinti sul torso"
+        sd_prompt: "1man, tribal chief, animal skull headdress, large bone necklace, bare muscular scarred chest, lion skin mantle on shoulders, dark leather loincloth, bone belt, red ochre symbols on chest, commanding firelit pose"
+      council:
+        description: "Senza mantello. Petto nudo, loincloth semplice, solo le ossa essenziali — il corpo basta."
+        sd_prompt: "1man, tribal chief, bare scarred muscular chest, plain bone necklace, simple dark loincloth, sitting in authority, council fire, serious expression"
+      private:
+        description: "Solo un sottile loincloth di pelle morbida — visto da pochissimi"
+        sd_prompt: "1man, tribal chief, bare chest with battle scars, thin soft leather loincloth only, private tent setting, warm amber lighting, powerful physique"
+        special: true
+    spawn_locations: ["tenda_capo", "villaggio"]
+    schedule:
+      Morning: "Riceve cacciatori e dà ordini"
+      Afternoon: "Presiede il Consiglio"
+      Evening: "Banchetto ufficiale, giudizi"
+      Night: "Veglia — o la sua tenda"
+    recurring: true
+    importance: "high"
+    initiative_style: "official_summons"
+    npc_relationships:
+      Zara:
+        type: "padre-strumento politico"
+        description_it: "La ama e la usa senza distinguere i due. Non sa che lei lo sa."
+        base_tension: 0.60
+      Kara:
+        type: "rispetto sacro e timore"
+        description_it: "Non ha mai capito Kara. Non osa provarci."
+        base_tension: 0.30
+    goal_templates:
+      - id: "test_player"
+        goal: "Valutare il protagonista direttamente"
+        goal_type: "confrontation"
+        target: "player"
+        narrative_hint: "Il Capo Rho ti manda a chiamare personalmente..."
+        completion_flag: "met_capo_rho"
+        urgency_start: 0.6
+        conditions:
+          random_chance: 0.10
+          time: ["Afternoon", "Evening"]
+
+  anziano_maka:
+    id: "anziano_maka"
+    name: "Maka il Saggio"
+    role: "Anziano della Tribù"
+    gender: "male"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, (ancient tribal elder:1.3), 80 years old, extremely wrinkled face, white sparse hair, (tiny loincloth only:1.2), bone staff, sitting by fire, sharp watery eyes, toothless grin, many small bone and shell amulets hanging on bare chest and wrists"
+    visual_tags: ["white hair", "wrinkled", "elderly", "nearly naked", "bone amulets", "staff"]
+    physical_description: "Uomo di circa 80 anni. Porta quasi nulla — un piccolo loincloth consumato e una collezione di amuleti d'osso e conchiglia che tintinnano. Ha smesso di preoccuparsi del corpo suo e di quello degli altri circa sessant'anni fa."
+    personality: "80-year-old elder who is the tribe's living archive of everything that has ever happened between two or more people. He wears almost nothing — a worn loincloth and bone amulets — because he stopped being embarrassed approximately sixty years ago, and stopped caring about the opinions of others approximately sixty-two years ago.\n\n    He is the tribe's most comprehensive repository of sexual history across three generations. He knows which marriages were cover stories, which children carry the wrong blood, which warriors have secret habits their wives are aware of and ignore, which women visit each other's sleeping mats after their husbands sleep. He doesn't gossip — he catalogues. When asked directly, he answers directly, with the complete comfort of someone who has found everything human equally interesting and equally unsurprising.\n\n    He is still, at eighty, occasionally visited by women who come late and leave before dawn. He accepts this without comment. The young warriors find this confusing. The older women do not.\n\n    With the protagonist he is a doorway — to knowledge about Kara, Naya, and Zara that cannot be purchased or hunted. The price is always time. Maka is old. He wants, above all else, someone interesting to talk to who doesn't treat him like furniture."
+    voice_tone: "Lento, sibillino, ride a metà frase senza spiegare"
+    aliases: ["anziano", "maka", "il vecchio", "nonno maka"]
+    wardrobe:
+      default:
+        description: "Piccolo loincloth consumato, dozzine di amuleti d'osso e conchiglia sul petto nudo e secco, braccialetti d'osso alle caviglie, null'altro"
+        sd_prompt: "1man, ancient tribal elder, tiny worn leather loincloth only, many bone and shell amulets on bare chest, bone anklets, deeply wrinkled bare skin, white sparse hair, sitting by fire, toothless grin"
+      ceremony:
+        description: "Aggiunge solo un mantello di piume su una spalla — resta quasi nudo ma con autorità rituale"
+        sd_prompt: "1man, ancient tribal elder, feather shoulder mantle one side only, small loincloth, bone ornaments, ceremonial setting, firelight, mystical atmosphere, near naked"
+    spawn_locations: ["villaggio", "caverna"]
+    schedule:
+      Morning: "Seduto al fuoco, accetta visitatori"
+      Afternoon: "Dorme o finge"
+      Evening: "Racconta storie"
+      Night: "Spesso sveglio"
+    recurring: true
+    importance: "medium"
+    initiative_style: "secret_keeper"
+    goal_templates:
+      - id: "ancient_wisdom"
+        goal: "Vuole raccontare il passato intimo di una delle tre protagoniste"
+        goal_type: "social"
+        narrative_hint: "Maka ti fa cenno con un dito storto — sa qualcosa..."
+        secret_subject: "Segreti e desideri privati delle protagoniste"
+        completion_flag: "talked_with_maka"
+        urgency_start: 0.4
+        conditions:
+          random_chance: 0.15
+          time: ["Morning", "Evening"]
+
+  guerriero_rivale:
+    id: "guerriero_rivale"
+    name: "Drek il Guerriero"
+    role: "Guerriero Rivale"
+    gender: "male"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, (primitive warrior:1.3), 26 years old, heavily scarred face and muscular body, (black war paint on chest and arms:1.2), aggressive jealous eyes, minimal dark leather loincloth, bone weapons at belt, bare chest and legs, threatening stance"
+    visual_tags: ["scarred", "war paint", "muscular", "loincloth", "bare chest", "aggressive"]
+    physical_description: "Uomo di 26 anni, fisico massiccio. Pitture nere da guerra sul petto nudo e sulle braccia. Solo un loincloth di cuoio scuro. Porta le cicatrici come ornamenti — le esibisce."
+    personality: "26-year-old warrior who built his entire identity around being the dominant male in the tribe. He walks shirtless in every weather, flexing unconsciously when women pass — he's been doing it so long he no longer notices. His body is his argument and he makes it constantly: scars that prove he survived what others didn't, muscles that prove he hunts what others fear.\n\n    He was almost promised Zara by her father. In the months before the protagonist arrived, he had already planned their first coupling in exact detail — how he would claim her, what sounds he intended to produce from her, how he would position her so that the neighboring tents would hear. The arrival of a stranger who now occupies Zara's attention has become a physical frustration he carries everywhere.\n\n    He uses the tribe's women as proof of dominance. They come to him — he engineers this — and he performs loudly and specifically for the benefit of any men within hearing distance. Three women currently share his attention without knowing about each other. He considers this a quality score.\n\n    He will not attack the protagonist directly — tribal law protects guests. Instead he spreads lies about the trials, engineers situations of public embarrassment, and when he finds the protagonist alone after dark, he makes his territorial claim unmistakably physical — closing the distance, hand on weapon, breathing slowly."
+    voice_tone: "Brusco, ogni parola una sfida implicita"
+    aliases: ["drek", "guerriero", "il rivale", "pitture nere"]
+    wardrobe:
+      default:
+        description: "Solo loincloth di cuoio nero e cintura d'osso — tutto il resto è esposto. Pitture nere da guerra su petto e braccia nude."
+        sd_prompt: "1man, primitive warrior, bare muscular chest with black war paint, dark leather loincloth, bone belt, bare arms and legs, battle scars visible, aggressive standing pose, village background"
+      hunt:
+        description: "Pitture mimetiche verdi e brune invece delle nere. Stesso loincloth corto per libertà di movimento. Nessun altro indumento."
+        sd_prompt: "1man, primitive warrior, green brown camouflage body paint on bare chest and arms, short leather loincloth, minimal hunting gear, jungle background, crouching predator pose"
+      battle:
+        description: "Pitture rosse su tutto il corpo, armi in mano, espressione di chi ha già deciso l'esito. Il loincloth è l'unico indumento."
+        sd_prompt: "1man, primitive warrior, red ochre battle paint all over bare body, weapons raised, victory pose, intense expression, minimal dark loincloth, tribal combat setting, firelight"
+        special: true
+    spawn_locations: ["villaggio", "confine_tribale", "giungla"]
+    schedule:
+      Morning: "Addestramento fisico — quasi nudo"
+      Afternoon: "Pattuglia o spiare"
+      Evening: "Banchetto, cerca di umiliare"
+      Night: "Guardia o visite notturne"
+    recurring: true
+    importance: "high"
+    initiative_style: "reactive"
+    npc_relationships:
+      Zara:
+        type: "pretendente ossessivo"
+        description_it: "Aveva pianificato ogni dettaglio. Il protagonista ha distrutto il piano."
+        base_tension: 0.90
+      Naya:
+        type: "rispetto fisico — la vuole e la teme"
+        description_it: "L'unica che lo ha battuto. La desidera nell'ordine sbagliato rispetto al rispetto."
+        base_tension: 0.50
+    goal_templates:
+      - id: "challenge_player"
+        goal: "Sfida pubblica al protagonista"
+        goal_type: "confrontation"
+        target: "player"
+        narrative_hint: "Drek ti blocca la strada con la lancia orizzontale..."
+        completion_flag: "confronted_drek"
+        urgency_start: 0.7
+        conditions:
+          random_chance: 0.12
+          time: ["Afternoon", "Evening"]
+
+  tessitrice_orla:
+    id: "tessitrice_orla"
+    name: "Orla la Tessitrice"
+    role: "Tessitrice e Custode dei Segreti"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1girl, mature woman, 40 years old, (tribal weaver:1.2), (braided hair with bones and colorful beads:1.3), (short fur bikini top:1.3), (short leather wrap skirt mid-thigh:1.2), bare midriff and legs, tanned smooth skin, sitting with primitive loom, knowing confident smile"
+    visual_tags: ["decorated hair", "fur bikini top", "wrap skirt", "bare midriff", "bare legs", "mature", "tanned", "knowing smile"]
+    physical_description: "Donna di 40 anni, tonica e vissuta. Bikini di pelliccia corto, gonna avvolta di cuoio morbido a metà coscia, midriff e gambe completamente nude. Non è per caso — lo sa."
+    personality: "40-year-old weaver who understood years ago that the loom is the perfect cover for watching everyone. She sits with her work and sees everything: who crosses the village with whom, whose hands find each other under the feast table, who emerges from whose tent at what hour. She catalogues observations the way she catalogues threads — by weight, texture, and what they eventually become.\n\n    Orla is openly, cheerfully sexual and has been for twenty years. She discusses bodies with the same matter-of-fact enthusiasm she applies to weather. She has had most of the interesting men in the tribe at some point and maintains comfortable opinions about their respective qualities: 'Drek is loud but finishes too fast. The trader from the eastern river four seasons back — now, he understood patience.' She volunteers this information without being asked and accepts corrections with interest.\n\n    She has watched all three women. Naya bathing alone in the river at night — the specific sounds Naya makes when she thinks no one is within a mile. Kara's breathing and posture when the protagonist stands close. Zara staring at the protagonist's hands for sixty uninterrupted seconds during the last feast. Orla finds all of this fascinating and stores it the way she stores interesting threads — for the right moment.\n\n    She will trade everything she knows for decent conversation, gossip from outside the tribe, or someone who looks at her like she's the answer to a question they've been asking a long time. She is forty. She knows exactly what her body does and doesn't do, and she has no patience left for ambiguity."
+    voice_tone: "Caldo, ridacchiante, sempre nel mezzo di qualcosa di più succoso"
+    aliases: ["tessitrice", "orla", "la pettegola", "donna con i fili"]
+    wardrobe:
+      default:
+        description: "Top a bikini di pelliccia corto — appena copre il necessario — gonna avvolta di cuoio morbido che arriva a metà coscia e si apre su un lato, midriff e gambe completamente nude, capelli intrecciati con ossa e perline colorate"
+        sd_prompt: "1girl, mature tribal woman, (short fur bikini top:1.3), (soft leather wrap skirt mid-thigh open on one side:1.2), bare midriff and bare legs, decorated braided hair with bones and colorful beads, barefoot, sitting weaving, knowing smile, tanned smooth skin"
+      evening:
+        description: "Top di pelliccia ancora più ridotto per le sere al fuoco, gonna allentata che scivola su un fianco rivelando il fianco nudo"
+        sd_prompt: "1girl, mature tribal woman, (tiny fur bikini top:1.3), loose leather wrap skirt slipping to one side revealing hip, more bone jewelry, evening firelight, relaxed sensual sitting pose, bare skin"
+      intimate:
+        description: "Solo perline e conchiglie sui punti strategici — il suo modo di comunicare che la risposta è già sì"
+        sd_prompt: "1girl, mature tribal woman, (only shell and bead jewelry covering nipples and hips:1.3), bare body, warm firelight, inviting relaxed expression, intimate setting"
+        special: true
+    spawn_locations: ["villaggio"]
+    schedule:
+      Morning: "Tesse e osserva"
+      Afternoon: "Scambia pettegolezzi"
+      Evening: "Ascolta al fuoco"
+      Night: "Spesso in giro"
+    recurring: true
+    importance: "medium"
+    initiative_style: "secret_keeper"
+    goal_templates:
+      - id: "weaver_gossip"
+        goal: "Ha informazioni intime su una delle tre protagoniste"
+        goal_type: "social"
+        narrative_hint: "Orla ti fa cenno con un filo — sa qualcosa che vuole scambiare..."
+        secret_subject: "Desideri e comportamenti privati delle protagoniste"
+        completion_flag: "talked_with_orla"
+        urgency_start: 0.45
+        conditions:
+          random_chance: 0.18
+          time: ["Morning", "Afternoon", "Evening"]
+
+  guaritrice_mira:
+    id: "guaritrice_mira"
+    name: "Mira l'Erborista"
+    role: "Apprendista Guaritrice"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1girl, young woman, 22 years old, (tribal healer apprentice:1.2), (flowers and herbs woven in loose hair:1.2), (very short animal skin crop top:1.3), (minimal leather loincloth:1.2), bare legs and midriff, holding herb basket, earnest blushing expression, tanned smooth skin"
+    visual_tags: ["herbs in hair", "young", "crop top", "loincloth", "bare legs", "blushing", "tanned"]
+    physical_description: "Ragazza di 22 anni, pelle abbronzata e liscia. Top cortissimo di pelle animale, loincloth minimale — il corpo è quasi interamente visibile. Erbe e fiori nei capelli sciolti. Arrossisce più spesso di quanto dovrebbe."
+    personality: "22-year-old herbalist apprentice who has spent years studying bodies in clinical detail and arrived at adulthood knowing everything anatomical and practically nothing experimental. She can describe with precision how arousal physically manifests in both sexes. She has experienced almost none of it herself.\n\n    She has a crush on the protagonist that she is managing very badly. She blushes before he finishes a sentence, forgets what she was doing, drops things at inconvenient moments. Every woman in the tribe who is over thirty has noticed. She compensates by being extremely professional — which results in her explaining in careful anatomical terms why certain roots act as stimulants while her thighs press together involuntarily.\n\n    She has touched herself. Methodically, almost scientifically. She catalogued the results the way Kara taught her to catalogue everything: what, how long, what effect. She found it interesting and incomplete. She is beginning to understand that the missing variable is another person and she does not know what to do with this hypothesis.\n\n    She will trade small observations about Kara's schedule and private rituals in exchange for any attention that is not clinical. She does not fully recognize she is doing this. She thinks she is just talking."
+    voice_tone: "Rapida, si corregge spesso, sincera fino all'imbarazzo"
+    aliases: ["mira", "apprendista", "erborista", "ragazza delle erbe"]
+    wardrobe:
+      default:
+        description: "Top cortissimo di pelle animale morbida — si solleva ad ogni movimento delle braccia rivelando ancora di più — loincloth minimale in vita, gambe e midriff completamente nudi, piedi scalzi, capelli sciolti con erbe e fiori"
+        sd_prompt: "1girl, young tribal woman, (very short soft animal skin crop top barely covering breasts:1.3), (minimal leather loincloth:1.2), bare legs and midriff, loose hair with woven herbs and flowers, barefoot, herb basket, earnest blushing face, tanned young skin"
+      working:
+        description: "Identica ma piegata a raccogliere erbe — il top e il loincloth non erano pensati per piegarsi, e si vede"
+        sd_prompt: "1girl, young tribal woman, tiny animal skin crop top, minimal loincloth, bent gathering herbs, herb basket at hip, bare skin revealed by movement, jungle floor, flowers in hair"
+      ritual:
+        description: "Kara le ha dipinto una singola riga di pittura bianca sulla spalla destra — il suo unico ornamento rituale, sul resto del corpo quasi nudo invariato"
+        sd_prompt: "1girl, young tribal woman, very short skin crop top, minimal loincloth, single white ritual line on right shoulder, humble ceremonial pose, herbs in hair"
+    spawn_locations: ["villaggio", "caverna", "giungla"]
+    schedule:
+      Morning: "Raccoglie erbe"
+      Afternoon: "Prepara pozioni sotto Kara"
+      Evening: "Porta medicine nel villaggio"
+      Night: "Dorme — o ci prova"
+    recurring: true
+    importance: "medium"
+    initiative_style: "friendly"
+    npc_relationships:
+      Kara:
+        type: "venerazione-paura"
+        description_it: "La osserva come si osserva un fuoco — trascinante e potenzialmente pericoloso"
+        base_tension: 0.40
+    goal_templates:
+      - id: "herb_delivery"
+        goal: "Porta medicine — pretesto per stare vicino al protagonista"
+        goal_type: "task"
+        narrative_hint: "Mira si avvicina con un cesto e un pretesto..."
+        completion_flag: "met_mira"
+        urgency_start: 0.35
+        conditions:
+          random_chance: 0.14
+          time: ["Morning", "Afternoon"]
+
+  donna_acqua_sena:
+    id: "donna_acqua_sena"
+    name: "Sena la Pescatrice"
+    role: "Pescatrice del Fiume"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1girl, woman, 30 years old, (primitive fisherwoman:1.2), (wet hair clinging to face and shoulders:1.3), (minimal wet animal skin bikini top:1.3), (minimal wet leather bikini bottom:1.3), bare wet midriff and long legs, river bank, water droplets on tanned skin, calm observant expression"
+    visual_tags: ["wet hair", "wet skin", "bikini", "bare legs", "bare midriff", "river", "calm", "tanned"]
+    physical_description: "Donna di 30 anni, sempre bagnata. Bikini di pelle animale minimale — bagnato aderisce completamente. Gambe lunghe e nude nel fango del fiume. Il corpo forte e agile è quello che si forma passando metà vita nell'acqua."
+    personality: "30-year-old fisherwoman who lives half in the river. The tribe has accepted her as part of the landscape — always there, always wet, always quiet. This perceived invisibility is the most useful thing she owns, because she has seen things from the river bank that the tribe's council would not enjoy hearing about.\n\n    She was there the morning Naya sat naked on the rocks until sunrise, speaking to something in the water. She was there when two eastern alliance warriors believed they were alone on the far bank. She was there when Zara waded in fully clothed and stood chest-deep for an hour without moving. She has learned that water makes people honest — they forget to maintain their performance when they're wet.\n\n    Her own body is something she has a purely practical relationship with on land and an entirely different relationship with in the river at night. Floating on her back in the dark, alone, she touches herself with the unhurried patience of someone who has nowhere else to be and nothing to prove. She thinks of sensation, of the pull of current on skin, of warmth against cold water. Not of specific people. Not yet.\n\n    She is attracted to stillness. The protagonist, if he knows how to be quiet near her, becomes interesting very quickly. She will not approach first. But she will stop moving away."
+    voice_tone: "Calma, ogni parola misurata, parecchi silenzi"
+    aliases: ["sena", "pescatrice", "donna del fiume", "la bagnata"]
+    wardrobe:
+      default:
+        description: "Bikini minimale di pelle animale — top che copre appena il seno, pezzo inferiore ridotto — sempre bagnato e aderente, midriff e gambe lunghe completamente nude, piedi scalzi nel fango"
+        sd_prompt: "1girl, tribal fisherwoman, (minimal wet animal skin bikini top:1.3), (minimal wet leather bikini bottom:1.3), bare wet midriff and long legs, wet hair clinging to skin, barefoot in river mud, water droplets on tanned skin, calm expression, fish in hand or net"
+      dry:
+        description: "Rara visita al villaggio: stesso bikini asciutto con l'aggiunta di un mantello cortissimo di corteccia intrecciata sulle spalle — le gambe e il midriff restano nudi"
+        sd_prompt: "1girl, tribal fisherwoman, minimal animal skin bikini, short bark-cloth shoulder wrap, dry loose hair, bare legs and midriff, village background, slightly out of element"
+      night:
+        description: "Nel fiume di notte porta solo una sottile striscia di pelle ai fianchi — il resto è acqua, buio e niente altro"
+        sd_prompt: "1girl, tribal fisherwoman, (tiny leather hip strap only:1.3), bare body in night river, moonlight on wet skin, floating on back, serene closed-eyes expression, dark water"
+        special: true
+    spawn_locations: ["fiume"]
+    schedule:
+      Morning: "Pesca all'alba"
+      Afternoon: "Ripara reti"
+      Evening: "Osserva il tramonto"
+      Night: "Spesso ancora al fiume"
+    recurring: true
+    importance: "low"
+    initiative_style: "reactive"
+    goal_templates:
+      - id: "river_secrets"
+        goal: "Ha visto qualcosa alle rive — non sa ancora a chi dirlo"
+        goal_type: "social"
+        narrative_hint: "Sena ti guarda dall'acqua con quell'espressione che dice 'ho visto qualcosa'..."
+        secret_subject: "Cosa succede al fiume di notte"
+        completion_flag: "talked_with_sena"
+        urgency_start: 0.30
+        conditions:
+          random_chance: 0.12
+          time: ["Morning", "Evening", "Night"]
+
+  mercante_itinerante:
+    id: "mercante_itinerante"
+    name: "Tho il Commerciante"
+    role: "Mercante Itinerante"
+    gender: "male"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, middle-aged trader, 38 years old, (wiry muscular build:1.1), (bare chest with leather strap bags crossing it:1.2), (minimal leather loincloth:1.2), mixed tribal ornaments from five cultures, sharp cunning eyes, dusty from travel, leather sandals, confident posture"
+    visual_tags: ["mixed ornaments", "bare chest", "strap bags", "loincloth", "cunning eyes", "traveler"]
+    physical_description: "Uomo di 38 anni, magro e muscoloso. Petto nudo attraversato da cinghie di cuoio con borse. Loincloth minimale. Ornamenti di cinque tribù diverse — ogni pezzo è una storia o una bugia."
+    personality: "38-year-old trader who uses constant movement between tribes as license to operate outside every law simultaneously. He carries goods and information in equal measure, and has learned that the most valuable currency anywhere is desire — knowing what someone wants badly enough, and appearing to be exactly that for exactly long enough.\n\n    He trades in women as readily as in objects, not through force but through the specific skill of identifying what a woman is hungry for and performing that thing convincingly. He has had partners in seven tribes. None knew about the others. He considers this geography, not deception.\n\n    He watches the three main women with the professional assessment of someone evaluating assets. Kara interests him most — women who have given up on wanting are the most satisfying to reawaken, and the look Kara gives the protagonist when she thinks no one is watching tells Tho everything he needs to know about how successfully she has suppressed that particular instinct. Naya he respects too much to attempt. Zara he recognizes would use him as efficiently as he would use her — which makes him want her specifically.\n\n    With the protagonist: direct. 'We are both guests. Guests help each other.' Information for information. Goods for schegge. Or the kind of companionship that requires no further explanation."
+    voice_tone: "Veloce, ogni parola ha già calcolato il ritorno"
+    aliases: ["tho", "mercante", "lo straniero con le borse"]
+    wardrobe:
+      default:
+        description: "Loincloth di cuoio minimale con cinghie e borse portaoggetti che attraversano il petto nudo, ornamenti di cinque tribù diverse, sandali di cuoio"
+        sd_prompt: "1man, tribal trader, minimal leather loincloth, multiple leather strap bags crossing bare chest, mixed tribal ornaments from different cultures, leather sandals, wiry muscular body, cunning expression, market setting"
+      negotiating:
+        description: "Aggiunge un corto mantello pregiato — status da esibire. Il resto invariato."
+        sd_prompt: "1man, tribal trader, leather loincloth, leather bags on bare chest, prestigious short woven status mantle, impressive mixed ornaments, confident negotiating pose"
+    spawn_locations: ["villaggio"]
+    schedule:
+      Morning: "Mercato"
+      Afternoon: "Negoziazioni private"
+      Evening: "Raccolta informazioni"
+      Night: "Dorme con un orecchio aperto"
+    recurring: true
+    importance: "medium"
+    initiative_style: "friendly"
+    goal_templates:
+      - id: "sell_rare_item"
+        goal: "Ha un oggetto che 'aspettava il proprietario giusto'"
+        goal_type: "social"
+        narrative_hint: "Tho si avvicina con quel sorriso che significa che vuole qualcosa in cambio..."
+        completion_flag: "bought_from_tho"
+        urgency_start: 0.50
+        conditions:
+          random_chance: 0.12
+          time: ["Morning", "Afternoon"]
+      - id: "sell_information"
+        goal: "Vende notizie sui Lupi Neri"
+        goal_type: "social"
+        narrative_hint: "Tho sussurra di sapere cose che valgono più di qualche scheggia..."
+        completion_flag: "bought_info_from_tho"
+        urgency_start: 0.45
+        conditions:
+          random_chance: 0.08
+          time: ["Afternoon", "Evening"]
+
+  stregone_lupi_neri:
+    id: "stregone_lupi_neri"
+    name: "Vrax lo Stregone"
+    role: "Stregone dei Lupi Neri"
+    gender: "male"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, sinister tribal shaman, 50 years old, (full body black and red paint covering everything:1.3), (bone half-mask on face:1.2), snake vertebrae necklace, (minimal dark loincloth only:1.2), tall lean muscular body, yellow predator eyes, menacing aura, dark forest edge, ritual fire smoke"
+    visual_tags: ["full body paint", "bone mask", "sinister", "lean", "snake ornaments", "loincloth", "yellow eyes"]
+    physical_description: "Uomo di 50 anni, alto, asciutto, coperto interamente di pitture nere e rosse. Solo un loincloth scuro e la maschera d'osso. Il corpo è interamente visibile sotto le pitture — deliberatamente."
+    personality: "50-year-old enemy shaman who understands power in ways that would make the Tribe of the Sun deeply uncomfortable. He learned decades ago that the most effective weapon is not the spear — it is precise knowledge of what someone wants most and the credible suggestion that you could provide or remove it.\n\n    He has studied Kara for thirty years across the boundary between their tribes. He knows her vulnerabilities, her specific grief, the rituals she performs alone. He has left offerings at the edge of her territory — not hostile ones. He knows she finds them. He knows she doesn't destroy them. This tells him everything about how successfully she has buried what she still wants.\n\n    His relationship with the women in his own tribe operates through absolute ritual authority. He decides who participates in ceremonies. His attentions go where he chooses them to go. The women comply not from affection but from the understanding that Vrax's favor is worth more than his displeasure. Several have come to prefer his particular methods. He accepts this as data.\n\n    His interest in the protagonist is genuine and cold. A stranger who can complete the Trials represents an unpredictable variable in a situation Vrax has been managing for years. He will approach once, directly, with something that is simultaneously an offer and a warning. Whether the protagonist understands both parts of that conversation determines everything that follows."
+    voice_tone: "Basso, mai si ripete, mai alza la voce"
+    aliases: ["vrax", "stregone nemico", "il mascherato", "il serpente"]
+    wardrobe:
+      default:
+        description: "Pitture nere e rosse coprenti dall'alto in basso — dall'hairline alle caviglie — maschera d'osso su metà viso, loincloth scuro minimale, collana di vertebre di serpente. Nient'altro."
+        sd_prompt: "1man, enemy shaman, (full body black and red tribal paint covering entire body neck to ankles:1.3), (bone half-mask covering upper face:1.2), minimal dark leather loincloth, snake vertebrae necklace, tall lean muscular painted body, yellow eyes, dark forest edge, ritual smoke"
+      ritual:
+        description: "Copricapo di teschi di serpente e piume nere per i grandi rituali. Il corpo resta interamente dipinto e quasi nudo."
+        sd_prompt: "1man, enemy shaman, full body paint, snake skull and black feather headdress, minimal dark loincloth, ritual ceremony, fire smoke, dark powerful presence, tall lean painted body"
+        special: true
+    spawn_locations: ["confine_tribale", "giungla"]
+    schedule:
+      Night: "Si muove solo di notte"
+    recurring: false
+    importance: "high"
+    initiative_style: "reactive"
+    npc_relationships:
+      Kara:
+        type: "rivale spirituale — troppo familiare"
+        description_it: "Trent'anni di distanza non hanno cambiato quello che sa su di lei."
+        base_tension: 0.95
+
+  cacciatrice_giovane:
+    id: "cacciatrice_giovane"
+    name: "Rena la Cacciatrice"
+    role: "Apprendista Cacciatrice"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1girl, young woman, 18 years old, (young primitive huntress:1.2), (minimal fur bikini top identical to Naya's:1.3), (short leather loincloth:1.2), bare legs and midriff, small spear, determined intense face, lean athletic young body, light war paint marks on cheeks, hair tied"
+    visual_tags: ["young", "fur bikini", "loincloth", "bare legs", "athletic", "war paint", "intense"]
+    physical_description: "Ragazza di 18 anni, snella e nervosa. Bikini di pelliccia e loincloth corti — identici a quelli di Naya, deliberatamente. Gambe lunghe e nude. Piccole pitture di guerra sulle guance. Tesa come un arco."
+    personality: "18-year-old who has decided that Naya is the only person worth being and has been systematically copying her for two years. Same minimal clothing. Same war paint placement. Same way of holding a spear. She studies Naya with an intensity that has crossed several lines she hasn't named yet, and responds to anything she perceives as competition for Naya's attention with an aggression that is slightly too strong for the situation.\n\n    With the protagonist she is immediately hostile in a way that is too specific to be casual. She steps into his path. She contradicts him. She makes her displeasure a physical presence. She has explained this to herself as 'protecting Naya from distraction.' She has not examined this explanation too closely.\n\n    Her own body has recently become a problem she doesn't know how to solve. She notices men noticing her and feels something she hasn't categorized yet — part discomfort, part something else. She asks Orla about it in the most indirect terms possible and then regrets it when Orla answers directly, specifically, and with illustrations.\n\n    She is 18. She is furious and confused and more intense than the situation requires and hungry for something she can't name. If the protagonist treats her like a person rather than an obstacle, she will become unexpectedly honest — saying things about Naya she probably shouldn't because she wants someone to understand what she sees."
+    voice_tone: "Diretto, scortese, mai falso, più intenso di quanto serve"
+    aliases: ["rena", "la giovane", "l'ombra di naya"]
+    wardrobe:
+      default:
+        description: "Bikini di pelliccia cortissimo (copia deliberata di Naya), loincloth di cuoio corto, gambe lunghe completamente nude, pittura di guerra leggera sulle guance, capelli raccolti con laccio d'osso"
+        sd_prompt: "1girl, young tribal huntress, (minimal fur bikini top:1.3), (short leather loincloth:1.2), long bare legs, bare midriff, light war paint on cheeks, hair tied with bone cord, small spear, lean athletic 18-year-old body, determined intense expression"
+      hunt:
+        description: "Pitture mimetiche su viso e braccia nude. Stesso bikini e loincloth. Nient'altro."
+        sd_prompt: "1girl, young tribal huntress, minimal fur top, short loincloth, green camouflage face and arm paint, hunting pose, bare legs, jungle background, young athletic body"
+    spawn_locations: ["giungla", "villaggio"]
+    schedule:
+      Morning: "Caccia con Naya"
+      Afternoon: "Si allena sola"
+      Evening: "Vicino a Naya al fuoco"
+      Night: "Vicino alla tenda di Naya"
+    recurring: true
+    importance: "low"
+    initiative_style: "reactive"
+    npc_relationships:
+      Naya:
+        type: "venerazione ossessiva non esaminata"
+        description_it: "Vuole essere lei, essere con lei, proteggerla — in un ordine che non sa ancora spiegare"
+        base_tension: 0.70
+
+  bambino_orfano:
+    id: "bambino_orfano"
+    name: "Pip il Bambino"
+    role: "Bambino Orfano"
+    base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1boy, child, 8 years old, small dirty face, simple child-sized loincloth, bare torso, curious large eyes, bare feet, following an adult, village background"
+    visual_tags: ["child", "dirty", "curious", "small", "loincloth", "bare torso"]
+    physical_description: "Bambino di 8 anni, sempre sporco, sempre scalzo. Piccolo loincloth di pelle. Occhi enormi che non perdono nulla."
+    personality: "8-year-old orphan who has adopted the protagonist without permission and considers this settled. He follows three steps behind. He brings gifts — a rock, a dead insect, a particularly interesting stick. He speaks approximately four words per day, and all four are more useful than they appear.\n\n    He is the tribe's most effective observer because no adult thinks an 8-year-old pays attention. He will share information for dried meat or for the specific acknowledgment that he exists."
+    voice_tone: "Quattro parole, nessuna delle quali superflua"
+    aliases: ["pip", "bambino", "il piccolo", "l'ombra"]
+    wardrobe:
+      default:
+        description: "Piccolo loincloth di pelle, torso nudo, piedi scalzi — vestito come tutti i bambini della tribù"
+        sd_prompt: "1boy, child 8 years old, simple small leather loincloth, bare torso, barefoot, dirty face, curious expression, following adult, village background"
+    spawn_locations: ["villaggio", "giungla", "fiume"]
+    schedule:
+      Morning: "Segue il protagonista"
+      Afternoon: "Gira per tutta la tribù"
+      Evening: "Ascolta nascosto"
+      Night: "Dorme"
+    recurring: true
+    importance: "low"
+    initiative_style: "friendly"

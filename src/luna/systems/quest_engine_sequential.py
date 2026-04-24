@@ -89,7 +89,11 @@ class SequentialQuestEngine(QuestEngine):
                 )
                 return self._fail_quest(quest_id, instance, quest_def, stage_id, game_state)
 
-        # 3. exit_conditions → advance stage or COMPLETED
+        # 3. Location gate: block exit_conditions if player not at required location
+        if stage.location and game_state.current_location != stage.location:
+            return None
+
+        # 4. exit_conditions → advance stage or COMPLETED
         if self._evaluator.evaluate_all(stage.exit_conditions, game_state, user_input):
             return self._advance_stage(quest_id, instance, quest_def, stage_id, game_state)
 

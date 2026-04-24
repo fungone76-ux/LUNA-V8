@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Optional, Tuple
 
 from luna.core.models import GameState, IntentType, NarrativeOutput, TurnResult
 from luna.systems.mini_games.poker import PokerGame
@@ -546,10 +546,14 @@ class IntentHandlersMixin:
                 if old_is_npc:
                     # Con NPC attivo: basta che il companion sia menzionato
                     should_switch = not is_roleplay
+                elif in_solo:
+                    # In solo mode: a companion mention should be enough.
+                    # Keep only roleplay guard to avoid literal stage directions.
+                    should_switch = not is_roleplay
                 else:
                     # Logica conservativa standard
                     should_switch = not is_roleplay and not is_too_long and not has_passive
-                    if word_count <= 5 and not has_active and not in_solo:
+                    if word_count <= 5 and not has_active:
                         should_switch = False
                 
                 if should_switch:

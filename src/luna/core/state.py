@@ -127,13 +127,18 @@ class StateManager:
             logger.error("Failed to deserialize state for session %d: %s", session_id, e)
             return None
 
-    async def save(self, db: Any, companion_location: Optional[str] = None) -> bool:
+    async def save(
+        self,
+        db: Any,
+        companion_location: Optional[str] = None,
+        save_name: Optional[str] = None,
+    ) -> bool:
         """Persist current state to database."""
         if not self._state:
             return False
         try:
             state_json = self._state.model_dump_json()
-            await self._db.update_session(
+            kwargs: Dict[str, Any] = dict(
                 db=db,
                 session_id=self._state.session_id,
                 turn_count=self._state.turn_count,
@@ -144,6 +149,9 @@ class StateManager:
                 companion=self._state.active_companion,
                 state_json=state_json,
             )
+            if save_name:
+                kwargs["name"] = save_name
+            await self._db.update_session(**kwargs)
             return True
         except Exception as e:
             logger.error("Failed to save state: %s", e)

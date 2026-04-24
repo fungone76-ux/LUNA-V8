@@ -249,6 +249,63 @@ locations:
     
     companion_can_follow: false
   
+  school_office_preside:
+    id: "school_office_preside"
+    name: "Ufficio del Preside"
+    description: "L'ufficio del preside. Scrivania grande, persiane semi-chiuse, luce pomeridiana filtrata."
+    visual_style: "dark wood desk, leather chair, half-closed blinds, afternoon light, authority"
+    lighting: "warm dim"
+
+    parent_location: "school_corridor"
+    requires_parent: true
+
+    connected_to: ["school_corridor"]
+    aliases: ["preside", "ufficio preside", "dirigente"]
+
+    available_times: ["Morning", "Afternoon", "Evening"]
+    hidden: true
+
+    companion_can_follow: false
+    companion_refuse_message: "Non ho niente a che fare con il preside."
+
+  school_infirmary:
+    id: "school_infirmary"
+    name: "Infermeria Scolastica"
+    description: "Piccolo ambulatorio scolastico. Lettino, armadio dei medicinali, tendina bianca."
+    visual_style: "medical bed, white curtain, medicine cabinet, clinical"
+    lighting: "fluorescent"
+
+    parent_location: "school_corridor"
+    requires_parent: true
+
+    connected_to: ["school_corridor"]
+    aliases: ["infermeria", "ambulatorio", "infermiera"]
+
+    available_times: ["Morning", "Afternoon"]
+
+    available_characters: ["infermiera"]
+    companion_can_follow: false
+    companion_refuse_message: "Non è il caso che entri in infermeria con te."
+
+  school_counselor:
+    id: "school_counselor"
+    name: "Studio della Psicologa"
+    description: "Ufficio riservato della consulente scolastica. Poltrone morbide, piante, penombra."
+    visual_style: "armchairs, soft light, plants, private office"
+    lighting: "warm indoor"
+
+    parent_location: "school_corridor"
+    requires_parent: true
+
+    connected_to: ["school_corridor"]
+    aliases: ["psicologa", "consulente", "studio", "psicologa scolastica"]
+
+    available_times: ["Morning", "Afternoon"]
+
+    available_characters: ["psicologa"]
+    companion_can_follow: false
+    companion_refuse_message: "Qui è riservato. Ti aspetto fuori."
+
   # ============================================================
   # FUORI SCUOLA
   # ============================================================

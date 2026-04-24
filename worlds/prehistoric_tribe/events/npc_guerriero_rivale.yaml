@@ -1,0 +1,201 @@
+# ============================================================
+# EVENTS - Drek il Guerriero Rivale
+# Antagonista che ostacola e sfida il protagonista
+# ============================================================
+
+quests:
+  drek_prima_sfida:
+    meta:
+      title: "Il Rivale si Fa Vivo"
+      description: "Drek ti blocca la strada e fa capire che sei sul suo territorio"
+      character: "guerriero_rivale"
+      hidden: false
+      priority: 7
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "turn_count"
+          operator: "gte"
+          value: 4
+        - type: "affinity"
+          target: "Zara"
+          operator: "gte"
+          value: 10
+
+    stages:
+      blocco:
+        title: "La Lancia di Drek"
+        narrative_prompt: |
+          Drek ti blocca il passaggio con la lancia orizzontale all'altezza del petto.
+          Non è un attacco — è un confine. Le pitture nere sul suo viso
+          non lasciano dubbi sul suo umore.
+          "Sei un ospite. Gli ospiti non camminano come se fossero a casa."
+          Intorno, qualche guerriero osserva. Nessuno interviene.
+          È tra voi due.
+        exit_conditions:
+          - type: "action"
+            pattern: "parla|risponde|affronta|cede|ignora"
+        transitions:
+          - condition: "default"
+            target_stage: "confronto"
+
+      confronto:
+        title: "La Valutazione"
+        narrative_prompt: |
+          Drek ti studia dall'alto in basso. "Sei venuto per le Prove.
+          Le Prove uccidono i deboli. Tu sembri debole."
+          Non mente — dice quello che pensa davvero. E aspetta la tua risposta
+          come un predatore aspetta che la preda si muova.
+          Come ti comporti in questo momento — con forza, con astuzia, con calma —
+          stabilisce quanto Drek ti rispetterà o quanto si intensificherà la sua ostilità.
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      flags:
+        drek_met: true
+
+  drek_sabotaggio:
+    meta:
+      title: "Il Sabotaggio"
+      description: "Drek cerca di sabotare una delle Prove attraverso la manipolazione"
+      character: "guerriero_rivale"
+      hidden: true
+      priority: 8
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "flag"
+          target: "drek_met"
+          value: true
+        - type: "affinity"
+          target: "Zara"
+          operator: "gte"
+          value: 30
+
+    stages:
+      voce:
+        title: "La Voce che Corre"
+        narrative_prompt: |
+          Orla la Tessitrice ti avvicina con un'espressione seria — rara per lei.
+          "Qualcuno sta dicendo cose. Che hai barato nelle Prove. Che hai corrotto
+          un cacciatore per coprire la tua debolezza nella selva."
+          Pausa. "Il nome di Drek non viene detto. Ma si sente ovunque."
+          Se non agisci, la tua reputazione erode. Se agisci male, peggiora.
+        exit_conditions:
+          - type: "action"
+            pattern: "drek|confronta|risponde|indaga|ignora"
+        transitions:
+          - condition: "default"
+            target_stage: "risposta"
+
+      risposta:
+        title: "Come Rispondere al Fango"
+        narrative_prompt: |
+          La tribù osserva. Non tutti credono alle voci — ma nessuno le smentisce.
+          Drek ti incontra per caso (o no) al bordo del villaggio.
+          Il suo sorriso è sottile. "Sento che ci sono domande sul tuo conto.
+          Peccato. Le Prove non perdonano chi non è all'altezza."
+          Hai un'occasione per rispondere a modo tuo.
+        on_enter:
+          - action: "set_flag"
+            target: "drek_sabotage_active"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 3
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      flags:
+        drek_sabotage_resolved: true
+
+  drek_resa_dei_conti:
+    meta:
+      title: "La Resa dei Conti"
+      description: "Drek sfida il protagonista a un duello formale davanti alla tribù"
+      character: "guerriero_rivale"
+      hidden: true
+      priority: 9
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "flag"
+          target: "prova_sangue_passata"
+          value: true
+        - type: "affinity"
+          target: "Zara"
+          operator: "gte"
+          value: 60
+
+    stages:
+      sfida_pubblica:
+        title: "Sfida Formale"
+        narrative_prompt: |
+          Drek si presenta al fuoco serale con la lancia e uno sguardo definitivo.
+          "Chiedo il Diritto di Duello. Il forestiero ha preso ciò che era mio.
+          La tradizione dà a un guerriero della tribù il diritto di reclamarlo."
+          Il Capo Rho guarda. Non interviene. Aspetta te.
+          È formale — il rifiuto sarebbe disonore. L'accettazione è rischio reale.
+        exit_conditions:
+          - type: "action"
+            pattern: "accetto|rifiuto|rispondo|combatto|parlo"
+        transitions:
+          - condition: "default"
+            target_stage: "duello"
+
+      duello:
+        title: "Il Duello"
+        narrative_prompt: |
+          Il cerchio si forma. Guerrieri, donne, bambini — tutti guardano.
+          Kara si siede in disparte con la sua espressione illeggibile.
+          Naya tiene le braccia conserte ma gli occhi fissi su di te.
+          Zara non si muove, ma le mani stringono qualcosa di invisibile.
+          Drek è bravo. Molto bravo. Questo non sarà facile.
+          Come gestisci il duello — forza bruta, astuzia, o qualcos'altro —
+          decide non solo il risultato ma quello che la tribù penserà di te.
+        on_enter:
+          - action: "set_flag"
+            target: "drek_duel_started"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 4
+        transitions:
+          - condition: "default"
+            target_stage: "esito"
+
+      esito:
+        title: "Dopo il Duello"
+        narrative_prompt: |
+          Qualunque sia l'esito — vittoria, sconfitta, o accordo — qualcosa cambia.
+          Se hai vinto: Drek si ritira. Non è finita, ma il confronto diretto è chiuso.
+          La tribù ti guarda diversamente. Zara anche.
+          Se hai perso: Drek esulta ma non ottiene Zara — era una questione di onore,
+          non un diritto automatico. Resti con meno reputazione, ma ancora in gioco.
+          Se hai trovato un accordo: sei brillante o vigliacco, a seconda di chi guarda.
+        on_enter:
+          - action: "set_flag"
+            target: "drek_confrontation_resolved"
+            value: true
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Zara: 15
+      flags:
+        drek_arc_complete: true

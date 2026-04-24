@@ -133,7 +133,6 @@ class NarrativeEngine:
         sections += self._story_beat(context)
         sections += self._gm_agenda(context)
         sections += self._activity_context(context)
-        sections += self._cross_npc_hint(context)
         sections += self._npc_presence_context(context)  # Metodo 7: stato accumulato NPC
         sections += self._npc_secret_hint(context)
         sections += self._multi_npc_context(context)
@@ -194,12 +193,52 @@ class NarrativeEngine:
             "",
         ]
 
+    def _npc_speaker_context(
+        self,
+        npc_id: str,
+        npc_def: Any,
+        companion: Optional[CompanionDefinition],
+    ) -> List[str]:
+        """Build context when an NPC template is the active speaker (not the companion)."""
+        get = lambda key, default="": (
+            npc_def.get(key, default) if isinstance(npc_def, dict)
+            else getattr(npc_def, key, default)
+        )
+        name = get("name", npc_id)
+        role = get("role", "")
+        physical = get("physical_description", "")
+        personality = get("personality", "")
+        companion_name = companion.name if companion else "the companion"
+
+        lines = [
+            "=== ACTIVE SPEAKER: NPC ===",
+            f"⚠️ {name} IS THE ONLY CHARACTER SPEAKING THIS TURN.",
+            f"⚠️ DO NOT write {companion_name}'s dialogue. {companion_name} is NOT at this location.",
+            f"Speak ONLY as {name}. Every quoted line must come from {name}.",
+            "",
+            f"Name: {name}",
+            f"Role: {role}",
+        ]
+        if physical:
+            lines.append(f"Physical: {physical}")
+        if personality:
+            lines.append(f"Personality: {personality[:400]}")
+        lines.append("")
+        return lines
+
     def _companion_context(
         self,
         companion: Optional[CompanionDefinition],
         game_state: GameState,
         context: Dict[str, Any],
     ) -> List[str]:
+        # If an NPC template is the active speaker, replace companion context entirely
+        active_npc_id = context.get("active_npc_speaker")
+        if active_npc_id:
+            npc_def = self.world.npc_templates.get(active_npc_id)
+            if npc_def:
+                return self._npc_speaker_context(active_npc_id, npc_def, companion)
+
         if not companion or game_state.active_companion == _SOLO_COMPANION:
             return [
                 "=== SOLO MODE ===",
@@ -300,6 +339,9 @@ class NarrativeEngine:
         companion: Optional[CompanionDefinition],
     ) -> List[str]:
         if not companion or game_state.active_companion == _SOLO_COMPANION:
+            return []
+        # Skip companion outfit when an NPC template is the active speaker
+        if game_state.flags.get("_active_npc_speaker"):
             return []
         outfit = game_state.get_outfit(companion.name)
         outfit_desc = outfit.to_prompt_string()

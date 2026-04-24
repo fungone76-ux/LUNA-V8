@@ -37,6 +37,7 @@ class GameSessionModel(Base):
     __tablename__ = "game_sessions"
 
     id:           Mapped[int]           = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name:         Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     world_id:     Mapped[str]           = mapped_column(String(64))
     companion:    Mapped[str]           = mapped_column(String(64))
     turn_count:   Mapped[int]           = mapped_column(Integer, default=0)
@@ -197,6 +198,8 @@ class DatabaseManager:
         return [
             {
                 "id":         r.id,
+                "session_id": r.id,
+                "name":       r.name or "",
                 "world_id":   r.world_id,
                 "companion":  r.companion,
                 "turn_count": r.turn_count,
@@ -260,7 +263,12 @@ class DatabaseManager:
             .limit(limit)
         )
         if companion_filter:
-            q = q.where(ConversationMessageModel.companion == companion_filter)
+            from sqlalchemy import or_
+            q = q.where(or_(
+                ConversationMessageModel.companion == companion_filter,
+                ConversationMessageModel.companion.is_(None),
+                ConversationMessageModel.companion == "",
+            ))
         result = await db.execute(q)
         rows = result.scalars().all()
         return list(reversed(rows))

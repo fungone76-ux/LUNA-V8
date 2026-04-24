@@ -1,0 +1,173 @@
+# ============================================================
+# MISSION - Kara: L'Origine della Sciamana
+# Missione sulla trasformazione di Kara — il suo passato umano
+# Prerequisito: kara_prova_spirito completata
+# ============================================================
+
+quests:
+  kara_origine_sciamana:
+    meta:
+      title: "Prima che diventassi Kara"
+      description: "Kara porta il protagonista nel luogo dove è diventata sciamana"
+      character: "Kara"
+      hidden: true
+      priority: 7
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "affinity"
+          target: "Kara"
+          operator: "gte"
+          value: 55
+        - type: "flag"
+          target: "prova_spirito_passata"
+          value: true
+
+    stages:
+      invito_strano:
+        title: "L'Invito Strano"
+        narrative_prompt: |
+          Kara non ti invita mai. Sono sempre gli altri ad andare da lei.
+          Oggi invece è lei a trovarti. Non dice nulla per un momento —
+          ti studia come fa con i segni che precedono il temporale.
+          "C'è un posto nella caverna che non ho mostrato a nessuno.
+          Voglio mostrartelo. Non so perché. Ma le cose che non so perché
+          sono quelle che devo fare."
+          Si volta e cammina. Aspetta che tu la segua.
+        exit_conditions:
+          - type: "action"
+            pattern: "segui|sì|vengo|cosa|dove"
+        transitions:
+          - condition: "default"
+            target_stage: "camera_nascosta"
+
+      camera_nascosta:
+        title: "La Camera del Lutto"
+        narrative_prompt: |
+          In fondo alla caverna principale, oltre un cunicolo stretto,
+          c'è una stanza piccola. La parete è coperta di dipinti.
+          Non sono simboli rituali — sono persone. Un uomo giovane, una donna giovane.
+          Un fuoco. Una capanna. Scene ordinarie di vita ordinaria.
+          Kara si siede sulla roccia al centro. "Ero io", dice semplicemente.
+          "Prima. Quando avevo un nome che nessuno usa più."
+          Il silenzio dopo è lungo come un anno.
+        on_enter:
+          - action: "set_location"
+            target: "caverna_sacra"
+          - action: "set_emotional_state"
+            character: "Kara"
+            value: "vulnerable"
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 3
+        transitions:
+          - condition: "default"
+            target_stage: "confessione"
+
+      confessione:
+        title: "Il Nome che Nessuno Usa"
+        narrative_prompt: |
+          Kara racconta lentamente — non come una storia, come una serie
+          di frammenti che ancora fanno male al bordo.
+          Si chiamava in modo diverso. Aveva un compagno. Rideva spesso.
+          Poi la malattia, la morte, la notte in cui aveva urlato
+          finché Maka non l'aveva trovata e lei aveva chiesto la domanda
+          che l'aveva cambiata per sempre.
+          "Devi sapere questo", dice alla fine. "Se mi conosci,
+          devi conoscere anche quella persona che ero.
+          Perché è ancora qui dentro. Non è sparita.
+          Ha solo smesso di sapere come vivere tra i vivi."
+          Ti guarda. Questa è la versione di Kara senza l'armatura.
+        on_enter:
+          - action: "change_affinity"
+            character: "Kara"
+            value: 15
+          - action: "set_flag"
+            target: "kara_true_self_revealed"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 3
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Kara: 20
+      flags:
+        kara_origin_complete: true
+
+  kara_cristallo_nero:
+    meta:
+      title: "Il Dono dello Strano Cristallo"
+      description: "Dare il cristallo di Tho a Kara — e vedere cosa succede"
+      character: "Kara"
+      hidden: true
+      priority: 6
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "flag"
+          target: "kara_gift_purchased"
+          value: true
+        - type: "affinity"
+          target: "Kara"
+          operator: "gte"
+          value: 45
+
+    stages:
+      dono:
+        title: "Il Cristallo e la Sciamana"
+        narrative_prompt: |
+          Porti il cristallo a Kara. Non sai come reagirà —
+          lei raramente reagisce come ti aspetti.
+          Apri la foglia davanti a lei.
+          Si ferma. Si irrigidisce. Un secondo, due secondi.
+          Poi allunga una mano e lo tocca con un dito solo —
+          come se non fosse sicura che sia reale.
+          "Dove l'hai preso?" La voce è diversa. Più bassa.
+        exit_conditions:
+          - type: "action"
+            pattern: "mercante|tho|comprato|trovato|racconto"
+        transitions:
+          - condition: "default"
+            target_stage: "riconoscimento"
+
+      riconoscimento:
+        title: "Lo Chiama per Nome"
+        narrative_prompt: |
+          Kara chiude gli occhi. Quando li riapre, sembrano leggermente umidi —
+          ma potrebbero essere le luci nella caverna.
+          "Si chiama Pietra Nera del Fiume Morto. Viene da lontano.
+          L'ho cercata per vent'anni. La usava il mio maestro."
+          Lo chiude nel pugno. "Tho sa cose che non dovrebbe sapere."
+          Ma non lo dice con rabbia. Lo dice con qualcosa di più morbido.
+          "Grazie." È la prima volta che lo dice. A te. Senza condizioni.
+        on_enter:
+          - action: "change_affinity"
+            character: "Kara"
+            value: 20
+          - action: "set_flag"
+            target: "kara_gift_received"
+            value: true
+          - action: "set_emotional_state"
+            character: "Kara"
+            value: "vulnerable"
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Kara: 25
+      flags:
+        kara_crystal_quest_complete: true

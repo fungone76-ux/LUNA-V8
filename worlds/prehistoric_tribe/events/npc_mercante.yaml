@@ -1,0 +1,167 @@
+# ============================================================
+# EVENTS - Tho il Mercante Itinerante
+# Commerciante che vende oggetti, informazioni e plot hooks
+# ============================================================
+
+quests:
+  tho_primo_incontro:
+    meta:
+      title: "Il Mercante di Segreti"
+      description: "Tho si presenta e offre la sua merce — oggetti e informazioni"
+      character: "mercante_itinerante"
+      hidden: false
+      priority: 4
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "turn_count"
+          operator: "gte"
+          value: 3
+      probability: 0.7
+
+    stages:
+      presentazione:
+        title: "Un Faccia Nuova al Mercato"
+        narrative_prompt: |
+          Un uomo con più borse di quanti siano i suoi anni apre la sua mercanzia
+          nel mercato mattutino. Ornamenti di cinque tribù diverse, erbe secche,
+          pietre lucide, qualcosa che non riesci a identificare.
+          Ti vede e sorride — il sorriso di chi sa già cosa vuoi.
+          "Forestiero. Anche tu forestiero. Ci riconosciamo."
+        exit_conditions:
+          - type: "action"
+            pattern: "parla|avvicinati|guarda|compra|ignora"
+        transitions:
+          - condition: "default"
+            target_stage: "offerta"
+
+      offerta:
+        title: "La Merce di Tho"
+        narrative_prompt: |
+          Tho parla veloce, come se il tempo fosse merce rara:
+          "Ho oggetti. Ho informazioni. I primi si comprano con schegge.
+          Le seconde... si pagano con informazioni. Funziona così tra me
+          e le persone interessanti."
+          Pausa. "Tu sembri interessante. Cosa ti serve?"
+          Tra la sua merce noti: un amuleto da una tribù che non conosci,
+          qualcosa che potrebbe essere un antidoto, e una piccola mappa parziale.
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      flags:
+        tho_met: true
+
+  tho_info_lupi_neri:
+    meta:
+      title: "Notizie dai Lupi Neri"
+      description: "Tho vende informazioni cruciali sui movimenti del nemico"
+      character: "mercante_itinerante"
+      hidden: true
+      priority: 7
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "flag"
+          target: "tho_met"
+          value: true
+        - type: "turn_count"
+          operator: "gte"
+          value: 12
+
+    stages:
+      notizia_urgente:
+        title: "Notizie che Costano"
+        narrative_prompt: |
+          Tho ti trova in un angolo discreto del villaggio. Niente sorrisi stavolta.
+          "Ho notizie. Brutte notizie. Ma le notizie brutte valgono di più
+          perché ti danno tempo. Hai tempo? Hai qualcosa da scambiare?"
+          L'urgenza nella sua voce non è recitata. Ha visto qualcosa.
+        exit_conditions:
+          - type: "action"
+            pattern: "sì|pagherò|parla|dimmi|cosa|certo"
+        transitions:
+          - condition: "default"
+            target_stage: "informazione"
+
+      informazione:
+        title: "Cosa ha Visto Tho"
+        narrative_prompt: |
+          Tho abbassa la voce: i Lupi Neri si stanno muovendo in gran numero.
+          Li ha incrociati due giorni fa vicino al secondo fiume.
+          Non era una pattuglia — era un'armata. Con lo stregone Vrax in testa.
+          Vrax non si muove mai senza avere qualcosa di preciso in mente.
+          "Ti dico questo perché la tribù del Sole fa bene ai miei affari viva.
+          E perché Vrax mi deve dei soldi che non mi ha mai pagato."
+          Sorride. Anche in questo, trova l'interesse personale.
+        on_enter:
+          - action: "set_flag"
+            target: "lupi_neri_army_known"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      flags:
+        tho_intel_received: true
+
+  tho_regalo_speciale:
+    meta:
+      title: "Il Regalo Giusto"
+      description: "Tho vende un oggetto perfetto per una delle tre protagoniste"
+      character: "mercante_itinerante"
+      hidden: true
+      priority: 5
+      requires_player_choice: true
+      choice_title: "L'Offerta del Mercante"
+      choice_description: "Tho ha qualcosa di speciale. Per chi è?"
+      accept_button_text: "Compra per Kara (15 schegge)"
+      decline_button_text: "Non ora"
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "flag"
+          target: "tho_intel_received"
+          value: true
+
+    stages:
+      oggetto_raro:
+        title: "Un Oggetto Che Ha Aspettato il Proprietario"
+        narrative_prompt: |
+          Tho tira fuori qualcosa di avvolto in una foglia.
+          "Questo viene da molto lontano. L'ho portato per mesi senza sapere
+          per chi fosse. Adesso so. È per lei."
+          Apre la foglia: un cristallo nero, perfettamente levigato,
+          attraversato da un filo d'oro naturale. Brilla come un occhio.
+          "La sciamana lo chiamerà per nome quando lo vedrà. Non so come lo so.
+          Lo so e basta."
+          Prezzo: 15 schegge. Un prezzo equo, dice, per qualcosa di inestimabile.
+        on_enter:
+          - action: "set_flag"
+            target: "kara_gift_available"
+            value: true
+        exit_conditions:
+          - type: "action"
+            pattern: "compra|prendo|pago|sì"
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      flags:
+        kara_gift_purchased: true
+      affinity:
+        Kara: 15

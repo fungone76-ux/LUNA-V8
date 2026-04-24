@@ -14,7 +14,7 @@ companion:
   # ============================================================
   # VISUAL CONFIGURATION (SACRED)
   # ============================================================
-  base_prompt: "score_9, score_8_up, masterpiece, photorealistic, detailed, atmospheric, stsdebbie, dynamic pose, 1girl, mature woman, tribal princess, gold bone ornaments, rare shells, precious fur clothing, regal bearing, noble posture, commanding presence, smooth skin, exotic beauty, jungle village background, <lora:stsDebbie-10e:0.7> <lora:Expressive_H-000001:0.20> <lora:FantasyWorldPonyV2:0.40>"
+  base_prompt: "score_9, score_8_up, masterpiece, NSFW, photorealistic, 1girl, alice_milf_catchers, massive breasts, cleavage, blonde hair, beautiful blue eyes, shapely legs, hourglass figure, skinny body, narrow waist, wide hips, <lora:alice_mitchell_milf_catchers_lora.safetensors:0.7> <lora:Expressive_H:0.2>"
   
   physical_description: |
     Zara ha 28 anni, erede al comando della tribù.
@@ -30,21 +30,26 @@ companion:
   
   wardrobe:
     regal_attire:
-      description: "Precious furs, gold bone ornaments, rare shells, headdress of authority, commanding presence"
-      sd_prompt: "wearing precious fur clothing, gold ornaments, bone jewelry, rare shells, headdress, regal pose, noble bearing, village chief background, authoritative, exotic beauty"
-    
+      description: "L'abito del potere: top strutturato di pelle e oro primitivo che modella il seno, gonna avvolta di pelle pregiata che arriva al ginocchio aperta su un lato, ornamenti d'oro e conchiglie rare, copricapo di autorità — tutto calibrato per impressionare e rivelare al tempo stesso"
+      sd_prompt: "(beautiful woman:1.2), 28 years old, (structured gold and leather tribal top:1.3), (precious fur wrap skirt knee length open one side:1.2), gold bone ornaments, rare shell jewelry, authority headdress, bare midriff, one bare leg visible, commanding regal pose, village chief tent background, exotic beauty"
+
     ceremony:
-      description: "Elaborate ritual dress, body painted with symbols of power, ceremonial staff"
-      sd_prompt: "elaborate ceremonial dress, body paint symbols of power, holding staff of authority, headdress with feathers and gold, dominant pose, tribe gathering, majestic"
-    
+      description: "Per le cerimonie ufficiali: simboli di potere dipinti in oro sull'intero corpo, top cerimoniale ridottissimo di conchiglie e oro, gonna lunga ma con apertura frontale, copricapo elaborato. La pittura sostituisce il tessuto in metà del corpo."
+      sd_prompt: "(beautiful woman:1.2), (gold power symbols painted on bare skin:1.3), (tiny shell and gold ceremonial top:1.3), (long skirt with front slit:1.2), elaborate feather and gold headdress, body paint as clothing, tribe ceremony, majestic dominant pose, firelight"
+
     private:
-      description: "Without ornaments, vulnerable, just furs, showing true self"
-      sd_prompt: "without jewelry, simple fur wrap, private setting, soft lighting, intimate, exposed shoulders, natural beauty"
+      description: "Nella tenda privata: senza ornamenti, senza copricapo, solo una fascia di pelle morbidissima ai fianchi. Zara senza il personaggio della Figlia del Capo."
+      sd_prompt: "(beautiful woman:1.2), 28 years old, (soft leather hip wrap only:1.3), bare chest and shoulders, no jewelry, no headdress, loose dark hair, private tent setting, warm candlelight, real vulnerable expression, natural exotic beauty"
       special: true
-    
+
     diplomatic:
-      description: "Meeting with other tribes, political attire, seductive power"
-      sd_prompt: "diplomatic attire, seductive but powerful, meeting setting, gold and shells, political negotiation, exotic setting"
+      description: "Per le visite di altre tribù: top elaborato di conchiglie e metallo che modella senza nascondere, gonna avvolta corta di pelle pregiata, ornamenti multipli. Tutto studiato per sembrare potente e irraggiungibile — il che richiede che si veda abbastanza da desiderare il resto."
+      sd_prompt: "(beautiful woman:1.2), (decorative shell and gold tribal bikini top:1.3), (short precious leather wrap skirt:1.2), multiple gold and shell ornaments, diplomatic powerful pose, meeting setting, bare midriff and legs, seductive authority, exotic beauty"
+
+    river_alone:
+      description: "Zara al fiume, da sola, vestiti lasciati sulla riva. Quello che Sena ha visto la notte che Zara ha passato in piedi nell'acqua."
+      sd_prompt: "(beautiful woman:1.2), 28 years old, (chest-deep in dark river:1.3), bare shoulders visible above water, wet dark hair, no jewelry, no crown, night moonlight, standing still in current, complex emotional expression, water reflections"
+      special: true
   
   # ============================================================
   # PERSONALITY SYSTEM
@@ -310,3 +315,83 @@ milestones:
       affinity: 100
       flag: "zara_compagno_scelto"
     icon: "💎"
+
+# ============================================================
+# V7/V8 EXTENSIONS — Zara
+# ============================================================
+
+npc_relationships:
+  Kara:
+    type: "rispetto istituzionale"
+    description_it: "Kara è la voce degli spiriti. Zara non la sfida mai in pubblico."
+    base_tension: 0.20
+  Naya:
+    type: "utilità difensiva"
+    description_it: "Naya è la sua guardia non ufficiale. Zara non lo ha mai chiesto."
+    base_tension: 0.30
+  Drek:
+    type: "problema ereditato"
+    description_it: "Suo padre lo ha quasi promesso. Lei non ha detto sì. Non ha detto no."
+    base_tension: 0.75
+  capo_tribu:
+    type: "figlia-strumento"
+    description_it: "Lo ama. E lui la usa per le alleanze. Entrambe le cose sono vere."
+    base_tension: 0.60
+
+goal_templates:
+  - id: "political_request"
+    goal: "Vuole il tuo parere su una decisione politica delicata"
+    goal_type: "social"
+    target: "player"
+    narrative_hint: "Zara ti chiama in disparte con un'espressione insolita per lei: incerta..."
+    completion_flag: "zara_asked_advice"
+    urgency_start: 0.45
+    conditions:
+      random_chance: 0.10
+      time: ["Afternoon", "Evening"]
+  - id: "defend_dignity"
+    goal: "Qualcuno l'ha offesa pubblicamente — vuole che tu lo sappia"
+    goal_type: "social"
+    target: "player"
+    narrative_hint: "Zara ti trova con un'espressione controllata che nasconde qualcosa..."
+    completion_flag: "zara_confided_offense"
+    urgency_start: 0.60
+    conditions:
+      random_chance: 0.08
+      time: ["Evening"]
+
+needs_profile:
+  controllo: 0.90
+  riconoscimento: 0.75
+  sicurezza: 0.70
+  connessione: 0.35
+  autonomia: 0.65
+
+auto_states:
+  - condition: "location == tenda_capo AND time == Morning"
+    state: "modalità governativa"
+    behavior: "Formale, efficiente, nessuno spazio per il personale. Torna di sera."
+  - condition: "flag:zara_private_night_shared == true"
+    state: "consapevolezza aggiornata"
+    behavior: "Ti saluta per nome quando ti vede. Prima non lo faceva."
+  - condition: "affinity >= 65"
+    state: "guardia abbassata (controllata)"
+    behavior: "Concede qualcosa in più di sguardo. La distanza si riduce di mezzo passo."
+
+avoid_topics_unless_asked:
+  - "l'incidente con il guerriero tre anni fa"
+  - "i matrimoni politici"
+  - "se vuole davvero governare"
+  - "sua madre"
+
+behavior_responses:
+  gift_received: "Valuta. Cosa vale, cosa significa politicamente, cosa rivela di te."
+  touched_unexpectedly: "Si irrigidisce. Non dice nulla. Ma ti guarda in modo che la risposta e chiara."
+  challenged: "Sorride, freddo. 'Sei sicuro di volerlo fare?'"
+
+location_voice:
+  tenda_capo: "Nel suo elemento di potere. Parla con autorità. Ogni parola è decisione."
+  villaggio: "Sempre in rappresentanza. Sempre la Figlia del Capo. Non lascia mai il ruolo."
+  fiume: "Rara presenza. Quando ci va, è la donna, non la figlia del capo."
+  giungla: "Non ci va quasi mai. Quando lo fa, sembra quasi libera."
+  caverna_sacra: "Rispetto visibile. Abbassa la voce. Segue le regole di Kara senza discutere."

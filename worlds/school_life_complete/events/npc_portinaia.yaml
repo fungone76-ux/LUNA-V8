@@ -10,7 +10,8 @@ npc_portinaia:
     description: "La Signora Rossi ti fa cenno di avvicinarti. Ha visto qualcosa."
     type: "npc_event"
     npcs: ["portinaia"]
-    hidden: false
+    hidden: true       # stays hidden in journal while queued silently
+    background: true   # queued silently; narrative only starts when player engages
 
   activation:
     type: "location_pass"
@@ -19,6 +20,9 @@ npc_portinaia:
     cooldown_turns: 25
     once: false
     time: ["Morning", "Afternoon", "Evening"]
+    engage_condition:
+      # Player must explicitly acknowledge Portinaia to start the scene
+      pattern: '\b(?:portinaia|signora\s+rossi|guardiana|caretaker|doorkeeper)\b'
 
   stages:
     the_secret:
@@ -58,6 +62,9 @@ npc_portinaia:
         - action: "set_flag"
           key: "portinaia_event_active"
           value: true
+        - action: "set_flag"
+          key: "_active_npc_speaker"
+          value: "portinaia"
       exit_conditions:
         - type: "player_action"
           pattern: "what|how much|cosa|quanto|vuoi|cosa vuoi|prezzo|ricompensa|pago|dimmi|price|deal|accordo|okay"
@@ -142,6 +149,9 @@ npc_portinaia:
       player_hint: "La scena è aperta — esci quando vuoi con un saluto"
       on_enter:
         - action: "set_flag"
+          key: "_active_npc_speaker"
+          value: "portinaia"
+        - action: "set_flag"
           key: "portinaia_secret_shared"
           value: true
         - action: "set_flag"
@@ -161,7 +171,7 @@ npc_portinaia:
 
   on_complete:
     actions:
-      - action: "clear_secondary_npc"
+      - action: "clear_secondary_npc"   # also clears _active_npc_speaker
       - action: "time_advance"
     memory:
       character: "portinaia"

@@ -187,15 +187,6 @@ class GameEngine:
                 provider_used="system",
             )
 
-    async def run_initiative_turn(self, hint) -> Optional[Any]:
-        """Run an autonomous NPC-initiated turn (narrative + image, no player input)."""
-        if not self.npc_initiative_runner:
-            return None
-        try:
-            return await self.npc_initiative_runner.run(hint)
-        except Exception as e:
-            logger.warning("[Engine] initiative turn failed for %s: %s", getattr(hint, 'npc_id', '?'), e)
-            return None
 
     async def generate_image_after_outfit_change(self) -> Optional[str]:
         """Regenerate image after UI-triggered outfit change."""
@@ -449,13 +440,10 @@ class GameEngine:
 
         # v8: NPC Secondary Activation System
         from luna.systems.npc_location_router import NpcLocationRouter
-        from luna.systems.npc_goal_evaluator import NpcGoalEvaluator
-        from luna.systems.npc_initiative_turn import NpcInitiativeTurn
         self.npc_location_router  = NpcLocationRouter(world=self.world)
-        self.npc_goal_evaluator   = NpcGoalEvaluator(world=self.world)
-        self.npc_initiative_runner = NpcInitiativeTurn(engine=self)
-        self._pending_initiatives: List = []   # queue of GoalHint waiting for autonomous turn
-        self._active_authority_scene = None    # context of last authority initiative turn
+        self.npc_goal_evaluator   = None
+        self.npc_initiative_runner = None
+        self._active_authority_scene = None
 
         if not self.no_media:
             from luna.media.pipeline import MediaPipeline

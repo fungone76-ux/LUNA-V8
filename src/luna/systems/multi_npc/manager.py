@@ -208,7 +208,8 @@ class MultiNPCManager:
             
             # H2: Check spawn_locations as fallback (with dict/object support)
             if not npc_location:
-                from luna.systems.npc_goal_evaluator import _get_value
+                def _get_value(obj, key, default=None):
+                    return obj.get(key, default) if isinstance(obj, dict) else getattr(obj, key, default)
                 spawn_locs = _get_value(npc_def, 'spawn_locations', [])
                 if spawn_locs:
                     if player_location in spawn_locs:

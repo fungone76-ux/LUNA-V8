@@ -1,0 +1,102 @@
+# ============================================================
+# TENSION CONFIG - Terra degli Antenati
+# Assi di tensione narrativa tribale
+# ============================================================
+
+tension_axes:
+
+  romantic:
+    growth_rate: 0.022
+    decay_rate: 0.12
+    foreshadow_at: 0.35
+    threshold: 0.75
+    cooldown: 12
+    foreshadow_hints:
+      - "I loro occhi si incontrano un istante di troppo"
+      - "{companion} si volta a guardarti mentre ti allontani"
+      - "Un silenzio carico riempie l'aria tra voi"
+    buildup_hints:
+      - "La distanza tra voi si accorcia senza che nessuno l'abbia deciso"
+      - "{companion} respira diversamente quando sei vicino"
+      - "Le sue mani cercano il tuo sguardo prima ancora di parlare"
+    events: []
+
+  tribal_pressure:
+    growth_rate: 0.018
+    decay_rate: 0.20
+    foreshadow_at: 0.40
+    threshold: 0.80
+    cooldown: 18
+    foreshadow_hints:
+      - "Gli anziani mormorano qualcosa al tuo passaggio"
+      - "I guerrieri si fanno da parte con un'espressione carica"
+      - "Qualcuno ha riferito al Capo di te"
+    buildup_hints:
+      - "Il Consiglio degli Anziani ti convoca per un confronto"
+      - "Il Capo ti osserva dall'altra parte del fuoco — senza sorridere"
+      - "Un guerriero ti blocca la strada: 'Le prove non si fanno così'"
+    events: []
+
+  enemy_threat:
+    growth_rate: 0.014
+    decay_rate: 0.25
+    foreshadow_at: 0.30
+    threshold: 0.85
+    cooldown: 25
+    foreshadow_hints:
+      - "Una sentinella riporta segni di Lupi Neri vicino al confine"
+      - "Trovi impronte sconosciute vicino al fiume"
+      - "Un falco messaggero porta notizie inquietanti"
+    buildup_hints:
+      - "Fuochi nemici visibili dalla collina — si avvicinano"
+      - "Naya torna dalla giungla con un'espressione tesa: 'Sono vicini'"
+      - "Il Capo arma i guerrieri: guerra imminente"
+    events: []
+
+  spiritual:
+    growth_rate: 0.016
+    decay_rate: 0.18
+    foreshadow_at: 0.45
+    threshold: 0.78
+    cooldown: 15
+    foreshadow_hints:
+      - "Kara smette di parlare a metà frase, occhi fissi nel nulla"
+      - "Il fuoco sacro guizza senza vento"
+      - "Un uccello strano volteggia tre volte sul villaggio"
+    buildup_hints:
+      - "Kara è in trance da ore — qualcosa di grave si avvicina"
+      - "Gli spiriti non rispondono ai rituali: segno di pericolo imminente"
+      - "Il fumo della caverna assume forme che nessuno riesce a ignorare"
+    events: []
+
+  nature_danger:
+    growth_rate: 0.020
+    decay_rate: 0.30
+    foreshadow_at: 0.35
+    threshold: 0.72
+    cooldown: 10
+    foreshadow_hints:
+      - "Gli animali si comportano in modo strano — nervosi, silenziosi"
+      - "Il cielo cambia colore troppo in fretta"
+      - "Rumori profondi dalla giungla che nessuno sa identificare"
+    buildup_hints:
+      - "La pioggia non cade da troppi giorni — la caccia scarseggia"
+      - "Un ruggito lontano fa alzare la testa a tutti i cacciatori"
+      - "Il fiume è cresciuto di notte: qualcosa a monte ha cambiato corso"
+    events: []
+
+  honor:
+    growth_rate: 0.012
+    decay_rate: 0.15
+    foreshadow_at: 0.50
+    threshold: 0.82
+    cooldown: 20
+    foreshadow_hints:
+      - "Un giovane guerriero ti sfida con gli occhi senza parole"
+      - "Qualcuno ha raccontato una versione diversa di quello che hai fatto"
+      - "Zara ti guarda con un'espressione che non sai decifrare"
+    buildup_hints:
+      - "La tua reputazione è in discussione davanti al Consiglio"
+      - "Un guerriero rivale ha vantato imprese che contraddicono le tue"
+      - "Il Capo ha convocato un giudizio pubblico sull'onore"
+    events: []

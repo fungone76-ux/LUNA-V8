@@ -5,7 +5,7 @@ Context building and enrichment methods for LLM prompts.
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from luna.core.models import GameState
 
@@ -175,23 +175,7 @@ class ContextBuilderMixin:
         # the context dict after _build_context() returns. Using both would
         # cause the legacy system to silently overwrite the agent's output.
 
-        # Fix 3: cross-location hint from non-active NPC
         ctx["cross_npc_hint"] = ""
-        try:
-            ws = getattr(self.engine, "world_simulator", None)
-            if ws is not None:
-                from luna.systems.world_sim.cross_location_hints import get_cross_location_hint
-                from luna.systems.world_sim.turn_director import _INITIATIVE_COOLDOWN
-                hint = get_cross_location_hint(
-                    ws.mind_manager,
-                    game_state.active_companion,
-                    cooldown=_INITIATIVE_COOLDOWN,
-                )
-                if hint:
-                    ctx["cross_npc_hint"] = hint
-                    logger.debug("[ContextBuilder] cross_npc_hint injected (%d chars)", len(hint))
-        except Exception as e:
-            logger.warning("[ContextBuilder] cross_location_hint failed: %s", e)
 
         # Metodo 7: NPC presence context — stato accumulato off-screen
         # Informa l'LLM di quanto tempo l'NPC è rimasto solo, in che umore è,
@@ -283,6 +267,15 @@ class ContextBuilderMixin:
                 if all_hints:
                     quest_ctx = (quest_ctx + "\n" + "\n".join(all_hints)).strip() if quest_ctx else "\n".join(all_hints)
                 ctx["quest_context"] = quest_ctx or ""
+
+                # Propagate active NPC speaker flag so narrative/media can swap character
+                active_npc_speaker = game_state.flags.get("_active_npc_speaker")
+                if active_npc_speaker:
+                    ctx["active_npc_speaker"] = active_npc_speaker
+
+                # Consume pending mission memory entries written by on_complete_memory
+                await self._flush_pending_npc_memories(game_state)
+
             except Exception as e:
                 logger.warning("[Orchestrator] QuestEngine failed: %s", e)
 
@@ -292,6 +285,51 @@ class ContextBuilderMixin:
         pass
 
         return ctx
+
+    async def _flush_pending_npc_memories(self, game_state: GameState) -> None:
+        """Consume _pending_npc_memory_* flags written by quest on_complete_memory.
+
+        For each pending flag found, stores the entry as a high-importance fact
+        in MemoryManager so it survives history compression and appears in future
+        LLM context. The flag is cleared after processing.
+        """
+        if not self.engine.memory_manager:
+            return
+
+        prefix = "_pending_npc_memory_"
+        keys_to_flush = [k for k in game_state.flags if k.startswith(prefix)]
+        if not keys_to_flush:
+            return
+
+        for key in keys_to_flush:
+            data = game_state.flags.pop(key)
+            if not isinstance(data, dict):
+                continue
+
+            character = key[len(prefix):]
+            entry = data.get("entry", "")
+            emotional_impact = data.get("emotional_impact", "neutral")
+            if not entry:
+                continue
+
+            content = f"[{character}] {entry}"
+            if emotional_impact and emotional_impact != "neutral":
+                content += f" (emotional impact: {emotional_impact})"
+
+            try:
+                await self.engine.memory_manager.add_fact(
+                    content=content,
+                    turn_number=game_state.turn_count,
+                    importance=8,
+                    associated_npc=character,
+                    context_tags=["mission_memory", emotional_impact],
+                )
+                logger.info(
+                    "[Memory] Mission memory stored for '%s': %s...",
+                    character, entry[:60],
+                )
+            except Exception as e:
+                logger.warning("[Memory] Failed to store mission memory for '%s': %s", character, e)
 
     def _build_npc_presence_context(
         self,

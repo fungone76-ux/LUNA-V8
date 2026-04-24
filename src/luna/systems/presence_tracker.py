@@ -74,6 +74,7 @@ class PresenceTracker:
         self,
         active_npc: str,
         present_npcs: List[str],
+        location: Optional[str] = None,
     ) -> str:
         """Stringa con le relazioni tra gli NPC in scena.
 
@@ -96,6 +97,14 @@ class PresenceTracker:
             if not rel:
                 lines.append(f"{npc_name} è in scena.")
                 continue
+
+            # Location-specific override takes priority
+            if location and isinstance(rel, dict):
+                loc_behaviors = rel.get("location_behaviors", {})
+                loc_override = loc_behaviors.get(location, "")
+                if loc_override:
+                    lines.append(f"{npc_name} è in scena. {loc_override}")
+                    continue
 
             rel_type    = rel.get("type", "") if isinstance(rel, dict) else ""
             rel_desc    = rel.get("description_it", rel.get("description", "")) if isinstance(rel, dict) else ""

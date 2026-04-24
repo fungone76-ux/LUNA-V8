@@ -49,12 +49,15 @@ class CharacterVoiceBuilder:
         Returns:
             Stringa formattata pronta per il prompt, o "" se nessuna direttiva.
         """
+        location = getattr(game_state, "current_location", None) if game_state else None
+
         directives: List[str] = []
 
         directives += self._behavior_directives(companion, personality_engine)
         directives += self._impression_directives(companion, personality_engine)
         directives += self._avoidance_directives(companion)
-        directives += self._presence_directives(companion, present_npcs or [], presence_tracker)
+        directives += self._presence_directives(companion, present_npcs or [], presence_tracker, location=location)
+        directives += self._location_directives(companion, location)
 
         if not directives:
             return ""
@@ -209,6 +212,7 @@ class CharacterVoiceBuilder:
         companion: "CompanionDefinition",
         present_npcs: List[str],
         presence_tracker: Optional[object],
+        location: Optional[str] = None,
     ) -> List[str]:
         """Istruzioni contestuali basate su chi è in scena."""
         if not present_npcs:
@@ -219,7 +223,7 @@ class CharacterVoiceBuilder:
         # Usa PresenceTracker se disponibile per il contesto relazionale
         if presence_tracker and hasattr(presence_tracker, "get_relationship_context"):
             ctx = presence_tracker.get_relationship_context(
-                companion.name, present_npcs
+                companion.name, present_npcs, location=location
             )
             if ctx:
                 directives.append(ctx)
@@ -230,6 +234,15 @@ class CharacterVoiceBuilder:
             rel = companion.npc_relationships.get(npc_name, {})
             if not rel:
                 continue
+
+            # Location-specific override
+            if location and isinstance(rel, dict):
+                loc_behaviors = rel.get("location_behaviors", {})
+                loc_override = loc_behaviors.get(location, "")
+                if loc_override:
+                    directives.append(f"{npc_name} è in scena. {loc_override}")
+                    continue
+
             rel_type = rel.get("type", "") if isinstance(rel, dict) else ""
             tension  = rel.get("base_tension", 0.0) if isinstance(rel, dict) else 0.0
             if tension >= 0.7:
@@ -241,6 +254,39 @@ class CharacterVoiceBuilder:
                 directives.append(
                     f"{npc_name} è in scena. Rapporto: {rel_type}."
                 )
+
+        return directives
+
+    # -------------------------------------------------------------------------
+    # Direttive contestuali per location
+    # -------------------------------------------------------------------------
+
+    def _location_directives(
+        self,
+        companion: "CompanionDefinition",
+        location: Optional[str],
+    ) -> List[str]:
+        """Istruzioni specifiche per la location corrente."""
+        if not location:
+            return []
+
+        loc_voice = getattr(companion, "location_voice", None) or {}
+        loc_data = loc_voice.get(location, {})
+        if not loc_data:
+            return []
+
+        directives = []
+
+        tone = loc_data.get("tone", "")
+        if tone:
+            directives.append(tone)
+
+        micro = loc_data.get("micro_reactions", [])
+        if micro:
+            samples = "; ".join(micro[:5])
+            directives.append(
+                f"Piccoli gesti naturali (usa UNO al massimo ogni 2-3 turni, mai di fila): {samples}"
+            )
 
         return directives
 

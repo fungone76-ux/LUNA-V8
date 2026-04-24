@@ -1,0 +1,193 @@
+# ============================================================
+# EVENTS - Vrax lo Stregone dei Lupi Neri
+# Antagonista spirituale — antagonista di Kara, minaccia narrativa
+# ============================================================
+
+quests:
+  vrax_messaggio:
+    meta:
+      title: "Il Messaggio dello Stregone"
+      description: "Vrax manda un segnale alla tribù — attraverso il corpo di un corvo"
+      character: "stregone_lupi_neri"
+      hidden: false
+      priority: 6
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "flag"
+          target: "prova_selva_passata"
+          value: true
+        - type: "turn_count"
+          operator: "gte"
+          value: 15
+
+    stages:
+      corvo:
+        title: "Il Corvo di Vrax"
+        narrative_prompt: |
+          Un corvo cade morto ai tuoi piedi. Non sembra ferito — è semplicemente
+          caduto dal cielo. Quando Kara lo esamina, la sua espressione cambia.
+          Sulle ali del corvo: simboli incisi nella carne. Simboli dei Lupi Neri.
+          Kara li legge lentamente, voce piatta: "Dice che il forestiero
+          deve andarsene prima che la luna cambi. Dice che sa delle Prove.
+          Dice che Vrax viene."
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "risposta_tribù"
+
+      risposta_tribù:
+        title: "Come Risponde la Tribù"
+        narrative_prompt: |
+          Il Capo Rho ascolta. Kara parla. Naya stringe la lancia.
+          Zara non dice nulla ma i suoi occhi ti trovano da tutto il villaggio.
+          La decisione che la tribù prende ora dipende in parte da te —
+          dalla tua presenza, da come ti sei comportato finora.
+          Sei una risorsa o un problema?
+        on_enter:
+          - action: "set_flag"
+            target: "vrax_threat_announced"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 3
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      flags:
+        vrax_first_contact: true
+
+  vrax_incontro_confine:
+    meta:
+      title: "Il Confine dei Lupi Neri"
+      description: "Vrax appare personalmente al confine — vuole parlare con il protagonista"
+      character: "stregone_lupi_neri"
+      hidden: true
+      priority: 9
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "flag"
+          target: "vrax_first_contact"
+          value: true
+        - type: "flag"
+          target: "prova_spirito_passata"
+          value: true
+        - type: "location"
+          operator: "eq"
+          value: "confine_tribale"
+
+    stages:
+      apparizione:
+        title: "Lo Stregone al Confine"
+        narrative_prompt: |
+          Una figura alta emerge dalla nebbia del mattino. Nessun guerriero intorno —
+          viene da solo, il che è più inquietante di un'armata.
+          Vrax si ferma a dieci passi. La maschera d'osso copre metà viso.
+          Gli occhi gialli ti trovano senza esitare.
+          "Sei tu il forestiero che supera le Prove." Non è una domanda.
+          "Kara deve averti detto che mi aspetta. Vorrei parlarti
+          prima che quella conversazione diventi... più complicata."
+        exit_conditions:
+          - type: "action"
+            pattern: "parla|ascolta|cosa|perché|rimango|fuggo"
+        transitions:
+          - condition: "default"
+            target_stage: "offerta_vrax"
+
+      offerta_vrax:
+        title: "Cosa Vuole lo Stregone"
+        narrative_prompt: |
+          Vrax parla lentamente, come se stesse misurando ogni parola.
+          "Non sono il nemico che pensate. Sono il contrappeso.
+          Kara tiene questa tribù in un equilibrio... artificiale. Le visioni
+          che usa — non tutte vengono dagli spiriti. Alcune vengono da me.
+          Ho lasciato che accadesse perché serviva. Ma adesso c'è qualcosa
+          di nuovo. Tu."
+          Ti guarda. "Le Prove non sono mai state completate da un forestiero.
+          Se succede, l'equilibrio cambia. Voglio sapere se capisci cosa stai cambiando."
+          Non ti offre nulla direttamente. Ma lascia intendere che potrebbe farlo.
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 3
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      flags:
+        vrax_met_personally: true
+
+  vrax_rivelazione_kara:
+    meta:
+      title: "La Verità su Kara"
+      description: "Vrax rivela qualcosa sul passato di Kara che lei non ha detto"
+      character: "stregone_lupi_neri"
+      hidden: true
+      priority: 8
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "flag"
+          target: "vrax_met_personally"
+          value: true
+        - type: "affinity"
+          target: "Kara"
+          operator: "gte"
+          value: 60
+
+    stages:
+      secondo_messaggio:
+        title: "Vrax Manda Parole"
+        narrative_prompt: |
+          Non appare lui — manda un messaggero. Un bambino neutrale
+          con un osso intagliato. Sul'osso, un simbolo: la runa di Kara.
+          Quando porti l'osso a Kara, lei si irrigidisce.
+          "Buttalo via", dice. Ma la sua voce trema leggermente.
+          Vuoi buttarlo via — o vuoi capire cosa significa?
+        exit_conditions:
+          - type: "action"
+            pattern: "capire|leggere|chiedo|cosa|kara|getto"
+        transitions:
+          - condition: "default"
+            target_stage: "verità_condivisa"
+
+      verità_condivisa:
+        title: "Quello che Non Ti Ha Detto"
+        narrative_prompt: |
+          Maka il Saggio sa leggere la runa. Racconta:
+          Kara e Vrax erano apprendisti dello stesso maestro sciamano, decenni fa.
+          Si conoscono da quando erano giovani. Il loro disaccordo non è
+          una guerra di tribù — è una disputa tra due persone che la pensano
+          diversamente su come si usa il potere spirituale.
+          Vrax usa la paura. Kara usa la speranza. Nessuno dei due ha torto.
+          Entrambi hanno ragione in modi che si escludono.
+          La riveli a Kara? Le chiedi perché non te l'ha detto?
+          O lasci riposare qualcosa che lei non voleva tu sapessi?
+        on_enter:
+          - action: "set_flag"
+            target: "kara_vrax_connection_known"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 3
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Kara: -5
+      flags:
+        vrax_arc_advanced: true

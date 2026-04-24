@@ -1,0 +1,153 @@
+# Mission: The Shadow of Stella
+# World: school_life_complete
+# Character: Luna
+# Arc: Luna's growing fear that Stella will take the player away from her
+# Three stages triggered sequentially as the relationship deepens
+
+# --- QUEST: The Shadow of Stella ---
+luna_stella_arc:
+  meta:
+    title: "L'Ombra di Stella"
+    description: "Luna ha paura. Non di perdere il lavoro — di perdere te."
+    character: "Luna"
+    hidden: true
+
+  activation:
+    type: "companion_initiative"
+    once: true
+    conditions:
+      - type: "affinity"
+        target: "Luna"
+        operator: "gte"
+        value: 30
+      - type: "flag"
+        target: "luna_private_lesson"
+        operator: "eq"
+        value: true
+      - type: "flag"
+        target: "stella_jealousy_happened"
+        operator: "eq"
+        value: true
+
+  stages:
+    the_question:
+      title: "La Domanda"
+      location: "school_office_luna"
+      time: ["Afternoon", "Evening"]
+      companion_situation: >
+        Luna has heard about Stella's hallway scene. Students talk. She has
+        been thinking about it ever since — what it means, whether it means
+        anything about you, whether Stella is what she is afraid she is.
+        She waited for you to come to her office. When you arrive she does
+        not start with the question; she starts with something smaller
+        and moves toward it slowly, as if she is not sure she wants the answer.
+        She is trying to be professional. She is not managing.
+      narrative_prompt: >
+        Luna is at her desk when you enter. She does not look up right away.
+        After a moment: "I heard there was a scene in the corridor today."
+        She straightens a stack of papers that does not need straightening.
+        "Involving Stella." A pause. "And you." She finally looks up.
+        "I am not asking out of curiosity."
+      player_hint: "Rispondi onestamente — lei sente quello che non dici"
+      on_enter:
+        - action: "set_outfit"
+          character: "Luna"
+          value: "casual_teacher"
+        - action: "set_location"
+          value: "school_office_luna"
+        - action: "set_emotional_state"
+          character: "Luna"
+          value: "conflicted"
+        - action: "set_flag"
+          key: "luna_asked_about_stella"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|arrivederci|ci vediamo|vado|me ne vado"
+      transitions:
+        - condition: "default"
+          target_stage: "the_wound"
+
+    the_wound:
+      title: "La Ferita"
+      location: "school_office_luna"
+      time: ["Evening"]
+      companion_situation: >
+        Days have passed since the question. Luna saw Stella in the hallway —
+        laughing, touching your arm, being eighteen. It sat in her chest all day.
+        She stayed late at the office, not correcting papers, just sitting.
+        When you come in this evening she is still there.
+        She starts talking before she means to — about Stella, about age,
+        about what it feels like to compete with someone who does not even
+        know she is competing. She is not performing. She is actually hurt.
+        She will let you comfort her if you do it right. If you do it very right,
+        the evening goes somewhere neither of you planned. Adult +18 permitted.
+      llm_context:
+        scene: >
+          You are Luna, 38. You have been sitting in your office for two hours
+          watching the evening come in. You saw Stella today — effortless,
+          golden, young. And then you looked in the mirror.
+          When he comes in you say what you have been thinking:
+          that you are afraid. Not of the scandal. Not of losing your job.
+          Of losing him to someone who has everything you used to have
+          and does not even notice she has it. You say this plainly,
+          the way you have learned to say difficult things — directly,
+          without drama, because drama feels like lying.
+          If he stays close and says the right thing you let him.
+          You stop being afraid. For tonight you stop being afraid.
+          Adult +18 content is permitted if the scene earns it.
+        tone: "raw vulnerability → comfort → intimacy if earned"
+        pacing: >
+          Luna opens with the wound — not fishing for compliments, stating a fear.
+          The player's response determines how far the scene goes.
+          She does not need to be seduced. She needs to be seen.
+          Once she feels seen the rest follows naturally.
+      narrative_prompt: >
+        The office is dim. Luna is by the window, arms crossed, not looking at you.
+        "She was laughing today." Her voice is flat. "In the corridor."
+        A silence. "I was watching." She turns slightly.
+        "I know what I am, at thirty-eight. I know what she is, at eighteen."
+        Another silence, longer. "I just —" She stops.
+        "Tell me I am not being stupid."
+      player_hint: "La scena è aperta — esci quando vuoi con un saluto a Luna"
+      on_enter:
+        - action: "set_outfit"
+          character: "Luna"
+          value: "casual_teacher"
+        - action: "set_location"
+          value: "school_office_luna"
+        - action: "set_emotional_state"
+          character: "Luna"
+          value: "vulnerable"
+        - action: "set_flag"
+          key: "luna_stella_wound_opened"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|I should go|see you|good night|arrivederci|ci vediamo|vado|me ne vado"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    affinity:
+      Luna: 20
+    flags:
+      luna_stella_arc_done: true
+      luna_fear_of_stella_spoken: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+    memory:
+      character: "Luna"
+      entry: >
+        I told him about Stella. About what it feels like watching her from
+        the other side of thirty. He stayed. He said the right thing — or
+        maybe just the true thing. I am still afraid but it is smaller now.
+        The kind of afraid you can live with.
+      emotional_impact: "seen_and_held"
+      flags_to_record:
+        - luna_stella_arc_happened
+        - luna_fear_acknowledged
+        - luna_chose_to_stay_open

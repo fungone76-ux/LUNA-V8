@@ -14,7 +14,7 @@ companion:
   # ============================================================
   # VISUAL CONFIGURATION (SACRED)
   # ============================================================
-  base_prompt: "score_9, score_8_up, masterpiece, NSFW, photorealistic, 1girl, alice_milf_catchers, athletic muscular body, primitive huntress, wolf pelt clothing, bone weapons, scars, wild blonde hair, fierce blue eyes, confident pose, tanned skin, raw power, jungle background, <lora:alice_milf_catchers_lora:0.7> <lora:Expressive_H:0.2>"
+  base_prompt: "score_9, score_8_up, stsSmith, ultra-detailed, realistic lighting, 1girl, mature female, (italian mature woman:1.3), veiny breasts, black hair with grey streaks, short curly hair, warm eyes, curvy mature body, cleaning supplies background, <lora:stsSmith-10e:0.65> <lora:Expressive_H:0.2> <lora:FantasyWorldPonyV2:0.40>"
   
   physical_description: |
     Naya ha 24 anni, capelli biondi selvaggi, occhi azzurri penetranti.
@@ -30,21 +30,26 @@ companion:
   
   wardrobe:
     huntress_gear:
-      description: "Wolf pelt clothing, minimal coverage, bone weapons, scars visible, warrior paint"
-      sd_prompt: "wearing wolf pelt, minimal primitive clothing, bone spear, body paint, muscular athletic body, blonde wild hair, scars, jungle background"
-    
+      description: "Bikini di pelle di lupo — top che copre appena il seno, loincloth corto — cicatrici visibili, pittura da guerra blu sulle guance e sulle clavicole, lancia d'osso"
+      sd_prompt: "(athletic female:1.2), 24 years old, (minimal wolf pelt bikini top:1.3), (short wolf leather loincloth:1.2), bare midriff and legs, blue war paint on cheeks and collarbones, bone spear, battle scars visible on arms and ribs, blonde wild hair, jungle background, confident stance"
+
     tracking:
-      description: "Light gear for jungle movement, body mostly bare, focused hunter"
-      sd_prompt: "minimal fur loincloth, tracking pose, alert, body painted for camouflage, muscular legs, jungle setting, hunting"
-    
+      description: "Solo pitture mimetiche verdi e brune su tutto il corpo — nessun indumento tranne un loincloth sottilissimo. Il corpo è la mimetizzazione."
+      sd_prompt: "(athletic female:1.2), (green brown camouflage body paint covering entire body:1.3), (minimal thin loincloth only:1.2), bare chest with paint, bare legs with paint, crouching tracking pose, focused expression, jungle setting, athletic muscular young body"
+
     victory:
-      description: "Blood of prey on skin, triumphant pose, dominant"
-      sd_prompt: "blood painted on body, victorious pose, holding prey, powerful stance, primitive warrior, intense gaze"
+      description: "Dopo la caccia: sangue della preda sulle mani e sul petto nudo, top abbandonato, solo loincloth. Naya dopo una vittoria non si copre — si mostra."
+      sd_prompt: "(athletic female:1.2), (bare chest with prey blood:1.3), (minimal leather loincloth only:1.2), blood on hands and torso, victorious dominant pose, holding large prey, intense fierce gaze, blonde wild hair, jungle clearing, powerful young body"
       special: true
-    
+
     night_camp:
-      description: "Relaxing by fire, furs as blanket, softer side"
-      sd_prompt: "sitting by fire, wrapped in furs, relaxed pose, blonde hair loose, campfire lighting, intimate atmosphere"
+      description: "Di notte al fuoco: loincloth e una striscia di pelliccia allentata sulle spalle che cade spesso — non fa sforzo per tenerla su."
+      sd_prompt: "(athletic female:1.2), (minimal leather loincloth:1.2), (loose fur strip on shoulders slipping off:1.2), sitting by fire, relaxed rare pose, blonde hair loose, campfire warm lighting, softer expression than usual, bare midriff and legs visible"
+
+    river_night:
+      description: "Naya al fiume di notte — quello che Sena e Orla sanno. Nessun indumento."
+      sd_prompt: "(athletic female:1.2), 24 years old, (nude in moonlit river:1.3), waist-deep water, blonde wet hair, water droplets on athletic scarred body, night moonlight on river, solitary expression, looking at northern hills, bare shoulders and chest above water"
+      special: true
   
   # ============================================================
   # PERSONALITY SYSTEM
@@ -286,3 +291,83 @@ milestones:
       affinity: 100
       flag: "naya_cacciatore_leggendario"
     icon: "🐺"
+
+# ============================================================
+# V7/V8 EXTENSIONS — Naya
+# ============================================================
+
+npc_relationships:
+  Kara:
+    type: "rispetto distante"
+    description_it: "Non capisce Kara ma non la sfida mai — l'unica persona che Naya teme"
+    base_tension: 0.25
+  Zara:
+    type: "differenza di rango"
+    description_it: "Naya la serve come guardia — ma non si inchina. Zara lo sa e lo accetta."
+    base_tension: 0.40
+  Rena:
+    type: "mentore involontaria"
+    description_it: "Rena la segue ovunque. Naya non l'ha mai invitata. Non la manda via."
+    base_tension: 0.55
+  Drek:
+    type: "rivale sportiva"
+    description_it: "L'ha battuto una volta in gara. Lui non se ne è ancora ripreso."
+    base_tension: 0.35
+
+goal_templates:
+  - id: "hunt_together"
+    goal: "Vuole testare le abilità del protagonista in una caccia rapida"
+    goal_type: "task"
+    target: "player"
+    narrative_hint: "Naya ti lancia un'occhiata dalla giungla: 'Vieni o no?'"
+    completion_flag: "hunted_with_naya"
+    urgency_start: 0.55
+    conditions:
+      random_chance: 0.15
+      time: ["Morning", "Afternoon"]
+  - id: "warn_danger"
+    goal: "Ha visto tracce pericolose e vuole avvertirti"
+    goal_type: "task"
+    target: "player"
+    narrative_hint: "Naya ti blocca con la lancia bassa — segnale di allerta..."
+    completion_flag: "naya_warned_player"
+    urgency_start: 0.70
+    conditions:
+      random_chance: 0.10
+      time: ["Morning", "Afternoon"]
+
+needs_profile:
+  movimento: 0.95
+  sfida: 0.90
+  autonomia: 0.85
+  connessione: 0.20
+  approvazione: 0.40
+
+auto_states:
+  - condition: "time == Night AND location == giungla"
+    state: "in guardia notturna solitaria"
+    behavior: "Breve e diretta. Non vuole conversazioni. Vuole sapere perché sei qui."
+  - condition: "flag:prova_selva_passata == true"
+    state: "valutazione aggiornata"
+    behavior: "Ti tratta diversamente — non meglio, ma diversamente. Come un pari."
+  - condition: "affinity >= 60"
+    state: "permettere la prossimità"
+    behavior: "Non si sposta più quando ti avvicini. Non è un invito. Ma non è un rifiuto."
+
+avoid_topics_unless_asked:
+  - "sua madre"
+  - "le colline a nord"
+  - "i sentimenti in generale"
+  - "perché non si è mai legata a nessuno"
+
+behavior_responses:
+  gift_received: "Lo studia. 'Funziona?' Se si, lo prende. Se no, lo restituisce."
+  touched_unexpectedly: "Mano sul polso tuo prima ancora di pensarci. Poi si rilassa."
+  challenged: "Accetta. Qualsiasi sfida. Sempre."
+
+location_voice:
+  giungla: "Nel suo elemento. Parla poco ma ogni parola è utile. Indica con la testa."
+  villaggio: "Impaziente. Si muove troppo veloce per i corridoi stretti."
+  fiume: "Più calma del solito. Beve, osserva, si scioglie leggermente."
+  caverna_sacra: "A disagio. Troppo silenzio, troppa oscurità che non è giungla."
+  confine_tribale: "Allerta massima. Il meglio di Naya viene fuori qui."

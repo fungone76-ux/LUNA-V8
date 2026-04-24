@@ -12,17 +12,18 @@ luna_gym_substitute:
     hidden: true
 
   activation:
-    type: "time_since_flag"
-    flag: "luna_physically_opened_up"
-    days: 1
-    time: ["Morning"]
+    type: "location_pass"
     once: true
+    conditions:
+      - type: "flag"
+        target: "luna_physically_opened_up"
+        operator: "eq"
+        value: true
 
   stages:
     announcement:
       title: "L'Annuncio"
       location: "school_corridor"
-      time: ["Morning"]
       companion_situation: >
         Early morning in the school corridor. The intercom crackles.
         An announcement: the PE teacher is absent today. Professor Luna
@@ -36,22 +37,22 @@ luna_gym_substitute:
         at 14:00."
         A beat of silence. Then someone nearby laughs quietly.
         Luna — in the gym. In a tracksuit. This you have to see.
-      player_hint: "Vai in palestra nel pomeriggio"
+      player_hint: "Vai in palestra nel pomeriggio per vedere Luna in tuta"
       on_enter:
-        - action: "set_location"
-          value: "school_corridor"
         - action: "set_flag"
           key: "luna_gym_substitute_announced"
           value: true
       exit_conditions:
-        - type: "player_action"
-          pattern: "gym|palestra|go|follow|afternoon|pomeriggio"
+        - type: "turn_count"
+          operator: "gte"
+          value: 1
       transitions:
         - condition: "default"
           target_stage: "the_class"
 
     the_class:
       title: "La Professoressa in Tuta"
+      auto_open: true
       location: "school_gym"
       time: ["Afternoon"]
       companion_situation: >

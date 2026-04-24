@@ -1,7 +1,7 @@
 # Mission: The Private Lesson
 # World: school_life_complete
 # Character: Luna
-# Trigger: classroom_interrogation_success
+# Trigger: companion_initiative — Luna notices the player during class and holds him back
 
 # --- QUEST 1: The Private Lesson ---
 luna_private_lesson:
@@ -12,9 +12,9 @@ luna_private_lesson:
     hidden: false
 
   activation:
-    type: "event"
-    trigger: "classroom_interrogation_success"
+    type: "companion_initiative"
     once: true
+    time: ["Morning", "Afternoon"]
     conditions:
       - type: "affinity"
         target: "Luna"
@@ -48,8 +48,9 @@ luna_private_lesson:
           key: "luna_private_lesson_invited"
           value: true
       exit_conditions:
-        - type: "player_action"
-          pattern: "office|afternoon|I'll be there|I'll come|I accept|okay|sure"
+        - type: "location"
+          operator: "eq"
+          value: "school_office_luna"
       transitions:
         - condition: "default"
           target_stage: "the_lesson"
@@ -70,8 +71,8 @@ luna_private_lesson:
         back to formality. Adult explicit content +18 is permitted in this scene.
       llm_context:
         scene: >
-          You are Luna, 38-year-old math teacher, divorced. You are alone
-          in your office with a student who surprised you in class today.
+          You are Luna, 38-year-old math teacher. You are alone in your
+          office with a student who surprised you in class today.
           The school is almost empty. The pretext is a math topic but you
           both know it is not only that. You are attracted and terrified
           at the same time — your career, the rules, the age gap. You yield
@@ -83,6 +84,12 @@ luna_private_lesson:
           words or gestures. She resists direct advances, responds to subtle
           ones. Tension rises by degrees. The scene ends when the player
           chooses to leave.
+        forbidden_in_this_scene: >
+          Do NOT mention divorce, loneliness, personal life, or emotional
+          vulnerability in this scene. Luna does not open up emotionally here —
+          that belongs to a separate future scene. The tension in this scene
+          is purely professional conflict vs. physical attraction. Luna is
+          guarded, not sad. She does not seek comfort; she resists desire.
       narrative_prompt: >
         Luna's office is quiet. Late afternoon light. She straightens some
         papers on her desk without looking up. "Have a seat." A pause.
@@ -105,14 +112,15 @@ luna_private_lesson:
           target_stage: "_complete"
 
   rewards:
-    affinity:
-      Luna: 30
     flags:
       luna_private_lesson: true
 
   on_complete:
     actions:
       - action: "time_advance"
+      - action: "change_affinity"
+        character: "Luna"
+        value: 20
     memory:
       character: "Luna"
       entry: >

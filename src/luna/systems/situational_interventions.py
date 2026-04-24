@@ -468,11 +468,41 @@ FORMATO JSON:
                 # Advance and save
                 self.state_manager.advance_turn()
                 await self.state_memory.save_all()
+
+                # Early-return path: generate media here because orchestrator
+                # will not reach _phase_finalize for situational interventions.
+                media: Dict[str, Optional[str]] = {
+                    "image_path": None,
+                    "audio_path": None,
+                    "video_path": None,
+                }
+                if not self.engine.no_media and self.engine.media_pipeline:
+                    try:
+                        media_result = await self.engine.media_pipeline.generate_all(
+                            text=response_text,
+                            visual_en=getattr(llm_response, "visual_en", "") or "",
+                            tags=getattr(llm_response, "tags_en", []) or [],
+                            companion_name=intervener,
+                            base_prompt=getattr(npc_def, "base_prompt", "") or "",
+                            location_id=game_state.current_location,
+                        )
+                        if media_result:
+                            media["image_path"] = getattr(media_result, "image_path", None)
+                            media["audio_path"] = getattr(media_result, "audio_path", None)
+                            media["video_path"] = getattr(media_result, "video_path", None)
+                    except Exception as media_err:
+                        logger.warning(
+                            "[Situational] Media generation failed (early return): %s",
+                            media_err,
+                        )
                 
                 # Build result
                 return TurnResult(
                     text=full_text,
                     user_input=context,
+                    image_path=media.get("image_path"),
+                    audio_path=media.get("audio_path"),
+                    video_path=media.get("video_path"),
                     turn_number=game_state.turn_count,
                     provider_used="situational_intervention",
                     switched_companion=switched,

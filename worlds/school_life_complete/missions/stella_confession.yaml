@@ -26,7 +26,7 @@ stella_confession:
   stages:
     the_lockers:
       title: "I Lockers"
-      location: "school_hallway"
+      location: "school_corridor"
       time: ["Evening"]
       companion_situation: >
         The school is nearly empty — late afternoon has gone to evening,
@@ -49,7 +49,7 @@ stella_confession:
           character: "Stella"
           value: "uniform_mod"
         - action: "set_location"
-          value: "school_hallway"
+          value: "school_corridor"
         - action: "set_emotional_state"
           character: "Stella"
           value: "devoted"
@@ -57,8 +57,9 @@ stella_confession:
           key: "stella_confession_active"
           value: true
       exit_conditions:
-        - type: "player_action"
-          pattern: "somewhere|take me|come with me|show me|take you|vieni|portami|andiamo|seguimi|a casa|da te"
+        - type: "location"
+          operator: "eq"
+          value: "stella_home"
       transitions:
         - condition: "default"
           target_stage: "her_terms"
@@ -124,8 +125,6 @@ stella_confession:
           target_stage: "_complete"
 
   rewards:
-    affinity:
-      Stella: 30
     flags:
       stella_confession_done: true
       stella_confessed_love: true
@@ -134,6 +133,10 @@ stella_confession:
   on_complete:
     actions:
       - action: "time_advance"
+      - action: "change_affinity"
+        character: "Stella"
+        value: 55
+
     memory:
       character: "Stella"
       entry: >

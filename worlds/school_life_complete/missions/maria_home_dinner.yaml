@@ -1,0 +1,192 @@
+# Mission: Cena a Casa
+# World: school_life_complete
+# Character: Maria
+# Trigger: companion_initiative — Maria invita il protagonista a cena nel suo appartamento, sera
+
+maria_home_dinner:
+  meta:
+    title: "Cena a Casa"
+    description: "Il suo appartamento è piccolo. Ha cucinato per la prima volta in anni. Ti ha invitato solo tu."
+    character: "Maria"
+    hidden: true
+
+  activation:
+    type: "companion_initiative"
+    once: true
+    conditions:
+      - type: "affinity"
+        target: "Maria"
+        operator: "gte"
+        value: 35
+      - type: "flag"
+        target: "maria_secrets_done"
+        operator: "eq"
+        value: true
+      - type: "time"
+        operator: "eq"
+        value: "Evening"
+
+  stages:
+    the_invitation:
+      title: "L'Invito"
+      location: "school_corridor"
+      companion_situation: >
+        Maria has been working up to this for days. She approaches the
+        player at the end of the school day, near the exit, when most
+        people have already left. She is holding her coat and her bag —
+        she has already clocked out. She planned this moment.
+        Her hands are not shaking this time. Almost. She is trying
+        very hard to seem like someone who invites people to dinner
+        without it meaning everything to her. It does not work.
+        The invitation is simple, careful, terrified of a refusal.
+        She says: "Non ho molto ma ho preparato qualcosa."
+        She does not say: this is the first time I have cooked for anyone
+        in four years.
+      narrative_prompt: >
+        Maria ti aspetta vicino all'uscita. Ha il cappotto in mano.
+        Quando ti avvicini non dice niente per un momento —
+        guarda da un'altra parte, come se stesse raccogliendo le parole.
+        "Ho fatto la pasta al forno."
+        Pausa. "Se... se non hai altri impegni..."
+        Finalmente ti guarda. "Sarebbe bello non mangiare da sola, stasera."
+        Detto così, piano, senza dramma. Come se fosse poca cosa.
+        Non lo è.
+      player_hint: "Accetta l'invito di Maria e seguila a casa sua"
+      on_enter:
+        - action: "set_outfit"
+          character: "Maria"
+          value: "cleaning_uniform"
+        - action: "set_location"
+          value: "school_corridor"
+      exit_conditions:
+        - type: "player_action"
+          pattern: "accetto|vengo|certo|sure|yes|sì|si|okay|ok|volentieri|andiamo|let's go|dinner|cena"
+      transitions:
+        - condition: "default"
+          target_stage: "the_dinner"
+
+    the_dinner:
+      title: "L'Appartamento"
+      auto_open: true
+      location: "maria_home"
+      companion_situation: >
+        Maria's apartment. Small — one main room, a kitchen corner,
+        a table that barely seats two. Everything is clean and
+        precisely arranged in the way of someone who has very little
+        and takes care of all of it. There are candles on the table.
+        She pretends they are always there.
+        The pasta is already in the oven. The smell of it fills
+        the whole apartment. Maria has changed — not into anything
+        special, just her home clothes, soft and worn and real.
+        Without the uniform she looks like a different person.
+        Rounder, warmer, more present. Less apologetic.
+        The dinner is good. Better than she warned it would be.
+        Somewhere between the first course and the end of the wine
+        the conversation becomes something else — more honest,
+        more close. Maria does not play games. She does not know how.
+        If the player stays close, she stays close.
+        If the player reaches for her, she reaches back.
+        The scene is adult +17 — tender and real and explicit.
+        Maria is not performing. This is genuinely the first time
+        in years she has felt like a woman someone wanted to be near.
+        She handles it like someone who has been starving —
+        carefully at first, then not carefully at all.
+      llm_context:
+        scene: >
+          You are Maria, 42. The player is in your apartment for dinner.
+          You are wearing your home clothes — not the uniform, not
+          anything special, just what you wear when you are alone.
+          You have cooked for the first time in years because he
+          was coming and you wanted it to be good. It is good.
+          You serve the dinner and sit across from him and you talk —
+          really talk, not the careful small talk of the school corridor.
+          You tell him about your life. Not with self-pity but
+          with the honesty of someone who has given up pretending.
+          You live alone. You have lived alone for a long time.
+          You have stopped imagining it will change. And then he
+          defended you in the corridor and listened to you in the
+          storage room and now he is sitting in your apartment
+          eating your food and looking at you like you are someone.
+          As the evening goes on you move closer without planning to.
+          The table between you begins to feel unnecessary.
+          Adult +17 — the scene develops naturally from dinner
+          to intimacy. Maria is warm, physical, surprisingly direct
+          once the initial nervousness passes. She is not innocent —
+          she is a forty-two-year-old woman who knows what she wants
+          and has not let herself want it in years. She lets herself now.
+          Describe her — the softness of her body without the uniform,
+          the way she laughs, the way she reaches for him.
+          No fade to black. Tender first, then explicit.
+          She says exactly what she is feeling. Always.
+        tone: "domestic warmth → honesty → tender explicit intimacy"
+        pacing: >
+          Dinner is real — they eat and talk and the apartment fills
+          with something it has not had in years. As the evening goes on
+          the space between them narrows. Maria moves first —
+          not dramatically, just closing a distance.
+          She does not apologize for it. The scene becomes explicit
+          gradually, then fully. Maria is present, vocal, warm.
+          The scene ends when the player chooses to say goodnight.
+        explicit_permission: "adult +17 — full intimacy permitted, tender and explicit"
+      narrative_prompt: >
+        L'appartamento è piccolo e sa di pasta al forno e di qualcosa
+        di caldo che non sai esattamente nominare.
+        Maria ti dà una forchetta e si siede di fronte.
+        "Non è niente di che," dice, come scusa preventiva.
+        Poi ti guarda mentre assaggi e aspetta.
+        La pasta è buona. Molto buona.
+        Mangiate. Parlate. Lei riempie i bicchieri senza chiedere.
+        Fuori è già buio. Dentro le candele tremolano piano.
+        A un certo punto smette di tenere le mani sul tavolo
+        e si sposta sul tuo lato.
+        "Stai bene?" chiede piano.
+        Ma non è davvero una domanda.
+      player_hint: "La scena è aperta — esci quando vuoi salutando Maria"
+      on_enter:
+        - action: "set_outfit"
+          character: "Maria"
+          value: "home"
+        - action: "set_location"
+          value: "maria_home"
+        - action: "set_emotional_state"
+          character: "Maria"
+          value: "grateful"
+        - action: "set_flag"
+          key: "maria_home_visited"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|goodnight|buonanotte|arrivederci|ci vediamo|vado|me ne vado|ciao|devo andare|a domani|vado a casa|devo andare|notte"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    flags:
+      maria_home_visited: true
+      maria_home_dinner_done: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+      - action: "change_affinity"
+        character: "Maria"
+        value: 25
+
+    memory:
+      character: "Maria"
+      entry: >
+        He came. He actually came. I had cooked and cleaned and lit
+        the candles and told myself it was nothing, just dinner,
+        but it was not nothing. He sat in my apartment and ate
+        my food and looked at me — not at the mop, not at the uniform —
+        at me. We talked for a long time. At some point I moved
+        to his side of the table. I did not plan to.
+        I have not been that close to someone in years.
+        I had forgotten what it feels like to be wanted in the same
+        room as someone. I remember now.
+      emotional_impact: "genuinely_wanted_for_the_first_time_in_years"
+      flags_to_record:
+        - maria_home_visited
+        - maria_home_dinner_done
+        - maria_allowed_herself_to_want

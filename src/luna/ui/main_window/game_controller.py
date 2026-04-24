@@ -91,7 +91,6 @@ class GameController:
             w.display_manager.update_action_bars()
             w.display_manager.update_personality_display()
             w.display_manager.update_event_widget()
-            w.display_manager.update_npc_actions_widget()  # v8: NPC Actions
 
             w.event_handler._check_pending_quest_choices()
 
@@ -138,7 +137,6 @@ class GameController:
             w.display_manager.update_quest_tracker()
             w.display_manager.update_action_bars()
             w.display_manager.update_personality_display()
-            w.display_manager.update_npc_actions_widget()  # v8: NPC Actions
 
             w.lbl_status.setText("Ready")
 

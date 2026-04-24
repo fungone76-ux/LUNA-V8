@@ -79,8 +79,9 @@ npc_ispettore:
           key: "ispettore_arrived"
           value: true
       exit_conditions:
-        - type: "player_action"
-          pattern: "watch|look|listen|stay|rimango|resto|guardo|ascolto|spio|avvicino|porta|door|closer"
+        - type: "location"
+          operator: "eq"
+          value: "school_office_luna"
       transitions:
         - condition: "default"
           target_stage: "the_inspection"

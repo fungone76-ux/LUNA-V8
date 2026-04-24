@@ -1,7 +1,7 @@
 # Mission: The Jealousy Scene
 # World: school_life_complete
 # Character: Stella
-# Trigger: Stella sees the player near Luna or Maria — explodes in the hallway
+# Trigger: random — Stella explodes when conditions are ripe (basketball done, affinity ≥ 35)
 
 stella_jealousy:
   meta:
@@ -11,8 +11,8 @@ stella_jealousy:
     hidden: true
 
   activation:
-    type: "event"
-    trigger: "player_close_to_luna"
+    type: "random"
+    chance: 0.15
     once: true
     conditions:
       - type: "affinity"
@@ -27,7 +27,7 @@ stella_jealousy:
   stages:
     the_explosion:
       title: "CHI ERA QUELLA?"
-      location: "school_hallway"
+      location: "school_corridor"
       time: ["Morning", "Afternoon"]
       companion_situation: >
         Stella saw the player laughing with Luna from across the hallway.
@@ -48,7 +48,7 @@ stella_jealousy:
           character: "Stella"
           value: "uniform_mod"
         - action: "set_location"
-          value: "school_hallway"
+          value: "school_corridor"
         - action: "set_emotional_state"
           character: "Stella"
           value: "jealous"
@@ -56,15 +56,16 @@ stella_jealousy:
           key: "stella_public_scene"
           value: true
       exit_conditions:
-        - type: "player_action"
-          pattern: "come with me|follow me|somewhere private|vieni|seguimi|parliamo|da soli|di qua|andiamo"
+        - type: "location"
+          operator: "eq"
+          value: "school_classroom"
       transitions:
         - condition: "default"
           target_stage: "the_breakdown"
 
     the_breakdown:
       title: "Lontano da Tutti"
-      location: "school_empty_classroom"
+      location: "school_classroom"
       time: ["Morning", "Afternoon", "Evening"]
       companion_situation: >
         They are in an empty classroom or storeroom — somewhere away from the
@@ -105,7 +106,7 @@ stella_jealousy:
           character: "Stella"
           value: "uniform_mod"
         - action: "set_location"
-          value: "school_empty_classroom"
+          value: "school_classroom"
         - action: "set_flag"
           key: "stella_breakdown_active"
           value: true
@@ -117,8 +118,6 @@ stella_jealousy:
           target_stage: "_complete"
 
   rewards:
-    affinity:
-      Stella: 20
     flags:
       stella_jealousy_done: true
       stella_possessive: true
@@ -127,6 +126,10 @@ stella_jealousy:
   on_complete:
     actions:
       - action: "time_advance"
+      - action: "change_affinity"
+        character: "Stella"
+        value: 30
+
     memory:
       character: "Stella"
       entry: >

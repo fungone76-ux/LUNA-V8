@@ -691,6 +691,17 @@ class EventHandler:
             for i, c in enumerate(choices_data)
         ]
 
+        if not getattr(w, "event_widget", None):
+            # Fallback: no dedicated event panel; show numbered options in story log.
+            w.story_log.append_system_message(f"🎲 Evento: {event_id.replace('_', ' ').title()}")
+            if narrative:
+                w.story_log.append_system_message(narrative)
+            for i, text in enumerate(choice_texts, start=1):
+                w.story_log.append_system_message(f"  {i}) {text}")
+            w.story_log.append_system_message("Scrivi il numero della scelta per continuare.")
+            logger.debug("[MainWindow] Dynamic event shown in story log (event widget disabled): %s", event_id)
+            return
+
         w.event_widget.show_event_choices(
             event_title=event_id.replace('_', ' ').title(),
             description=narrative,

@@ -2,7 +2,7 @@
 # World: school_life_complete
 # Type: NPC secondary event — location_pass trigger
 # NPC: Fioraia Giulia (25, pink hair, flower crown, denim overalls)
-# Activation: player enters town_center / flower shop
+# Activation: player enters park / flower shop
 
 npc_fioraia:
   meta:
@@ -14,7 +14,7 @@ npc_fioraia:
 
   activation:
     type: "location_pass"
-    location: "town_center"
+    location: "park"
     chance: 0.40
     cooldown_turns: 30
     once: false
@@ -23,7 +23,7 @@ npc_fioraia:
   stages:
     the_backache:
       title: "Mal di Schiena"
-      location: "town_center"
+      location: "park"
       time: ["Morning", "Afternoon", "Evening"]
       companion_situation: >
         The player arrives at the flower shop. Giulia is behind the counter
@@ -48,7 +48,7 @@ npc_fioraia:
           character: "fioraia"
           value: "denim_overalls"
         - action: "set_location"
-          value: "town_center"
+          value: "park"
         - action: "set_flag"
           key: "fioraia_event_active"
           value: true
@@ -61,7 +61,7 @@ npc_fioraia:
 
     the_massage:
       title: "Nel Retro"
-      location: "town_center"
+      location: "park"
       time: ["Morning", "Afternoon", "Evening"]
       companion_situation: >
         She takes him to the back room of the shop — half storeroom,

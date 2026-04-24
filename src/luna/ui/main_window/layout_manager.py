@@ -17,7 +17,6 @@ from PySide6.QtGui import QAction
 from luna.core.config import get_settings
 from luna.ui.widgets import (
     CompanionStatusWidget,
-    GlobalEventWidget,
     StoryLogWidget,
     OutfitWidget,
     LocationWidget,
@@ -26,7 +25,6 @@ from luna.ui.widgets import (
 from luna.ui.quest_journal_widget import QuestJournalWidget
 from luna.ui.narrative_compass_widget import NarrativeCompassWidget
 from luna.ui.action_bar import QuickActionBar
-from luna.ui.npc_actions_widget import NpcActionsWidget
 from luna.ui.feedback_visualizer import FeedbackVisualizer
 from luna.ui.quest_choice_widget import QuestChoiceWidget, PendingChoiceManager
 from luna.media.lora_mapping import LoraMapping
@@ -43,7 +41,7 @@ class LayoutManager:
 
         # Widget references (set during setup_all)
         self.personality_widget: Optional[PersonalityArchetypeWidget] = None
-        self.event_widget: Optional[GlobalEventWidget] = None
+        self.event_widget = None
         self.location_widget: Optional[LocationWidget] = None
         self.outfit_widget: Optional[OutfitWidget] = None
         self.compass_widget: Optional[NarrativeCompassWidget] = None
@@ -70,7 +68,7 @@ class LayoutManager:
         self.feedback: Optional[FeedbackVisualizer] = None
         self.choice_manager: Optional[PendingChoiceManager] = None
         self.lora_mapping: Optional[LoraMapping] = None
-        self.npc_actions_widget: Optional[NpcActionsWidget] = None
+        self.npc_actions_widget = None
 
     def setup_all(self) -> None:
         """Build complete UI — widgets, toolbar, statusbar."""
@@ -110,12 +108,8 @@ class LayoutManager:
         self.personality_widget = PersonalityArchetypeWidget()
         left_layout.addWidget(self.personality_widget, stretch=1)
 
-        self.event_widget = GlobalEventWidget()
-        self.event_widget.setMinimumHeight(100)
-        self.event_widget.setMaximumHeight(180)
-        self.event_widget.choice_selected.connect(w.event_handler._on_event_choice_selected)
-        self.event_widget.event_dismissed.connect(w.event_handler._on_event_dismissed)
-        left_layout.addWidget(self.event_widget)
+        # Event widget intentionally removed from UI.
+        self.event_widget = None
 
         self.location_widget = LocationWidget()
         self.location_widget.setMaximumHeight(160)
@@ -157,10 +151,6 @@ class LayoutManager:
         self.quest_journal.setMaximumHeight(120)
         right_layout.addWidget(self.quest_journal)
 
-        # v8: NPC Actions Widget — wide horizontal layout
-        self.npc_actions_widget = NpcActionsWidget()
-        self.npc_actions_widget.setMaximumHeight(160)
-        right_layout.addWidget(self.npc_actions_widget)
 
         self.companion_status = CompanionStatusWidget()
         self.companion_status.setMaximumHeight(140)

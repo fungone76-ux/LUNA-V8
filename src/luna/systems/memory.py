@@ -444,14 +444,17 @@ class MemoryManager:
             if self._semantic_store and self._semantic_store.is_available:
                 for fact in self._facts:
                     if fact.id:  # Only add if has ID
+                        meta: Dict[str, Any] = {
+                            "turn": fact.turn_count,
+                            "importance": fact.importance,
+                            "type": fact.type,
+                        }
+                        if fact.companion:
+                            meta["companion"] = fact.companion
                         self._semantic_store.add_memory(
                             memory_id=str(fact.id),
                             content=fact.content,
-                            metadata={
-                                "turn": fact.turn_count,
-                                "importance": fact.importance,
-                                "type": fact.type,
-                            }
+                            metadata=meta,
                         )
         
         self._loaded = True

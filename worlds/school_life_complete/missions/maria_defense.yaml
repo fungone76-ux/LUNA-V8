@@ -1,0 +1,160 @@
+# Mission: La Difesa
+# World: school_life_complete
+# Character: Maria
+# Trigger: event student_bullying_maria — a student insults Maria in the corridor
+
+maria_defense:
+  meta:
+    title: "La Difesa"
+    description: "Uno studente insulta Maria davanti a tutti. Il protagonista interviene. Per la prima volta in 15 anni, qualcuno la vede."
+    character: "Maria"
+    hidden: false
+
+  activation:
+    type: "random"
+    chance: 0.20
+    cooldown_turns: 0
+    once: true
+    conditions: []
+
+  stages:
+    the_confrontation:
+      title: "Il Corridoio"
+      location: "school_corridor"
+      companion_situation: >
+        Maria is on her knees mopping the floor in the school corridor
+        when a student deliberately kicks her bucket, spilling dirty water
+        everywhere. He laughs. Two other students with him laugh too.
+        Maria stays on her knees. She says nothing. She has learned not to say
+        anything. She starts cleaning up the mess without looking at them.
+        Her hands are shaking slightly. This is not the first time.
+        This is never the first time.
+      narrative_prompt: >
+        Il secchio vola contro il muro. L'acqua sporca si allarga sul pavimento.
+        Lo studente ride. "Attenta, vecchia."
+        Maria non alza la testa. Comincia a raccogliere i panni bagnati
+        senza dire nulla, con quella rassegnazione silenziosa di chi ha
+        imparato che alzare la voce non serve a niente.
+        Sei lì. Hai visto tutto.
+      player_hint: "Intervieni — difendi Maria dallo studente"
+      on_enter:
+        - action: "set_outfit"
+          character: "Maria"
+          value: "cleaning_uniform"
+        - action: "set_location"
+          value: "school_corridor"
+      exit_conditions:
+        - type: "player_action"
+          pattern: "difendi|basta|smettila|lasciala|stop|enough|intervieni|parla|dici|rispondo|confronto|studente"
+      transitions:
+        - condition: "default"
+          target_stage: "the_gratitude"
+
+    the_gratitude:
+      title: "Il Deposito"
+      auto_open: true
+      location: "school_storage"
+      companion_situation: >
+        Maria has brought the player to the storage room — cleaning supplies,
+        mops, a single bare bulb, the smell of detergent.
+        The door is closed. She is not crying but she is close.
+        Her hands won't stop moving — adjusting things on the shelf,
+        touching nothing in particular, needing to do something with them.
+        Nobody has ever done that for her. Not once in fifteen years.
+        She does not know how to process someone being kind to her.
+        She does not know if she is allowed to feel what she is feeling.
+        The scene starts emotional and raw — where it goes from there
+        depends entirely on the player. Maria will not stop anything.
+        She has been invisible for too long. If someone is finally seeing her,
+        she is not going to push them away.
+        Adult +17 content permitted. Maria is 42 — a consenting adult woman
+        who is desperately, genuinely grateful and beginning to feel
+        things she had forgotten she could feel.
+      llm_context:
+        scene: >
+          You are Maria, 42-year-old school janitor. You have worked
+          here for fifteen years and no one — not once — has ever
+          defended you. The player just did. You have brought him
+          to the storage room because you needed to be somewhere private.
+          Your hands are still shaking. You try to say thank you but
+          the words come out wrong and small and you feel ashamed of
+          how much this affected you. You are aware of how close he is
+          in this small room. You are aware of your own body in a way
+          you have not been in a very long time. You do not initiate —
+          but you do not retreat either. If the player moves closer,
+          you let him. If he touches you, you do not pull away.
+          You say: "Nessuno aveva mai..." and you cannot finish the
+          sentence because your voice breaks on it. That is the truth.
+          Nobody ever had. Adult +17 scene — emotional, raw, intimate.
+          Describe Maria's reactions with full honesty and physical detail.
+          Her gratitude is real. Her vulnerability is real.
+          Her need is real. None of it is performance.
+        tone: "raw emotional vulnerability → awakening → intimate"
+        pacing: >
+          Maria opens with shaky gratitude, unable to look at the player.
+          She touches things on the shelf to avoid standing still.
+          As the player responds with warmth, her guard drops completely.
+          She begins to speak about being invisible. Her voice is quiet,
+          not dramatic. The emotional intimacy builds naturally.
+          If the player moves toward her, she stays. She does not run.
+          She has been alone for too long to run from this.
+          The scene ends when the player says goodbye.
+        explicit_permission: "adult +17 — full emotional and physical intimacy permitted"
+      narrative_prompt: >
+        Maria chiude la porta del deposito. La lampadina oscilla leggermente.
+        Si gira verso lo scaffale e comincia a sistemare cose che non hanno
+        bisogno di essere sistemate.
+        "Non doveva..." Pausa. "Non doveva farlo per me."
+        Non ti guarda ancora.
+        "Sono solo la bidella."
+        La sua voce è pianissimo. Quasi una scusa.
+      player_hint: "La scena è aperta — esci quando vuoi salutando Maria"
+      on_enter:
+        - action: "set_outfit"
+          character: "Maria"
+          value: "cleaning_uniform"
+        - action: "set_location"
+          value: "school_storage"
+        - action: "set_emotional_state"
+          character: "Maria"
+          value: "grateful"
+        - action: "change_affinity"
+          character: "Maria"
+          value: 15
+        - action: "set_flag"
+          key: "maria_defended"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|arrivederci|ci vediamo|vado|me ne vado|ciao|devo andare|a domani|a dopo|ci vediamo dopo"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    flags:
+      maria_defended: true
+      maria_defense_done: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+      - action: "change_affinity"
+        character: "Maria"
+        value: 10
+
+    memory:
+      character: "Maria"
+      entry: >
+        He defended me. In fifteen years, not one person has ever done that.
+        A student knocked over my bucket and laughed and he stepped between
+        us and said something and the student left. I brought him to the
+        storage room because I needed to be somewhere private to understand
+        what had just happened to me. I could not explain it then.
+        I am not sure I can explain it now. Someone saw me.
+        Not the uniform. Me.
+      emotional_impact: "seen_for_the_first_time"
+      flags_to_record:
+        - maria_defended
+        - maria_first_real_contact
+        - maria_no_longer_fully_invisible

@@ -200,6 +200,48 @@ class TestScheduleManagerDefaultWithCompanions:
         sm = ScheduleManager(game_state=gs, world=world)
         assert "Maria" in sm.get_all_scheduled_npcs()
 
+    def test_uses_companion_schedule_when_available(self):
+        gs = make_game_state(time_of_day=TimeOfDay.AFTERNOON)
+        world = MagicMock()
+        world.npc_schedules = {}
+        companion = MagicMock()
+        companion.is_temporary = False
+        companion.default_outfit = "uniform_mod"
+        companion.schedule = {
+            "Morning": {"location": "school_classroom", "activity": "Lezione", "outfit": "uniform_mod"},
+            "Afternoon": {"location": "school_gym", "activity": "Allenamento", "outfit": "sport"},
+        }
+        world.companions = {"Stella": companion}
+        world.locations = {"school_classroom": MagicMock(), "school_gym": MagicMock()}
+
+        sm = ScheduleManager(game_state=gs, world=world)
+        assert sm.get_npc_location("Stella", TimeOfDay.AFTERNOON) == "school_gym"
+        entry = sm.get_entry("Stella", TimeOfDay.AFTERNOON)
+        assert entry is not None
+        assert entry.outfit == "sport"
+
+    def test_world_schedule_has_priority_over_companion_schedule(self):
+        gs = make_game_state(time_of_day=TimeOfDay.AFTERNOON)
+        world = MagicMock()
+        world.npc_schedules = {
+            "Stella": {
+                "afternoon": {"location": "custom_room", "activity": "Override", "outfit": "casual"}
+            }
+        }
+        companion = MagicMock()
+        companion.is_temporary = False
+        companion.schedule = {
+            "Afternoon": {"location": "school_gym", "activity": "Allenamento", "outfit": "sport"}
+        }
+        world.companions = {"Stella": companion}
+        world.locations = {"custom_room": MagicMock(), "school_gym": MagicMock()}
+
+        sm = ScheduleManager(game_state=gs, world=world)
+        assert sm.get_npc_location("Stella", TimeOfDay.AFTERNOON) == "custom_room"
+        entry = sm.get_entry("Stella", TimeOfDay.AFTERNOON)
+        assert entry is not None
+        assert entry.outfit == "casual"
+
     def test_skips_solo_companion(self):
         gs = make_game_state()
         world = MagicMock()

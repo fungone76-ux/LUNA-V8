@@ -31,7 +31,7 @@ class QuestAction(LunaBaseModel):
     """Action to execute when quest stage changes."""
     action: Literal[
         "set_location", "set_outfit", "set_flag", "add_flag",
-        "change_affinity", "increment_stat", "set_emotional_state",
+        "change_affinity", "set_affinity", "increment_stat", "set_emotional_state",
         "set_time", "start_quest", "complete_quest", "fail_quest",
         "time_advance", "set_secondary_npc", "clear_secondary_npc"
     ]
@@ -57,6 +57,7 @@ class QuestStage(LunaBaseModel):
     # Separate from narrative_prompt (that goes to the LLM, this goes to the UI).
     player_hint: str = ""
     llm_context: Dict[str, Any] = Field(default_factory=dict)
+    auto_open: bool = False
     on_enter: List[QuestAction] = Field(default_factory=list)
     on_exit: List[QuestAction] = Field(default_factory=list)
     on_fail: List[QuestAction] = Field(default_factory=list)
@@ -65,6 +66,9 @@ class QuestStage(LunaBaseModel):
     fail_conditions: List[QuestCondition] = Field(default_factory=list)
     transitions: List[Any] = Field(default_factory=list)
     max_turns: Optional[int] = None  # stage timeout
+    # Location/time constraints: exit_conditions are not evaluated unless met
+    location: Optional[str] = None
+    time: List[str] = Field(default_factory=list)
 
 
 class QuestRewards(LunaBaseModel):
@@ -90,6 +94,10 @@ class QuestDefinition(LunaBaseModel):
     activation_conditions: List[QuestCondition] = Field(default_factory=list)
     trigger_event: Optional[str] = None
     hidden: bool = False
+    once: bool = True
+    probability: float = Field(default=0.0, ge=0.0, le=1.0)
+    cooldown_turns: int = Field(default=0, ge=0)
+    allowed_times: List[str] = Field(default_factory=list)
 
     # V5: quest priority (lower = checked first when multiple eligible)
     priority: int = Field(default=5, ge=1, le=10)
@@ -99,6 +107,11 @@ class QuestDefinition(LunaBaseModel):
 
     # V5: required quests that must be completed first
     required_quests: List[str] = Field(default_factory=list)
+
+    # Background quest: queued silently, doesn't inject narrative or block other quests
+    # until the player explicitly engages via engage_pattern
+    background: bool = False
+    engage_pattern: str = ""  # regex matched against player input to surface the quest
 
     # Choice configuration
     requires_player_choice: bool = False
@@ -116,6 +129,8 @@ class QuestDefinition(LunaBaseModel):
 
     rewards: QuestRewards = Field(default_factory=QuestRewards)
     on_complete: List[QuestAction] = Field(default_factory=list)
+    # Raw memory block from YAML on_complete.memory — processed at quest completion
+    on_complete_memory: Dict[str, Any] = Field(default_factory=dict)
 
 
 class QuestInstance(LunaBaseModel):

@@ -26,7 +26,7 @@ stella_basketball:
   stages:
     the_challenge:
       title: "La Sfida"
-      location: "school_hallway"
+      location: "school_corridor"
       time: ["Afternoon"]
       companion_situation: >
         Stella stops the player in the hallway before the afternoon break.
@@ -47,7 +47,7 @@ stella_basketball:
           character: "Stella"
           value: "uniform_mod"
         - action: "set_location"
-          value: "school_hallway"
+          value: "school_corridor"
         - action: "set_flag"
           key: "stella_basketball_challenge"
           value: true
@@ -60,7 +60,7 @@ stella_basketball:
 
     the_game:
       title: "Il Campo"
-      location: "school_basketball_court"
+      location: "school_gym"
       time: ["Afternoon", "Evening"]
       companion_situation: >
         They are at the outdoor basketball court behind the school building.
@@ -101,7 +101,7 @@ stella_basketball:
           character: "Stella"
           value: "sport"
         - action: "set_location"
-          value: "school_basketball_court"
+          value: "school_gym"
         - action: "set_emotional_state"
           character: "Stella"
           value: "tsundere"
@@ -116,8 +116,6 @@ stella_basketball:
           target_stage: "_complete"
 
   rewards:
-    affinity:
-      Stella: 15
     flags:
       stella_basketball_done: true
       stella_physically_opened_up: true
@@ -125,6 +123,10 @@ stella_basketball:
   on_complete:
     actions:
       - action: "time_advance"
+      - action: "change_affinity"
+        character: "Stella"
+        value: 20
+
     memory:
       character: "Stella"
       entry: >

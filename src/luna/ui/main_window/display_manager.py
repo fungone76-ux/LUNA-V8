@@ -41,7 +41,6 @@ class DisplayManager:
         self.update_video_toggle()
         self.update_personality_display()
         self.update_event_widget()
-        self.update_npc_actions_widget()  # v8: NPC Actions
 
     # ------------------------------------------------------------------
     # Companion / status
@@ -66,31 +65,6 @@ class DisplayManager:
     def update_companion_locator(self) -> None:
         """Removed — CompanionLocatorWidget no longer present."""
         pass
-
-    def update_npc_actions_widget(self, result=None) -> None:
-        """Update NPC actions widget with current game state."""
-        w = self.window
-        if not w.engine or not w.npc_actions_widget:
-            return
-
-        game_state = w.engine.get_game_state()
-        if not game_state:
-            return
-
-        # Build directory on first run
-        if not w.npc_actions_widget.world and w.engine.world:
-            w.npc_actions_widget.world = w.engine.world
-            w.npc_actions_widget._build_directory(w.engine.world)
-
-        # Remove completed actions
-        w.npc_actions_widget.update_from_state(game_state)
-
-        # Add new action if a goal fired this turn
-        if result and getattr(result, "npc_action", None):
-            w.npc_actions_widget.add_action(result.npc_action)
-            logger.info("[DisplayManager] NPC action added: %s", result.npc_action.npc_display_name)
-
-        logger.debug("[DisplayManager] NPC actions widget updated")
 
     def update_status(self) -> None:
         """Update status bar."""
@@ -355,6 +329,8 @@ class DisplayManager:
     def update_event_widget(self) -> None:
         """Update event widget with current active global event."""
         w = self.window
+        if not getattr(w, "event_widget", None):
+            return
         if not w.engine or not w.engine.event_manager:
             w.event_widget.set_event()
             return
@@ -504,7 +480,8 @@ class DisplayManager:
             self.update_story_beats()
             self.update_outfit_widget()
             self.update_personality_display()
-            w.event_widget.set_event()
+            if getattr(w, "event_widget", None):
+                w.event_widget.set_event()
 
         # Handle MultiNPC sequence display
         if result.multi_npc_sequence:
@@ -563,11 +540,12 @@ class DisplayManager:
                 w.feedback.quest_completed(quest_title)
 
         if result.active_event:
-            w.event_widget.set_event(
-                title=result.active_event.get('name', ''),
-                description=result.active_event.get('description', ''),
-                icon=result.active_event.get('icon', '🌍'),
-            )
+            if getattr(w, "event_widget", None):
+                w.event_widget.set_event(
+                    title=result.active_event.get('name', ''),
+                    description=result.active_event.get('description', ''),
+                    icon=result.active_event.get('icon', '🌍'),
+                )
             if result.new_event_started:
                 w.feedback.info(
                     f"{result.active_event.get('icon', '🌍')} {result.active_event.get('name', '')}",
@@ -587,6 +565,23 @@ class DisplayManager:
         if result.available_actions:
             w.quick_actions.update_actions(result.available_actions)
 
+        # HUD: active_event takes priority and is shown regardless of narrative_compass
+        if result.active_event:
+            evt = result.active_event
+            hud_type = "macro_event" if evt.get("is_macro") else "event"
+            w.quest_journal.update_hud({
+                "type": hud_type,
+                "title": evt.get("name", ""),
+                "description": evt.get("description", ""),
+            })
+        elif result.narrative_compass is not None:
+            nc = result.narrative_compass
+            w.quest_journal.update_quest(
+                active_quest_title=nc.active_quest_title,
+                active_stage_hint=nc.active_stage_hint,
+                next_quest_title=nc.next_quest_title,
+            )
+
         if result.narrative_compass is not None:
             nc = result.narrative_compass
             w.compass_widget.update_compass(nc)
@@ -597,14 +592,7 @@ class DisplayManager:
                 next_quest_title=nc.next_quest_title,
                 is_hidden=nc.is_hidden,
             )
-            w.quest_journal.update_quest(
-                active_quest_title=nc.active_quest_title,
-                active_stage_hint=nc.active_stage_hint,
-                next_quest_title=nc.next_quest_title,
-            )
 
-        # v8: NPC Actions widget
-        self.update_npc_actions_widget(result)
 
     def _display_multi_npc_sequence(self, result: TurnResult) -> None:
         """Display multi-NPC images (text is already shown during generation via callback).
@@ -663,6 +651,8 @@ class DisplayManager:
     def on_event_changed(self, event) -> None:
         """Handle global event activation/deactivation."""
         w = self.window
+        if not getattr(w, "event_widget", None):
+            return
         logger.debug(f"[GlobalEvent] Event changed: {event}")
         if event:
             logger.debug(f"[GlobalEvent] Setting event: {event.name} - {event.description[:50]}...")

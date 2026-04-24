@@ -52,15 +52,16 @@ npc_professoressa_inglese:
           key: "prof_inglese_event_active"
           value: true
       exit_conditions:
-        - type: "player_action"
-          pattern: "okay|sure|follow|coming|sì|vengo|la seguo|d'accordo|arrivo|vado"
+        - type: "location"
+          operator: "eq"
+          value: "school_classroom"
       transitions:
         - condition: "default"
           target_stage: "after_class"
 
     after_class:
       title: "Dopo le Lezioni"
-      location: "school_empty_classroom"
+      location: "school_classroom"
       time: ["Afternoon", "Evening"]
       companion_situation: >
         She walked him to the end of the corridor and opened an empty
@@ -129,7 +130,7 @@ npc_professoressa_inglese:
       player_hint: "La scena è aperta — esci quando vuoi con un saluto"
       on_enter:
         - action: "set_location"
-          value: "school_empty_classroom"
+          value: "school_classroom"
         - action: "set_flag"
           key: "prof_inglese_scene_started"
           value: true

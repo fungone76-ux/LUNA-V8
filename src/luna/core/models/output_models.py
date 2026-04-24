@@ -114,9 +114,6 @@ class TurnResult:
     # v7: resolved promise id for debug UI (populated from guardian changes)
     resolved_promise: Optional[str] = None
 
-    # v8: NPC Secondary Activation — new action for NpcActionsWidget
-    npc_action: Optional[Any] = None  # NpcAction dataclass, if a goal fired this turn
-
     # v7.5: MultiNPC expanded - sequenza messaggi separati
     was_interrupted: bool = False  # True se l'utente ha interrotto la sequenza MultiNPC
 

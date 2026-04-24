@@ -18,11 +18,13 @@ events:
       Gli uccelli iniziano il loro concerto. La tribù si sveglia.
       Nuovo giorno, nuove sfide. Le 3 Prove ti aspettano.
     effects:
-      - type: "restore_stat"
-        stat: "energy"
-        value: 30
-      - type: "message"
-        text: "🌅 Nuovo giorno nella Terra degli Antenati"
+      duration: 1
+      on_start:
+        - type: "restore_stat"
+          stat: "energy"
+          value: 30
+        - type: "message"
+          text: "🌅 Nuovo giorno nella Terra degli Antenati"
 
   preparazione_caccia:
     time: "Morning"
@@ -54,8 +56,10 @@ events:
       offrono il pescato della notte, artigiani mostrano gioielli d'osso.
       È caos, colori, odori. Opportunità per chi ha occhio.
     effects:
-      - type: "market_available"
-        duration: 1
+      duration: 1
+      on_start:
+        - type: "market_available"
+          duration: 1
 
   # ============================================================
   # POMERIGGIO
@@ -70,11 +74,13 @@ events:
       È tempo di riposo, di sonnellini all'ombra, di storie sotto gli alberi.
       Anche le bestie tacciono. Solo il caldo parla.
     effects:
-      - type: "modify_stat"
-        stat: "water"
-        value: -10
-      - type: "message"
-        text: "☀️ Calura pomeridiana. Meglio riposare."
+      duration: 1
+      on_start:
+        - type: "modify_stat"
+          stat: "water"
+          value: -10
+        - type: "message"
+          text: "☀️ Calura pomeridiana. Meglio riposare."
 
   bambini_lezione:
     time: "Afternoon"
@@ -129,11 +135,13 @@ events:
       viola. Uno spettacolo quotidiano, ma sempre nuovo. La tribù si raduna.
       È tempo di racconti, di cibo, di comunità.
     effects:
-      - type: "restore_stat"
-        stat: "mind"
-        value: 10
-      - type: "message"
-        text: "🌅 Tramonto sulla valle. La tribù si riunisce."
+      duration: 1
+      on_start:
+        - type: "restore_stat"
+          stat: "mind"
+          value: 10
+        - type: "message"
+          text: "🌅 Tramonto sulla valle. La tribù si riunisce."
 
   racconti_fuoco:
     time: "Evening"
@@ -145,11 +153,13 @@ events:
       Storie di eroi, di mostri, di amori impossibili. Tutti ascoltano,
       ipnotizzati. Anche tu. Le storie sono vita, sono memoria.
     effects:
-      - type: "restore_stat"
-        stat: "mind"
-        value: 15
-      - type: "random_knowledge"
-        chance: 30
+      duration: 1
+      on_start:
+        - type: "restore_stat"
+          stat: "mind"
+          value: 15
+        - type: "random_knowledge"
+          chance: 30
     choices:
       - text: "Ascolta rapito"
         effect: { knowledge: 10, mind: 10 }
@@ -200,17 +210,19 @@ events:
       Suoni strani provengono dalla giungla. I predatori cacciano.
       È il loro momento. Il tuo è riposare, se osi chiudere gli occhi.
     effects:
-      - type: "restore_stat"
-        stat: "energy"
-        value: 50
-      - type: "modify_stat"
-        stat: "food"
-        value: -10
-      - type: "modify_stat"
-        stat: "water"
-        value: -10
-      - type: "message"
-        text: "🌙 La notte avvolge la valle. Tempo di riposo."
+      duration: 1
+      on_start:
+        - type: "restore_stat"
+          stat: "energy"
+          value: 50
+        - type: "modify_stat"
+          stat: "food"
+          value: -10
+        - type: "modify_stat"
+          stat: "water"
+          value: -10
+        - type: "message"
+          text: "🌙 La notte avvolge la valle. Tempo di riposo."
 
   guardia_notturna:
     time: "Night"
@@ -295,9 +307,11 @@ events:
       È caos, colori, lingue strane. Mercanti, giocolieri, stregoni.
       Opportunità uniche... e pericoli.
     effects:
-      - type: "special_market"
-        duration: 1
-      - type: "rare_items_available"
+      duration: 1
+      on_start:
+        - type: "special_market"
+          duration: 1
+        - type: "rare_items_available"
     choices:
       - text: "Cerca oggetti rari"
         effect: { gold: -20 }
@@ -320,10 +334,12 @@ events:
       si raccoglie. Kara presiede il rituale sacro. È notte di magia,
       di trasformazioni, di promesse. Qualcosa cambierà stanotte.
     effects:
-      - type: "moon_bonus"
-        all_affinities: 10
-      - type: "special_interactions"
-        available: true
+      duration: 1
+      on_start:
+        - type: "moon_bonus"
+          all_affinities: 10
+        - type: "special_interactions"
+          available: true
     choices:
       - text: "Partecipa al rituale"
         effect: { affinity_kara: 20, set_flag: "moon_blessing" }

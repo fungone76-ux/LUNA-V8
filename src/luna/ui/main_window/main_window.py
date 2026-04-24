@@ -102,7 +102,6 @@ class MainWindow(QMainWindow):
         self.feedback = lm.feedback
         self.choice_manager = lm.choice_manager
         self.lora_mapping = lm.lora_mapping
-        self.npc_actions_widget = lm.npc_actions_widget  # v8: NPC Actions Widget
 
     # ------------------------------------------------------------------
     # Game initialization

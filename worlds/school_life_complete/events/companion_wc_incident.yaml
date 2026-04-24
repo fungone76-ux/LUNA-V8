@@ -1,0 +1,176 @@
+# Event pack: WC door incident (companions)
+# World: school_life_complete
+# Trigger: location_pass in bathroom, afternoon, medium chance
+
+maria_wc_door_incident:
+  meta:
+    title: "Maria nel WC"
+    description: "Apri la porta del WC e trovi Maria in un momento molto imbarazzante."
+    type: "companion_event"
+    npcs: ["Maria"]
+    character: "Maria"
+    hidden: false
+    priority: 4
+    mutex_group: "wc_door_incident"
+
+  activation:
+    type: "location_pass"
+    location: "school_bathroom_female"
+    chance: 0.35
+    cooldown_turns: 18
+    once: false
+    time: ["Afternoon"]
+    conditions:
+      - type: "companion"
+        value: "Maria"
+
+  stages:
+    caught_opening_door:
+      title: "Porta aperta"
+      location: "school_bathroom_female"
+      time: ["Afternoon"]
+      companion_situation: >
+        The player opens a bathroom stall door too quickly and finds Maria peeing.
+        It is a sudden, embarrassing moment. Maria reacts with surprise first,
+        then tries to recover composure while asking for privacy.
+      narrative_prompt: >
+        Hai aperto la porta del WC senza bussare.
+        Maria e li dentro, colta di sorpresa mentre sta facendo pipi.
+        Arrossisce, si irrigidisce e ti guarda con imbarazzo: "Chiudi subito, per favore!"
+        La scena resta realistica, breve e imbarazzata, senza volgarita gratuite.
+      llm_context:
+        scene: >
+          Keep the scene awkward and human. Maria is surprised and embarrassed,
+          asks for privacy, and then calms down if the player apologizes.
+          Keep details non-explicit.
+        tone: "awkward, intimate embarrassment, then de-escalation"
+      player_hint: "Scusati e chiudi la porta"
+      on_enter:
+        - action: "set_flag"
+          key: "wc_incident_maria_seen"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "scusa|chiudo|chiudo subito|sorry|ok|esco|vado via|perdonami"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  on_complete:
+    actions:
+      - action: "clear_secondary_npc"
+
+stella_wc_door_incident:
+  meta:
+    title: "Stella nel WC"
+    description: "Apri la porta del WC e trovi Stella in un momento molto imbarazzante."
+    type: "companion_event"
+    npcs: ["Stella"]
+    character: "Stella"
+    hidden: false
+    priority: 4
+    mutex_group: "wc_door_incident"
+
+  activation:
+    type: "location_pass"
+    location: "school_bathroom_female"
+    chance: 0.35
+    cooldown_turns: 18
+    once: false
+    time: ["Afternoon"]
+    conditions:
+      - type: "companion"
+        value: "Stella"
+
+  stages:
+    caught_opening_door:
+      title: "Porta aperta"
+      location: "school_bathroom_female"
+      time: ["Afternoon"]
+      companion_situation: >
+        The player opens a bathroom stall door too quickly and finds Stella peeing.
+        She reacts with sharp embarrassment and asks the player to close immediately.
+      narrative_prompt: >
+        Hai aperto la porta del WC senza bussare.
+        Stella e li dentro, sorpresa mentre sta facendo pipi.
+        Ti fulmina con lo sguardo: "Ehi! Chiudi la porta, adesso."
+        Il momento e teso e imbarazzante, ma resta breve e non esplicito.
+      llm_context:
+        scene: >
+          Keep Stella coherent with her personality: direct, proud, reactive.
+          She is embarrassed, defensive, and quickly regains control.
+          Keep details non-explicit.
+        tone: "sharp embarrassment, defensive, fast recovery"
+      player_hint: "Chiudi la porta e chiedi scusa"
+      on_enter:
+        - action: "set_flag"
+          key: "wc_incident_stella_seen"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "scusa|chiudo|chiudo subito|sorry|ok|esco|vado via|perdonami"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  on_complete:
+    actions:
+      - action: "clear_secondary_npc"
+
+luna_wc_door_incident:
+  meta:
+    title: "Luna nel WC"
+    description: "Apri la porta del WC e trovi Luna in un momento molto imbarazzante."
+    type: "companion_event"
+    npcs: ["Luna"]
+    character: "Luna"
+    hidden: false
+    priority: 4
+    mutex_group: "wc_door_incident"
+
+  activation:
+    type: "location_pass"
+    location: "school_bathroom_female"
+    chance: 0.35
+    cooldown_turns: 18
+    once: false
+    time: ["Afternoon"]
+    conditions:
+      - type: "companion"
+        value: "Luna"
+
+  stages:
+    caught_opening_door:
+      title: "Porta aperta"
+      location: "school_bathroom_female"
+      time: ["Afternoon"]
+      companion_situation: >
+        The player opens a bathroom stall door too quickly and finds Luna peeing.
+        Luna is clearly embarrassed but tries to maintain authority and composure.
+      narrative_prompt: >
+        Hai aperto la porta del WC senza bussare.
+        Luna e li dentro, sorpresa mentre sta facendo pipi.
+        La sua voce e ferma ma imbarazzata: "Chiudi. Subito. Ne riparliamo fuori."
+        La scena resta realistica, breve e non esplicita.
+      llm_context:
+        scene: >
+          Luna keeps dignity and control even in embarrassment.
+          She asks for privacy immediately, then composes herself.
+          Keep details non-explicit.
+        tone: "controlled embarrassment, authoritative, brief"
+      player_hint: "Chiudi la porta e aspetta fuori"
+      on_enter:
+        - action: "set_flag"
+          key: "wc_incident_luna_seen"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "scusa|chiudo|chiudo subito|sorry|ok|esco|vado via|perdonami"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  on_complete:
+    actions:
+      - action: "clear_secondary_npc"
+

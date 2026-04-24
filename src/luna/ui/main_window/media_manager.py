@@ -61,7 +61,7 @@ class MediaManager:
             current_loc = w.engine.get_game_state().current_location
             logger.debug(f"[Save] Current location before save: {current_loc}")
             async with get_db_session() as db:
-                success = await w.engine.state_manager.save(db, name=save_name)
+                success = await w.engine.state_manager.save(db, save_name=save_name)
                 if success:
                     session_id = w.engine.state_manager.current.session_id
                     w.statusbar.showMessage(f"💾 Salvato: {save_name}", 5000)
@@ -147,8 +147,8 @@ class MediaManager:
         for i, save in enumerate(saves):
             session_id = save.get('session_id', i)
             name = save.get('name') or f"Salvataggio {session_id}"
-            companion = save.get('active_companion', 'unknown')
-            location = save.get('current_location', 'unknown')
+            companion = save.get('companion') or save.get('active_companion', 'unknown')
+            location = save.get('location') or save.get('current_location', 'unknown')
             turn_count = save.get('turn_count', 0)
             updated_at = save.get('updated_at', 'unknown')
 
@@ -287,22 +287,7 @@ class MediaManager:
 
                 await w.engine.initialize()
 
-                w.engine.state_manager._current = state
-
-                session_model = await db_manager.get_session(db, session_id)
-                if session_model and session_model.personality_state:
-                    try:
-                        from luna.systems.personality import PersonalityState
-                        personality_data = session_model.personality_state
-                        states_list = personality_data.get("states", [])
-                        personality_states = [
-                            PersonalityState(**state_data)
-                            for state_data in states_list
-                        ]
-                        w.engine.personality_engine.load_states(personality_states)
-                        logger.debug(f"[Load] Loaded {len(personality_states)} personality states")
-                    except Exception as e:
-                        logger.error(f"[Load] Error loading personality states: {e}")
+                w.engine.state_manager._state = state
 
                 from luna.core.models import QuestInstance, QuestStatus
                 quest_state_models = await db_manager.get_all_quest_states(db, session_id)
@@ -381,7 +366,7 @@ class MediaManager:
                     if primary_event:
                         logger.debug(f"[Load] Restoring active event: {primary_event.name}")
                         w.display_manager.on_event_changed(primary_event)
-                    else:
+                    elif getattr(w, "event_widget", None):
                         w.event_widget.set_event()
 
                 if w.engine:

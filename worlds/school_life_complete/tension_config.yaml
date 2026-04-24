@@ -29,8 +29,7 @@ tension_axes:
       - "L'aria tra voi è carica di qualcosa di non detto"
       - "Ogni contatto accidentale sembra elettrico"
       - "{companion} si morde il labbro, pensierosa"
-    events:
-      - "alone_classroom"
+    events: []
 
   environmental:
     growth_rate: 0.015
@@ -46,9 +45,7 @@ tension_axes:
       - "Le finestre vibrano per il vento"
       - "Si sentono tuoni in lontananza"
       - "Le luci sfarfallano per un istante"
-    events:
-      - "rainstorm"
-      - "blackout"
+    events: []
 
   authority:
     growth_rate: 0.012
@@ -64,8 +61,7 @@ tension_axes:
       - "Si mormora di un'ispezione imminente"
       - "Il preside ha convocato una riunione urgente"
       - "La segretaria ti guarda con un'aria che non promette nulla di buono"
-    events:
-      - "luna_discipline"
+    events: []
 
   social:
     growth_rate: 0.018
@@ -81,8 +77,7 @@ tension_axes:
       - "Il gossip sulla tua vicinanza con lei si sta diffondendo"
       - "Stella ti lancia un'occhiata carica di significato"
       - "Senti il tuo nome pronunciato da qualcuno in corridoio"
-    events:
-      - "stella_entourage"
+    events: []
 
   routine_break:
     growth_rate: 0.03
@@ -97,5 +92,4 @@ tension_axes:
       - "Un rumore insolito dal corridoio"
       - "Qualcuno bussa alla porta inaspettatamente"
       - "Si sente trambusto dalle scale"
-    events:
-      - "maria_cleaning"
+    events: []

@@ -53,6 +53,28 @@ class StateManagerMixin:
                         turn_number=game_state.turn_count,
                         associated_npc=game_state.active_companion,
                     )
+
+                # Auto-fact: significant affinity change (≥5)
+                affinity_changes = changes.get("affinity_change", {})
+                if isinstance(affinity_changes, dict):
+                    for npc, delta in affinity_changes.items():
+                        try:
+                            delta_int = int(delta)
+                        except (TypeError, ValueError):
+                            continue
+                        if abs(delta_int) >= 5:
+                            importance = 8 if abs(delta_int) >= 10 else 6
+                            sign = "+" if delta_int > 0 else ""
+                            fact_text = (
+                                f"Affinity with {npc} changed significantly "
+                                f"({sign}{delta_int}) — turn {game_state.turn_count}."
+                            )
+                            await self.engine.memory_manager.add_fact(
+                                fact_text,
+                                turn_number=game_state.turn_count,
+                                associated_npc=npc,
+                                importance=importance,
+                            )
             except Exception as e:
                 logger.warning("[Orchestrator] Memory save failed: %s", e)
 

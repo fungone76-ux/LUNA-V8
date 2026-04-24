@@ -70,7 +70,7 @@ class StateMemoryManager:
         """Remove transient per-turn flags before saving to DB."""
         return {k: v for k, v in flags.items() if k not in _TRANSIENT_FLAG_KEYS}
 
-    async def save_all(self, companion_location: Optional[str] = None) -> None:
+    async def save_all(self, companion_location: Optional[str] = None, save_name: Optional[str] = None) -> None:
         """Save all subsystem states in a single DB transaction.
         
         Note: GameState fields (active_quests, completed_quests, failed_quests, etc.)
@@ -123,7 +123,7 @@ class StateMemoryManager:
             state = self.state_manager.current
             state.flags = self._prune_transient_flags(state.flags)
 
-            await self.state_manager.save(db_session, companion_location=companion_location)
+            await self.state_manager.save(db_session, companion_location=companion_location, save_name=save_name)
 
             # 2. Quest states
             if self.quest_engine:
@@ -204,7 +204,7 @@ class StateMemoryManager:
         visual_en: str = "",
         tags_en: Optional[List[str]] = None,
     ) -> None:
-        """Add a conversation message to the DB and memory manager."""
+        """Add a conversation message to the DB and sync the MemoryManager cache."""
         async with self.db.session() as db_session:
             await self.db.add_message(
                 db_session,
@@ -216,6 +216,12 @@ class StateMemoryManager:
                 tags_en=tags_en or [],
                 companion=companion,
             )
-        # Note: MemoryManager doesn't have add_to_buffer method
-        # Messages are already saved to DB above
-        pass
+        if self.memory_manager:
+            await self.memory_manager.add_message(
+                role=role,
+                content=content,
+                turn_number=turn_number,
+                companion_name=companion or None,
+                visual_en=visual_en,
+                tags_en=tags_en,
+            )

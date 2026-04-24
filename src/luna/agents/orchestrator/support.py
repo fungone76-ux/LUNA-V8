@@ -111,9 +111,21 @@ class SupportMethodsMixin:
 
         try:
             comp_def = self.engine.world.companions.get(game_state.active_companion)
-            # For solo mode or template NPCs, use base_prompt from comp_def if available
             base_prompt = comp_def.base_prompt if comp_def else ""
             companion_name = game_state.active_companion
+
+            # If an NPC template is the active speaker, use their base_prompt instead
+            active_npc_id = game_state.flags.get("_active_npc_speaker")
+            if active_npc_id:
+                npc_def = self.engine.world.npc_templates.get(active_npc_id)
+                if npc_def:
+                    companion_name = active_npc_id
+                    base_prompt = (
+                        npc_def.get("base_prompt", "") if isinstance(npc_def, dict)
+                        else getattr(npc_def, "base_prompt", "")
+                    )
+                    logger.debug("[Media] Using NPC base_prompt for %s", active_npc_id)
+
             result   = await self.engine.media_pipeline.generate_all(
                 text=narrative.text,
                 visual_en=visual_output.positive,

@@ -15,6 +15,7 @@ from luna.core.config import get_settings
 from luna.core.models import (
     CompanionDefinition,
     GlobalEventDefinition,
+    GlobalEventEffect,
     Location,
     NarrativeArc,
     QuestAction,
@@ -258,7 +259,7 @@ class WorldLoader:
             merged["global_events"].update(file_data["global_events"])
         if "npc_templates" in file_data:
             merged["npc_templates"].update(file_data["npc_templates"])
-        if "npc_schedules" in file_data:
+        if file_data.get("npc_schedules"):
             merged["npc_schedules"] = file_data["npc_schedules"]
 
         # v7: tension config
@@ -273,6 +274,7 @@ class WorldLoader:
             for v7_field in (
                 "npc_relationships", "goal_templates", "needs_profile",
                 "auto_states", "avoid_topics_unless_asked", "behavior_responses",
+                "location_voice",
             ):
                 if v7_field in file_data:
                     if comp_name in merged["companions"]:
@@ -282,7 +284,7 @@ class WorldLoader:
             evt = file_data["events"]
             if isinstance(evt, dict):
                 merged["random_events"].update(evt)
-                # Also add to global_events so GlobalEventManager can use them
+                # Keep compatibility: random events are also visible to GlobalEventManager.
                 merged["global_events"].update(evt)
             elif isinstance(evt, list):
                 for e in evt:
@@ -294,7 +296,7 @@ class WorldLoader:
             evt = file_data["events"]
             if isinstance(evt, dict):
                 merged["daily_events"].update(evt)
-                # Also add to global_events so GlobalEventManager can use them
+                # Keep compatibility: daily events are also visible to GlobalEventManager.
                 merged["global_events"].update(evt)
             elif isinstance(evt, list):
                 for e in evt:
@@ -302,7 +304,7 @@ class WorldLoader:
                         merged["daily_events"][e["id"]] = e
                         merged["global_events"][e["id"]] = e
 
-        if filename == "companion_schedules.yaml" and "npc_schedules" in file_data:
+        if filename == "companion_schedules.yaml" and file_data.get("npc_schedules"):
             merged["npc_schedules"] = file_data["npc_schedules"]
 
     # -------------------------------------------------------------------------
@@ -366,19 +368,36 @@ class WorldLoader:
                     continue
                 meta_evt = evt_data.get("meta", {})
                 trigger  = evt_data.get("trigger", {})
-                
+
                 # Build trigger conditions from trigger dict
                 trigger_conditions = []
                 if trigger.get("conditions"):
                     trigger_conditions.extend(trigger["conditions"])
-                
+
+                # Normalize allowed_times: also accept trigger.time (single string)
+                raw_allowed = trigger.get("allowed_times", [])
+                if not raw_allowed and trigger.get("time"):
+                    raw_allowed = [trigger["time"]]
+
+                # Parse effects
+                effects_data = evt_data.get("effects", {})
+                effects = GlobalEventEffect(
+                    duration=int(effects_data.get("duration", 3)),
+                    location_modifiers=effects_data.get("location_modifiers", []),
+                    visual_tags=effects_data.get("visual_tags", []),
+                    atmosphere_change=effects_data.get("atmosphere_change", ""),
+                    affinity_multiplier=float(effects_data.get("affinity_multiplier", 1.0)),
+                    on_start=effects_data.get("on_start", []),
+                    on_end=effects_data.get("on_end", []),
+                )
+
                 global_events[evt_id] = GlobalEventDefinition(
                     id=evt_id,
                     title=meta_evt.get("title", evt_data.get("title", evt_id)),
                     description=meta_evt.get("description", evt_data.get("description", "")),
                     trigger_type=trigger.get("type", "random"),
                     trigger_chance=float(trigger.get("chance", 0.1)),
-                    allowed_times=trigger.get("allowed_times", []),
+                    allowed_times=raw_allowed,
                     allowed_locations=trigger.get("allowed_locations", []),
                     min_turn=int(trigger.get("min_turn", 0)),
                     repeatable=trigger.get("repeatable", True) if isinstance(trigger.get("repeatable"), bool) else True,
@@ -387,6 +406,7 @@ class WorldLoader:
                     choices=evt_data.get("choices", []),
                     type=evt_data.get("type", "random"),
                     trigger_conditions=trigger_conditions,
+                    effects=effects,
                 )
             except Exception as e:
                 logger.warning("[WorldLoader] GlobalEvent %s failed: %s", evt_id, e)
@@ -490,6 +510,7 @@ class WorldLoader:
             auto_states=data.get("auto_states", []),
             avoid_topics_unless_asked=data.get("avoid_topics_unless_asked", []),
             behavior_responses=data.get("behavior_responses", {}),
+            location_voice=data.get("location_voice", {}),
         )
 
     def _process_location(
@@ -559,8 +580,20 @@ class WorldLoader:
                 QuestAction(**a) for a in stage_data.get("on_enter", [])
                 if isinstance(a, dict)
             ]
+            on_exit = [
+                QuestAction(**a) for a in stage_data.get("on_exit", [])
+                if isinstance(a, dict)
+            ]
+            on_fail = [
+                QuestAction(**a) for a in stage_data.get("on_fail", [])
+                if isinstance(a, dict)
+            ]
             exit_conditions = [
                 QuestCondition(**c) for c in stage_data.get("exit_conditions", [])
+                if isinstance(c, dict)
+            ]
+            fail_conditions = [
+                QuestCondition(**c) for c in stage_data.get("fail_conditions", [])
                 if isinstance(c, dict)
             ]
             # Transitions stored as plain dicts (QuestTransition removed from v6)
@@ -572,14 +605,28 @@ class WorldLoader:
                         t = {**t, "target_stage": t.pop("target")}
                     transitions.append(t)
 
+            # Normalize time field: string → list
+            raw_time = stage_data.get("time", [])
+            if isinstance(raw_time, str):
+                raw_time = [raw_time]
+
             stages[stage_id] = QuestStage(
                 title=stage_data.get("title", ""),
                 description=stage_data.get("description", ""),
                 narrative_prompt=stage_data.get("narrative_prompt", ""),
+                companion_situation=stage_data.get("companion_situation", ""),
+                player_hint=stage_data.get("player_hint", ""),
+                llm_context=stage_data.get("llm_context", {}),
+                auto_open=bool(stage_data.get("auto_open", False)),
                 on_enter=on_enter,
+                on_exit=on_exit,
+                on_fail=on_fail,
                 exit_conditions=exit_conditions,
+                fail_conditions=fail_conditions,
                 transitions=transitions,
                 max_turns=stage_data.get("max_turns"),
+                location=stage_data.get("location"),
+                time=raw_time,
             )
 
         # Activation
@@ -589,6 +636,26 @@ class WorldLoader:
             for c in activation.get("conditions", [])
             if isinstance(c, dict)
         ]
+        # Normalize: accept both "trigger" and "trigger_event" keys
+        trigger_event = activation.get("trigger_event") or activation.get("trigger")
+
+        # on_complete: parse actions list from dict or list form
+        on_complete_raw = data.get("on_complete", {})
+        if isinstance(on_complete_raw, dict):
+            on_complete_actions = [
+                QuestAction(**a) for a in on_complete_raw.get("actions", [])
+                if isinstance(a, dict)
+            ]
+        elif isinstance(on_complete_raw, list):
+            on_complete_actions = [
+                QuestAction(**a) for a in on_complete_raw if isinstance(a, dict)
+            ]
+        else:
+            on_complete_actions = []
+
+        on_complete_memory: Dict[str, Any] = {}
+        if isinstance(on_complete_raw, dict):
+            on_complete_memory = on_complete_raw.get("memory", {}) or {}
 
         # Rewards
         rewards_data = data.get("rewards", {})
@@ -608,8 +675,18 @@ class WorldLoader:
             character=meta.get("character"),
             activation_type=activation.get("type", "auto"),
             activation_conditions=activation_conditions,
-            trigger_event=activation.get("trigger_event"),
+            trigger_event=trigger_event,
             hidden=bool(meta.get("hidden", False)),
+            once=bool(activation.get("once", True)),
+            probability=float(activation.get("chance", activation.get("probability", 0.0))),
+            cooldown_turns=int(activation.get("cooldown_turns", 0)),
+            allowed_times=[str(t) for t in activation.get("time", [])],
+            background=bool(meta.get("background", False)),
+            engage_pattern=(
+                (activation.get("engage_condition") or {}).get("pattern", "")
+                if isinstance(activation.get("engage_condition"), dict)
+                else ""
+            ),
             priority=int(meta.get("priority", 5)),
             mutex_group=meta.get("mutex_group"),
             required_quests=data.get("requires", []),
@@ -626,6 +703,8 @@ class WorldLoader:
                 else ""
             ),
             rewards=rewards,
+            on_complete=on_complete_actions,
+            on_complete_memory=on_complete_memory,
         )
 
     # -------------------------------------------------------------------------

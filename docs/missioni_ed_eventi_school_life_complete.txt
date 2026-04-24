@@ -1,0 +1,650 @@
+================================================================================
+  LUNA RPG v8 — MISSIONI ED EVENTI: SCHOOL LIFE COMPLETE
+  Guida di riferimento rapido — aggiornato 2026-04-22
+================================================================================
+
+Struttura del documento:
+  PARTE 1 — Missioni principali (Luna, Stella, Maria)
+  PARTE 2 — Eventi NPC secondari
+
+Legenda attivazione:
+  companion_initiative = si attiva quando il giocatore è nella location giusta con
+                         le condizioni soddisfatte (l'NPC "prende l'iniziativa")
+  location_pass        = si attiva quando il giocatore entra/passa in una location
+  random               = si attiva per probabilità casuale ogni turno
+  event                = si attiva quando un flag specifico viene alzato dal sistema
+
+Nota sul sistema affinità:
+  Le missioni NON accumulano affinità in modo permanente al completamento.
+  Al termine di ogni missione l'affinità viene RESETTATA a un valore fisso
+  (il "legame permanente" guadagnato). Il giocatore deve ricostruire l'affinità
+  per sbloccare la missione successiva. Questo mantiene la progressione
+  narrativa significativa per tutta la durata del gioco.
+
+
+================================================================================
+  PARTE 1 — MISSIONI PRINCIPALI
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+  LUNA — La Professoressa di Matematica
+  38 anni, elegante, controllata, separata e sola
+────────────────────────────────────────────────────────────────────────────────
+
+M1 — LA LEZIONE PRIVATA (luna_private_lesson)
+  Personaggi: Giocatore + Luna
+  Tipo attivazione: companion_initiative
+  Condizioni: Affinità Luna ≥ 5
+  Come si attiva: Luna nota il giocatore durante un'interrogazione in classe.
+                  Risposta corretta — lo trattiene mentre gli altri escono.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — L'Invito / school_classroom]
+    Mentre gli ultimi studenti escono, Luna trattiene il giocatore.
+    Lo loda per la risposta — vuole approfondire. Atmosfera professionale
+    ma con una tensione latente. Lo invita nel suo ufficio.
+
+  [Stage 2 — La Lezione / school_office_luna — Afternoon/Evening]
+    Studio di Luna, pomeriggio, porta chiusa. Inizia come una sessione
+    di ripasso ma la vicinanza fisica e l'intimità dello spazio fanno
+    scivolare la scena verso qualcosa di diverso. Luna perde il controllo
+    professionale per la prima volta. Scena esplicita +18.
+    Il giocatore esce con un saluto naturale.
+
+  Conseguenze: flag "luna_private_lesson_happened", "luna_private_lesson",
+               affinità RESET a 20 (legame permanente guadagnato).
+               Sblocca M2 dopo 2 giorni. Sblocca M1b quando stella_jealousy_happened.
+
+────────────────────────────────────────────────────────────────────────────────
+
+M1b — L'OMBRA DI STELLA (luna_stella_arc)       [NUOVO]
+  Personaggi: Giocatore + Luna
+  Tipo attivazione: companion_initiative
+  Condizioni: M1 completata + stella_jealousy_happened + Affinità Luna ≥ 30
+  Come si attiva: Luna ha saputo della scenata di Stella nel corridoio.
+                  Aspetta il giocatore nel suo ufficio.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — La Domanda / school_office_luna — Afternoon/Evening]
+    Luna non inizia con la domanda — inizia con qualcosa di più piccolo
+    e ci si avvicina lentamente. "Ho sentito che c'è stata una scena
+    nel corridoio. Con Stella. E con te." Non lo chiede per curiosità.
+
+  [Stage 2 — La Ferita / school_office_luna — Evening]
+    Days after. Luna ha visto Stella — i diciotto anni, la leggerezza.
+    È rimasta in ufficio fino a tardi, non a correggere compiti, solo
+    a stare. Quando il giocatore arriva, dice quello che ha pensato:
+    che ha paura. Non di perdere il lavoro — di perdere lui a qualcuno
+    che ha tutto quello che lei aveva e non sa nemmeno di averlo.
+    Lo dice senza dramma, come fa con le cose difficili.
+    Se lui resta vicino e dice la cosa giusta, lei smette di aver paura.
+    Per quella sera smette. Esplicita +18 se la scena lo guadagna.
+
+  Conseguenze: flag "luna_stella_arc_done", "luna_fear_of_stella_spoken",
+               affinità +20 (delta — questa missione non applica reset).
+
+────────────────────────────────────────────────────────────────────────────────
+
+M2 — LA CONFESSIONE (luna_divorce_confession)
+  Personaggi: Giocatore + Luna
+  Tipo attivazione: location_pass (corridoio, sera)
+  Condizioni: M1 completata + almeno 2 giorni dopo + ora = Evening
+  Come si attiva: Il giocatore passa per il corridoio di sera e vede la luce
+                  accesa nell'ufficio di Luna — fuori orario, sola.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — La Luce / school_corridor]
+    Il corridoio è buio. Una striscia di luce filtra sotto la porta
+    dell'ufficio di Luna. È tardi, tutti sono andati. Il giocatore si avvicina.
+
+  [Stage 2 — La Confessione / school_office_luna]
+    Luna non si mette in posa professionale — è esausta, vulnerabile.
+    Parla del divorzio, della solitudine fisica, di quello che non riesce
+    a chiedere a nessuno. La conversazione diventa intima, poi esplicitamente
+    fisica. Scena molto esplicita. Uscita libera con saluto.
+
+  Conseguenze: flag "luna_divorce_confessed", "luna_physically_opened_up",
+               affinità +25, sblocca M3 dopo 1 giorno.
+
+────────────────────────────────────────────────────────────────────────────────
+
+M3 — SUPPLENZA IN PALESTRA (luna_gym_substitute)
+  Personaggi: Giocatore + Luna
+  Tipo attivazione: location_pass (corridoio, qualsiasi ora)
+  Condizioni: Flag "luna_physically_opened_up" attivo
+  Come si attiva: Il giocatore è nel corridoio → l'interfono annuncia che
+                  il prof. di ginnastica è assente e Luna farà supplenza.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — L'Annuncio / school_corridor]
+    L'interfono gracchia. "Attenzione: il professore Russo è assente.
+    La professoressa Luna coprirà la lezione di ginnastica del pomeriggio."
+    Pausa. Qualcuno ride sottovoce. Luna — in tuta. Da vedere.
+
+  [Stage 2 — La Professoressa in Tuta / school_gym — solo Afternoon]
+    Luna in palestra con una classe. Tuta attillata, capelli in coda,
+    corpo visibile in modo che i vestiti da insegnante non permettono mai.
+    Guida la lezione con la stessa autorità dell'aula ma sa benissimo
+    come appare. Quando gli studenti escono e rimangono soli, la scena
+    evolve liberamente. Esplicita +18. Uscita con saluto.
+
+  Conseguenze: flag "luna_gym_substitute_done", affinità +20, sblocca M4.
+
+────────────────────────────────────────────────────────────────────────────────
+
+M4 — A CASA SUA (luna_final_choice)
+  Personaggi: Giocatore + Luna
+  Tipo attivazione: companion_initiative (ufficio di Luna, sera)
+  Condizioni: M3 completata + affinità Luna ≥ 75 + ora = Evening
+  Come si attiva: Luna aspetta il giocatore nel suo ufficio la sera,
+                  gli consegna un foglio scritto a mano con il suo indirizzo.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — L'Invito / school_office_luna]
+    Luna blocca il giocatore mentre sta uscendo. Gli dà un foglietto
+    piegato senza spiegare. "Se vuoi." Non dice altro.
+
+  [Stage 2 — A Casa Sua / luna_home]
+    Appartamento piccolo e caldo, libri ovunque, mezzo bicchiere di vino
+    sul tavolo. Luna è diversa qui — niente ruolo professionale, niente
+    distanza. È la scena più intima e più esplicita del suo arco narrativo.
+    Nessun limite di contenuto. Uscita con saluto.
+
+  Conseguenze: flag "luna_absolute", affinità +30,
+               arco narrativo di Luna completato.
+
+────────────────────────────────────────────────────────────────────────────────
+  STELLA — La Studentessa Tsundere
+  18 anni, popolare, competitiva, armatura sociale dura ma fragile dentro
+────────────────────────────────────────────────────────────────────────────────
+
+M1 — IL SERVIZIO FOTOGRAFICO (stella_photoshoot)
+  Personaggi: Giocatore + Stella
+  Tipo attivazione: companion_initiative (corridoio, mattina/pomeriggio)
+  Condizioni: Affinità Stella ≥ 10
+  Come si attiva: Stella intercetta il giocatore nel corridoio con il telefono
+                  in mano — tre foto di outfit diversi. Ha bisogno di un parere
+                  vero, non di validazione.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — Il Consiglio / school_corridor]
+    Stella mostra le foto, pone la domanda con tono brusco.
+    Non chiede mai opinioni a nessuno — questo è insolito.
+    Il giocatore risponde. La scena avanza dopo 1 turno di interazione.
+
+  [Stage 2 — Dietro l'Obiettivo / school_gym — Afternoon/Evening]
+    Palestra vuota dopo l'orario. Stella ha una borsa con tre cambi di
+    outfit. Inizia come una performance — lei si esibisce, lui valuta.
+    Ma il fatto che lui la guardi davvero, non in modo volgare, la
+    destabilizza. Ogni cambio la lascia un po' più esposta, emotivamente
+    e fisicamente. Esplicita +18 se la scena si sviluppa in quella
+    direzione. Uscita con saluto.
+
+  Conseguenze: flag "stella_photoshoot_done", "stella_physically_aware",
+               affinità RESET a 15.
+
+────────────────────────────────────────────────────────────────────────────────
+
+M2 — SFIDA A BASKET (stella_basketball)
+  Personaggi: Giocatore + Stella
+  Tipo attivazione: companion_initiative (corridoio, pomeriggio)
+  Condizioni: Affinità Stella ≥ 25 + M1 completata
+  Come si attiva: Stella blocca il giocatore nel corridoio. Ha una scommessa
+                  in mente — uno contro uno a basket. Se vince lui, le deve
+                  qualcosa. Se vince lei, viceversa. Non ha calcolato cosa
+                  succede se perde.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — La Sfida / school_corridor — Afternoon]
+    Stella espone la proposta con finta nonchalance. La scommessa è vaga
+    di proposito — "uno" può significare qualsiasi cosa.
+    Avanza quando il giocatore accetta.
+
+  [Stage 2 — Il Campo / school_gym — Afternoon/Evening]
+    Palestra esterna, luce pomeridiana, solo loro due.
+    Stella è genuinamente brava e gioca sporco — gomitate, piedi veloci.
+    Il contatto fisico del gioco scalda la situazione. A un certo punto
+    la partita smette di importare e inizia qualcos'altro. Esplicita +18.
+    Uscita con saluto.
+
+  Conseguenze: flag "stella_basketball_done", "stella_physically_opened_up",
+               affinità RESET a 20.
+
+────────────────────────────────────────────────────────────────────────────────
+
+M3 — LA SCENA DI GELOSIA (stella_jealousy)
+  Personaggi: Giocatore + Stella
+  Tipo attivazione: random 15%
+  Condizioni: Affinità Stella ≥ 35 + M2 completata
+  Come si attiva: Il giocatore viene visto ridere con Luna dal lato opposto
+                  del corridoio → Stella perde il controllo pubblicamente.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — CHI ERA QUELLA? / school_corridor — Morning/Afternoon]
+    Stella marcia verso il giocatore davanti a tutti. Lo afferra per
+    un braccio. "Chi era quella?" La voce porta in tutto il corridoio.
+    Non le importa chi guarda — ed è questo il momento più rivelatore
+    di tutta la sua storyline. Avanza quando il giocatore la porta
+    in un posto privato.
+
+  [Stage 2 — Lontano da Tutti / school_classroom]
+    Aula vuota. Stella è ancora carica di adrenalina ma la rabbia si
+    sta coagulando in qualcosa di più onesto. Le tremano le mani.
+    Non sa come gestire la gelosia perché non le è mai capitato di
+    tenere davvero a qualcuno. Se il giocatore regge il confronto
+    senza cedere, lei crolla — violentemente, nel modo in cui fa
+    tutto. Esplicita +18 se la scena va in quella direzione. Uscita.
+
+  Conseguenze: flag "stella_jealousy_done", "stella_possessive",
+               "stella_walls_broken", affinità RESET a 30.
+
+────────────────────────────────────────────────────────────────────────────────
+
+M4 — SEI MIO (stella_confession)
+  Personaggi: Giocatore + Stella
+  Tipo attivazione: companion_initiative (corridoio, sera)
+  Condizioni: Affinità Stella ≥ 65 + M3 completata
+  Come si attiva: Stella aspetta il giocatore al suo armadietto la sera
+                  tardi, scuola quasi deserta. Non ha intenzione di parlare.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — I Lockers / school_corridor — Evening]
+    Stella si piazza tra il giocatore e l'uscita. Una mano sul muro
+    accanto alla sua testa. Voce bassa. "Sei mio. Non te lo sto
+    chiedendo." Non è una dichiarazione romantica — è una presa
+    di possesso. Avanza quando il giocatore propone di spostarsi.
+
+  [Stage 2 — Solo Noi / stella_home — Evening/Night]
+    Casa di Stella, genitori assenti. Grande e troppo silenziosa.
+    Prima volta che porta qualcuno qui che voleva davvero portare.
+    Nessuna performance — possessiva, diretta, fisicamente intensa.
+    Scena completamente esplicita +18, nessun limite. Uscita con saluto.
+
+  Conseguenze: flag "stella_confession_done", "stella_absolute",
+               affinità RESET a 55, arco narrativo di Stella completato.
+
+────────────────────────────────────────────────────────────────────────────────
+  MARIA — La Bidella
+  42 anni, invisibile da 15 anni, mai vista da nessuno prima del giocatore
+────────────────────────────────────────────────────────────────────────────────
+
+M1 — LA DIFESA (maria_defense)
+  Personaggi: Giocatore + Maria
+  Tipo attivazione: random 20% (corridoio, qualsiasi ora)
+  Condizioni: Nessuna — basta essere nel corridoio
+  Come si attiva: Uno studente rovescia il secchio di Maria e ride.
+                  Il giocatore è lì. Ha una scelta.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — Il Corridoio / school_corridor]
+    Il secchio vola contro il muro. L'acqua sporca si allarga.
+    Lo studente ride. Maria raccoglie i panni in silenzio — le mani
+    tremano leggermente. Non è la prima volta. Non sarà l'ultima.
+    Avanza quando il giocatore interviene a difenderla.
+
+  [Stage 2 — Il Deposito / school_storage]
+    Maria porta il giocatore nel deposito per stare da sola a
+    capire quello che è appena successo. Quindici anni — nessuno
+    aveva mai fatto quello. Non riesce a guardarlo in faccia.
+    Non riesce a smettere di sistemare cose sugli scaffali.
+    "Nessuno aveva mai..." — e non finisce la frase.
+    Emotivamente raw, intimità autentica. +18. Uscita.
+
+  Conseguenze: flag "maria_defended", "maria_defense_done",
+               affinità RESET a 10. Sblocca M2.
+
+────────────────────────────────────────────────────────────────────────────────
+
+M2 — I SEGRETI DELLA SCUOLA (maria_secrets)
+  Personaggi: Giocatore + Maria
+  Tipo attivazione: companion_initiative (corridoio, pomeriggio)
+  Condizioni: Affinità Maria ≥ 20 + M1 completata + ora = Afternoon
+  Come si attiva: Maria si avvicina di lato, aspetta che il corridoio
+                  si svuoti, poi ti lancia un'occhiata. Ha qualcosa da dire.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — Il Whisper / school_corridor — Afternoon]
+    Maria sussurra — sa cose di questa scuola dopo 15 anni che
+    nessun professore sa. Cose sui colleghi, sui segreti nascosti
+    negli armadi, su chi fa cosa dopo l'orario. Lo porta via
+    prima che qualcuno senta.
+
+  [Stage 2 — Le Confessioni / school_storage]
+    Nel deposito, appoggiata agli scaffali, Maria parla.
+    Senza abbellimenti, senza drammi. Dice le cose come stanno,
+    con quella precisione silenziosa di chi osserva da anni
+    senza essere mai osservata. L'intimità che si crea non è
+    romantica in senso classico — è il raro contatto tra due
+    persone che si vedono davvero. +18. Uscita con saluto.
+
+  Conseguenze: flag "maria_secrets_done", "knows_luna_divorce",
+               "knows_stella_insecure", affinità RESET a 15. Sblocca M3.
+
+────────────────────────────────────────────────────────────────────────────────
+
+M3 — CENA A CASA (maria_home_dinner)
+  Personaggi: Giocatore + Maria
+  Tipo attivazione: companion_initiative (corridoio, sera)
+  Condizioni: Affinità Maria ≥ 35 + M2 completata + ora = Evening
+  Come si attiva: Maria aspetta il giocatore vicino all'uscita con
+                  il cappotto in mano. Non chiede — propone, con quella
+                  timidezza di chi sa già che la risposta potrebbe
+                  essere no e si è preparata a sopportarlo.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — L'Invito / school_corridor — Evening]
+    "Ho cucinato. Se hai fame." Detto così, senza enfasi, come
+    se fosse una cosa normale. Non è normale. È la prima volta
+    che porta qualcuno a casa sua.
+
+  [Stage 2 — La Cena / maria_home]
+    Appartamentino piccolo, pasta al forno, caldo che non è
+    del cibo. Maria si muove nella cucina come chi finalmente
+    sa dove mettere le mani — in cucina è sicura, è brava,
+    non è la bidella. La cena diventa conversazione.
+    La conversazione diventa qualcos'altro. +18. Uscita.
+
+  Conseguenze: flag "maria_home_visited", "maria_home_dinner_done",
+               affinità RESET a 25. Sblocca M4.
+
+────────────────────────────────────────────────────────────────────────────────
+
+M4 — LA NOTTE DELLA DEVOZIONE (maria_night)
+  Personaggi: Giocatore + Maria
+  Tipo attivazione: companion_initiative (corridoio, sera)
+  Condizioni: Affinità Maria ≥ 65 + M3 completata + ora = Evening
+  Come si attiva: Maria aspetta all'uscita con il cappotto già indosso.
+                  Non dice quasi niente. Sa già dove stanno andando.
+  Una tantum: Sì
+
+  Cosa succede:
+  [Stage 1 — L'Offerta / school_corridor — Evening]
+    "Stasera sei libero?" — e già si volta verso l'uscita prima
+    della risposta. Gesto minuscolo e totale insieme.
+
+  [Stage 2 — Devozione / maria_home]
+    L'appartamento buio tranne la lampada sul comodino.
+    Maria chiude la porta e si gira. Senza parole inutili.
+    In 42 anni ha imparato a non sprecare le cose rare.
+    Scena completamente esplicita +18, nessun limite.
+    Maria è devota, presente, reale — nessuna performance.
+    Uscita con saluto.
+
+  Conseguenze: flag "maria_devoted", "maria_intimate", "maria_night_done",
+               affinità RESET a 40, arco narrativo di Maria completato.
+
+
+================================================================================
+  PARTE 2 — EVENTI NPC SECONDARI
+================================================================================
+
+Gli eventi NPC sono incontri con personaggi secondari che non fanno parte
+delle storyline principali. Si ripetono (once: false) con cooldown variabile.
+Tutti i personaggi coinvolti sono adulti consenzienti. Contenuto +18.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EVT-01 — L'ISPEZIONE DEL PRESIDE (npc_preside_inspection)
+  Personaggi: Giocatore (voyeur) + Preside Bianchi + Luna
+  Tipo: random 8% | Pomeriggio/Sera | Cooldown: 40 turni | Ripetibile
+  Condizioni: Nessuna missione Luna attiva al momento
+  Dove: Corridoio → Ufficio del Preside
+
+  Come si attiva: Passando per il corridoio nel pomeriggio/sera, il giocatore
+                  nota la porta del preside socchiusa con la luce accesa dentro.
+                  Luna è in piedi davanti alla scrivania. Qualcosa non va.
+
+  Cosa succede: Il giocatore osserva di nascosto dalla porta. Preside Bianchi
+                ricatta Luna — minacce vaghe sulla carriera, richieste specifiche.
+                Lei è intrappolata e lui lo sa. Scena a turni alternati:
+                turni dispari = il preside parla e ordina,
+                turni pari = Luna risponde e obbedisce, riluttante ma reale.
+                Meccanica voyeur: il giocatore guarda, non interviene.
+                La scena finisce quando il giocatore smette di guardare.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EVT-02 — L'ISPEZIONE MINISTERIALE (npc_ispettore)
+  Personaggi: Giocatore (voyeur) + Ispettore scolastico + Luna
+  Tipo: random 3% | Mattina/Pomeriggio | Once: Sì (accade una volta sola)
+  Condizioni: M1 di Luna (luna_private_lesson) completata + no missioni Luna attive
+  Dove: Corridoio → Ufficio di Luna
+
+  Come si attiva: Raro — 3% di probabilità per turno. Un ispettore ministeriale
+                  è arrivato alla scuola. Il giocatore lo sente da lontano,
+                  poi lo vede entrare nell'ufficio di Luna.
+
+  Cosa succede: Come il Preside, ma con l'ispettore — più freddo, più burocratico,
+                linguaggio formale e asettico, nessuna storia personale con Luna.
+                Stesso schema a turni dispari/pari. Meccanica voyeur identica.
+                Una tantum — l'ispettore passa una volta e non torna.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EVT-03 — LA BIBLIOTECARIA (npc_bibliotecaria)
+  Personaggi: Giocatore + Bibliotecaria (età adulta, scala a pioli)
+  Tipo: location_pass 40% | Pomeriggio/Sera | Cooldown: 35 turni | Ripetibile
+  Condizioni: Nessuna
+  Dove: Biblioteca scolastica
+
+  Come si attiva: Il giocatore entra in biblioteca — la bibliotecaria è in cima
+                  alla scala a pioli che raggiunge gli scaffali più alti. Lo vede.
+                  Scende con la sua calma.
+
+  Cosa succede: [Stage 1] Scende dalla scala, lo studia. Ha qualcosa da
+                proporre — accesso a una sezione speciale, libri che non sono
+                nel catalogo ufficiale. C'è un accordo non verbale da fare.
+                [Stage 2] Nella sezione riservata, la scena si svolge.
+                Esplicita +18. Uscita con saluto.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EVT-04 — LA CUOCA DELLA MENSA (npc_cuoca)
+  Personaggi: Giocatore + Cuoca della mensa (adulta, vivace)
+  Tipo: location_pass 35% | Pomeriggio/Sera | Cooldown: 25 turni | Ripetibile
+  Condizioni: Nessuna
+  Dove: Mensa scolastica (kitchen side)
+
+  Come si attiva: Il giocatore entra in mensa. La cuoca lo vede dal bancone,
+                  tutta la faccia si muove. "Ah! Arrivi al momento giusto."
+
+  Cosa succede: Scena in un'unica location — la cucina della mensa.
+                La cuoca è energetica, diretta, senza filtri sociali.
+                Inizia con cibo, finisce con qualcos'altro. Esplicita +18.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EVT-05 — LA PORTINAIA (npc_portinaia)
+  Personaggi: Giocatore + Portinaia (anziana, occhi acuti)
+  Tipo: location_pass 35% | Mattina/Pomeriggio/Sera | Cooldown: 25 turni | Ripetibile
+  Condizioni: Nessuna
+  Dove: Ingresso della scuola
+
+  Come si attiva: Il giocatore passa per l'ingresso. La portinaia alza un dito
+                  dalla sua scrivania — un dito solo. Il giocatore si ferma.
+
+  Cosa succede: [Stage 1] La portinaia parla sottovoce — ha un taccuino.
+                Quello che ha visto in 30 anni di ingresso non si dimentica.
+                Sa tutto di tutti. Ha un'informazione che potrebbe interessare.
+                [Stage 2] Schiena al muro di uno stanzino vicino, il "premio"
+                per l'informazione. Esplicita +18.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EVT-06 — L'INFERMIERA (npc_infermiera)
+  Personaggi: Giocatore + Infermiera scolastica (adulta, clinica)
+  Tipo: random 12% (25% se stella_basketball_done) | Mattina/Pomeriggio | Cooldown: 30 turni | Ripetibile
+  Condizioni: Nessuna
+  Dove: Infermeria scolastica
+
+  Come si attiva: Il giocatore viene convocato in infermeria — o ci arriva
+                  per conto suo. L'infermiera ha già il file aperto.
+
+  Cosa succede: [Stage 1] Visita "di routine". Misurazione, qualche domanda.
+                Lei è professionale, compita, efficiente.
+                [Stage 2] La porta si chiude. "Privacy del paziente."
+                La visita diventa qualcosa di molto diverso.
+                Esplicita +18 con frame clinico/medico.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EVT-07 — LA SEGRETARIA (npc_segretaria)
+  Personaggi: Giocatore + Segretaria della scuola (adulta, occhiali)
+  Tipo: random 15% | Mattina/Pomeriggio | Cooldown: 20 turni | Ripetibile
+  Condizioni: Nessuna
+  Dove: Segreteria scolastica
+
+  Come si attiva: La segretaria sporge la testa dallo sportello.
+                  "Ehi. Tu." Cartella in mano. "Firma qui."
+
+  Cosa succede: [Stage 1] Una firma su un documento che non guarda nemmeno.
+                Scusa per parlare. Occhi che lo seguono mentre firma.
+                [Stage 2] Dopo l'orario, sportello abbassato, porta chiusa.
+                "Bene. Ora possiamo parlare davvero." Esplicita +18.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EVT-08 — LA PSICOLOGA SCOLASTICA (npc_psicologa)
+  Personaggi: Giocatore + Psicologa scolastica (adulta, competente)
+  Tipo: random 20% | Mattina/Pomeriggio | Cooldown: 40 turni | Ripetibile
+  Condizioni: M2 Luna (luna_divorce_confession) completata
+  Dove: Studio della psicologa (school_counselor)
+
+  Come si attiva: Disponibile solo dopo che Luna ha parlato del suo divorzio
+                  (M2 completata). La psicologa ha saputo. O intuito.
+                  Il giocatore viene chiamato per una "sessione di ascolto".
+
+  Cosa succede: [Stage 1] Poltrona morbida, piante, luce soffusa.
+                La psicologa fa domande che vanno subito in profondità.
+                Sa già più di quello che sembra.
+                [Stage 2] Chiude a chiave. Si risiede. Ri-incrocia le gambe.
+                "Bene. Ora possiamo parlare davvero." Esplicita +18.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EVT-09 — LA PROFESSORESSA DI INGLESE (npc_professoressa_inglese)
+  Personaggi: Giocatore + Prof. di Inglese (49 anni, chignon biondo, occhiali)
+  Tipo: random 8% | Pomeriggio/Sera | Cooldown: 25 turni | Ripetibile
+  Condizioni: Nessuna
+  Dove: Corridoio → Aula vuota
+
+  Come si attiva: La professoressa blocca il giocatore nel corridoio senza
+                  preamboli. "Ho bisogno di parlarti." Si volta e cammina.
+
+  Cosa succede: [Stage 1] Lo ferma con tono freddo — ha notato qualcosa
+                nel suo inglese scritto. C'è un errore che va corretto.
+                Lei è precisa, esigente, non sorride.
+                [Stage 2] In un'aula vuota, i ruoli cambiano molto in fretta.
+                La professoressa sa esattamente cosa vuole e come chiederlo.
+                Esplicita +18.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EVT-10 — LA FARMACISTA (npc_farmacista)
+  Personaggi: Giocatore + Farmacista (50 anni, capelli argentei, camice)
+  Tipo: location_pass 35% | Mattina/Pomeriggio/Sera | Cooldown: 30 turni | Ripetibile
+  Condizioni: Nessuna
+  Dove: Parco (area negozi di paese)
+
+  Come si attiva: Il giocatore passa per il parco. La farmacista lo vede
+                  prima che lui raggiunga il bancone. Posa la penna.
+
+  Cosa succede: [Stage 1] Ha un prodotto. Composto ad hoc — risposta
+                vascolare, amplificatore di sensibilità, effetto prolungato.
+                Non può venderlo senza una valutazione baseline. Liability.
+                Ha una stanza sul retro per questo scopo.
+                [Stage 2] Stanza clinica sul retro. Lei documenta tutto con
+                la clipboard tra ogni fase. Utilizza linguaggio completamente
+                medico per descrivere atti esplicitamente sessuali.
+                Frame professionale che non si rompe mai. Esplicita +18.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EVT-11 — LA FIORAIA (npc_fioraia)
+  Personaggi: Giocatore + Giulia la Fioraia (25 anni, capelli rosa, salopette)
+  Tipo: location_pass 40% | Mattina/Pomeriggio/Sera | Cooldown: 30 turni | Ripetibile
+  Condizioni: Nessuna
+  Dove: Parco (area negozi di paese)
+
+  Come si attiva: Il giocatore arriva al parco. Giulia è dietro il banco
+                  a spostare secchi pesanti. Si raddrizza con una smorfia,
+                  una mano sulla schiena. Lo vede. Si illumina.
+
+  Cosa succede: [Stage 1] Mal di schiena. Solleva cose tutto il giorno.
+                Lo guarda le mani. "Sai fare i massaggi?"
+                [Stage 2] Nel retro del negozio — piante ovunque, un tavolo
+                di lavoro. Lei si sdraia faccia in giù senza cerimonie.
+                Parla di piante, impollinazione, di come il corpo ha bisogno
+                delle stesse cose delle piante. Tutto quello che dice ha
+                un doppio senso che lei non nota — o forse sì.
+                Esplicita +18 quando si gira. Uscita con saluto.
+
+
+================================================================================
+  NOTE DI SISTEMA
+================================================================================
+
+SISTEMA AFFINITÀ E RESET:
+  Ogni missione resetta l'affinità a un valore fisso al completamento.
+  Il giocatore deve ricostruire i punti per sbloccare la missione successiva.
+  Questo garantisce che ogni companion abbia un comportamento coerente con
+  il proprio arco narrativo invece di restare permanentemente in stato "max".
+
+  Valori di reset per missione:
+    Luna  M1 La Lezione Privata   → 20  (poi auto_state: conflicted per flag)
+    Stella M1 Servizio Fotografico → 15  (poi auto_state: aware per flag)
+    Stella M2 Sfida a Basket       → 20
+    Stella M3 Scena di Gelosia     → 30  (poi auto_state: jealous per flag)
+    Stella M4 Sei Mio              → 55  (poi auto_state: devoted per flag)
+    Maria  M1 La Difesa            → 10  (poi auto_state: surprised per flag)
+    Maria  M2 I Segreti            → 15
+    Maria  M3 Cena a Casa          → 25  (poi auto_state: grateful per flag)
+    Maria  M4 La Notte             → 40  (poi auto_state: devoted per flag)
+
+  Eccezioni (nessun reset):
+    Luna M2/M3/M4, Luna M1b (L'Ombra di Stella) — arco in progressione attiva
+    Missioni finale di arco quando il companion raggiunge lo stato permanente
+
+ORDINE PROGRESSIONE LUNA:
+  M1 (La Lezione) → M2 (La Confessione, dopo 2 giorni)
+  → M3 (Supplenza, dopo 1 giorno) → M4 (A Casa Sua)
+  M1b (L'Ombra di Stella) — si sblocca dopo M1 + stella_jealousy_happened,
+  indipendente dalla sequenza M2/M3/M4
+
+ORDINE PROGRESSIONE STELLA:
+  M1 (Servizio Fotografico) → M2 (Basket)
+  → M3 (Gelosia, trigger random) → M4 (Sei Mio)
+
+ORDINE PROGRESSIONE MARIA:
+  M1 (La Difesa, random) → M2 (I Segreti, pomeriggio)
+  → M3 (Cena a Casa, sera) → M4 (La Notte, sera)
+
+EVENTI RISERVATI (prerequisiti non banali):
+  - npc_ispettore:   solo dopo M1 Luna completata (accade una volta sola)
+  - npc_psicologa:   solo dopo M2 Luna completata
+
+EVENTI SEMPRE DISPONIBILI (al posto giusto nell'orario giusto):
+  - npc_preside_inspection, npc_bibliotecaria, npc_cuoca,
+    npc_portinaia, npc_infermiera, npc_segretaria,
+    npc_professoressa_inglese, npc_farmacista, npc_fioraia
+
+GOAL TEMPLATES ATTIVI PER COMPANION (comportamenti ambientali spontanei):
+  Luna:   lonely_evening, vent_about_preside
+  Stella: copy_homework, complain_about_math, demand_attention, invite_bar,
+          show_off_victory, gossip_about_luna, provoke_luna_public,
+          steal_attention_from_luna, trap_luna
+  Maria:  offer_help, confide_loneliness, found_something, gossip_about_preside
+
+================================================================================

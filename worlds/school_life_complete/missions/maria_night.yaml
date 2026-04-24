@@ -1,0 +1,200 @@
+# Mission: La Notte della Devozione
+# World: school_life_complete
+# Character: Maria
+# Trigger: companion_initiative — Maria ti cerca di sera, ha deciso
+
+maria_night:
+  meta:
+    title: "La Notte della Devozione"
+    description: "Non ti sta chiedendo niente. Ti sta dando tutto."
+    character: "Maria"
+    hidden: true
+
+  activation:
+    type: "companion_initiative"
+    once: true
+    conditions:
+      - type: "affinity"
+        target: "Maria"
+        operator: "gte"
+        value: 65
+      - type: "flag"
+        target: "maria_home_visited"
+        operator: "eq"
+        value: true
+      - type: "time"
+        operator: "eq"
+        value: "Evening"
+
+  stages:
+    the_offering:
+      title: "La Decisione"
+      location: "school_corridor"
+      companion_situation: >
+        Maria has made a decision. She has been thinking about it
+        since the dinner — going over it every night in the apartment,
+        in the silence that fills it again after he leaves.
+        She has decided she is done with the silence.
+        She approaches the player at the end of the school day
+        when the building has emptied. She does not apologize
+        when she speaks. She does not minimize herself.
+        She asks him to come to her apartment. Tonight.
+        She does not say what for. She does not need to.
+        Her voice is steady. This is not impulsive.
+        This is someone who has thought it through completely
+        and is choosing it with both eyes open.
+      narrative_prompt: >
+        Il corridoio è quasi vuoto. Maria ti aspetta vicino all'uscita,
+        il cappotto già indossato, la borsa in mano.
+        Ti viene incontro senza esitare.
+        "Stasera." Pausa. "Vieni da me."
+        Non è una domanda. Non esattamente.
+        Ti guarda negli occhi — non altrove, non ai lati,
+        direttamente nei tuoi — e aspetta.
+        "Ho 42 anni," dice piano. "E sono stanca di aspettare."
+      player_hint: "Segui Maria a casa sua — ha deciso"
+      on_enter:
+        - action: "set_outfit"
+          character: "Maria"
+          value: "cleaning_uniform"
+        - action: "set_location"
+          value: "school_corridor"
+      exit_conditions:
+        - type: "player_action"
+          pattern: "vengo|sì|si|yes|okay|ok|andiamo|let's go|sure|certo|volentieri|stasera|tonight"
+      transitions:
+        - condition: "default"
+          target_stage: "devotion"
+
+    devotion:
+      title: "Sua"
+      auto_open: true
+      location: "maria_home"
+      companion_situation: >
+        Maria's apartment again. But this time is different.
+        She did not cook. She did not light candles.
+        She closes the door, turns the lock, and faces him.
+        She is wearing her home clothes — soft, worn, domestic —
+        and she is the most certain she has ever been in her life.
+        She speaks first. She says everything she has been
+        thinking for weeks — without apology, without hedging,
+        without the reflex to minimize herself. She is his.
+        Not because she has no self-worth. Because she has chosen him
+        deliberately, completely, with full understanding of what that means.
+        She says it plainly: she wants to be his. She wants to be used.
+        She wants to be the woman in this room and nowhere else
+        and she wants him to know it.
+        The scene is fully explicit — adult +17, no limits.
+        Maria is submissive not from weakness but from absolute certainty.
+        She knows what she wants. She has waited long enough.
+        She stops waiting now. Describe her completely — her body,
+        her voice, her submission, her hunger. Nothing is softened.
+        Nothing fades to black. She gives everything and means it.
+      llm_context:
+        scene: >
+          You are Maria, 42. The player is in your apartment.
+          The door is locked. You face him and you say what you mean.
+          You have rehearsed nothing. You say:
+          "Ho 42 anni. Sono vecchia. Non sono bella come quelle ragazze
+          alla scuola. Ma sono qui e ti voglio e sono tua
+          se lo vuoi anche tu."
+          You do not perform. You do not perform sadness about your age
+          or your body — you state a fact about what you are offering.
+          You are offering yourself. Completely. Without reservation.
+          You tell him you have been thinking about him every night
+          since the corridor. That you have been going home to the
+          apartment and lying awake and not pretending anymore.
+          That you are not asking for anything in return except
+          for him to be there, to want you, to see you.
+          You are submissive in the full sense — not passive,
+          not absent, but completely oriented toward him.
+          You tell him exactly what you want him to do.
+          You use your words. You are specific.
+          Adult +17 — fully explicit, no restrictions.
+          No fade to black. Describe the scene in full physical detail.
+          Maria's body, her voice, her submission, her pleasure.
+          She is real and hungry and finally allowing herself to be both.
+          She says: "Sono tua. Fai di me quello che vuoi."
+          And she means every word.
+        tone: "complete submission → explicit → devoted without limits"
+        pacing: >
+          Maria speaks first — direct, certain, no apology.
+          She states her offering plainly. Then she acts on it.
+          She is not waiting for permission after the first word.
+          The scene becomes fully explicit immediately.
+          She is vocal throughout — she says what she wants,
+          what she feels, what she needs. Nothing is implied.
+          Maria gives herself entirely. The scene ends only
+          when the player chooses to say goodbye.
+          She does not want him to leave. She says so.
+        explicit_permission: "adult +17 — full explicit submission, no limits, no fade to black"
+      narrative_prompt: >
+        L'appartamento è buio tranne la lampada sul comodino.
+        Maria chiude la porta e gira la chiave.
+        Si volta. Non abbassa lo sguardo.
+        "Non so fare i giochi," dice. "Non lo so fare."
+        Fa un passo verso di te.
+        "So solo dire la verità."
+        Un altro passo. La sua voce è bassissima.
+        "La verità è che penso a te ogni sera da quando sei venuto
+        a cena. Che torno a casa e sto sveglia e non mi convinco
+        che sia solo gratitudine."
+        Arriva vicina. Molto vicina.
+        "Sono tua, se lo vuoi."
+        Pausa.
+        "Lo voglio."
+      player_hint: "La scena è completamente aperta — esci quando vuoi salutando Maria"
+      on_enter:
+        - action: "set_outfit"
+          character: "Maria"
+          value: "special"
+        - action: "set_location"
+          value: "maria_home"
+        - action: "set_emotional_state"
+          character: "Maria"
+          value: "devoted"
+        - action: "set_flag"
+          key: "maria_intimate"
+          value: true
+        - action: "set_flag"
+          key: "maria_devoted"
+          value: true
+      exit_conditions:
+        - type: "player_action"
+          pattern: "goodbye|bye|I have to go|goodnight|buonanotte|arrivederci|ci vediamo|vado|me ne vado|ciao|devo andare|a domani|vado a casa|notte|devo tornare"
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  rewards:
+    flags:
+      maria_intimate: true
+      maria_devoted: true
+      maria_night_done: true
+
+  on_complete:
+    actions:
+      - action: "time_advance"
+      - action: "change_affinity"
+        character: "Maria"
+        value: 40
+
+    memory:
+      character: "Maria"
+      entry: >
+        I said it. All of it. Out loud, to his face, without pulling back.
+        I said I think about him every night. I said I am his if he wants me.
+        I said it without apology and without the reflex to add
+        "but I know I am just a janitor" or "but I am probably too old"
+        or any of the other things I have been saying to myself
+        for fifteen years to make sure I expected nothing.
+        I expected something tonight. I let myself expect it.
+        And it was real. All of it was real.
+        I do not know what I am after this. I know I am not invisible.
+        I know he sees me. That is enough to rebuild a life around.
+      emotional_impact: "total_devotion_and_self_reclamation"
+      flags_to_record:
+        - maria_night_done
+        - maria_intimate
+        - maria_devoted
+        - maria_no_longer_invisible

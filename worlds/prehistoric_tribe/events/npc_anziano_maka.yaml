@@ -1,0 +1,195 @@
+# ============================================================
+# EVENTS - Maka il Saggio
+# Anziano che svela segreti delle protagoniste
+# ============================================================
+
+quests:
+  maka_segreto_kara:
+    meta:
+      title: "Il Segreto della Sciamana"
+      description: "Maka vuole raccontarti qualcosa sul passato di Kara"
+      character: "maka_anziano"
+      hidden: true
+      priority: 6
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "affinity"
+          target: "Kara"
+          operator: "gte"
+          value: 30
+        - type: "turn_count"
+          operator: "gte"
+          value: 8
+
+    stages:
+      richiamo:
+        title: "Il Vecchio ti Chiama"
+        narrative_prompt: |
+          Maka il Saggio ti fa cenno dal suo solito posto vicino al fuoco.
+          "Siediti, giovane. Conosci la sciamana, ma non la conosci.
+          Lascia che ti racconti cosa era Kara prima di diventare quello che è."
+          I suoi occhi acquosi ti fissano con una precisione che smentisce l'età.
+        exit_conditions:
+          - type: "action"
+            pattern: "siedi|ascolta|avvicinati|vai"
+        transitions:
+          - condition: "default"
+            target_stage: "racconto"
+
+      racconto:
+        title: "La Storia di Kara"
+        narrative_prompt: |
+          Maka racconta lentamente, con molte pause:
+          Kara non è sempre stata sciamana. Era una ragazza come le altre,
+          aveva un compagno, aveva riso. Poi il suo compagno morì di malattia
+          in una notte di luna nera. Kara cercò Maka alle prime luci dell'alba
+          con gli occhi asciutti e una domanda: "Come si parla con i morti?"
+          Maka le insegnò. Non sapeva che quella sarebbe stata la sua rovina
+          — e la sua forza. Da allora Kara non ha più cercato di vivere
+          tra i vivi. Fino ad ora.
+          "Voi stranieri", dice Maka ridacchiando, "portate sempre casino."
+        on_enter:
+          - action: "set_flag"
+            target: "kara_backstory_known"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Kara: 8
+      flags:
+        maka_kara_secret_told: true
+
+  maka_segreto_naya:
+    meta:
+      title: "La Madre di Naya"
+      description: "Maka racconta chi era la madre di Naya e perché è morta"
+      character: "maka_anziano"
+      hidden: true
+      priority: 5
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "affinity"
+          target: "Naya"
+          operator: "gte"
+          value: 40
+        - type: "flag"
+          target: "maka_kara_secret_told"
+          value: true
+
+    stages:
+      inizio:
+        title: "Una Seconda Storia"
+        narrative_prompt: |
+          Maka ti trova di nuovo. Stavolta non aspetta che tu ti sieda —
+          inizia a parlare mentre camminate fianco a fianco nel villaggio.
+          "Hai visto come Naya non guarda mai verso nord? Non verso la giungla
+          — verso le colline a nord. Sai perché?"
+        exit_conditions:
+          - type: "action"
+            pattern: "no|perché|dimmi|racconta"
+        transitions:
+          - condition: "default"
+            target_stage: "storia_madre"
+
+      storia_madre:
+        title: "La Cacciatrice e le Colline"
+        narrative_prompt: |
+          La madre di Naya era la migliore cacciatrice che la tribù avesse mai avuto.
+          Un giorno inseguì una preda oltre le colline a nord — territorio dei Lupi Neri.
+          Non tornò. Il corpo fu trovato tre giorni dopo. Naya aveva sei anni.
+          Da allora, è cresciuta cercando di essere migliore di sua madre.
+          Non per onore — per rabbia. Per dimostrarle che avrebbe dovuto tornare.
+          Maka si ferma: "Quando la sfidi, non sfidi lei. Sfidi il fantasma
+          che porta sulle spalle da vent'anni."
+        on_enter:
+          - action: "set_flag"
+            target: "naya_backstory_known"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Naya: 10
+      flags:
+        maka_naya_secret_told: true
+
+  maka_segreto_zara:
+    meta:
+      title: "La Vera Zara"
+      description: "Maka svela perché Zara è così fredda con i pretendenti"
+      character: "maka_anziano"
+      hidden: true
+      priority: 5
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "affinity"
+          target: "Zara"
+          operator: "gte"
+          value: 35
+        - type: "flag"
+          target: "maka_naya_secret_told"
+          value: true
+
+    stages:
+      terza_storia:
+        title: "L'Ultima Storia di Maka"
+        narrative_prompt: |
+          Maka aspetta che tu sia solo la sera, poi si siede accanto a te
+          senza essere invitato. "Ne ho una ultima. Poi ho finito di raccontare."
+          Sorride senza denti. "Hai mai chiesto a Zara quante volte ha detto sì
+          a un pretendente?"
+        exit_conditions:
+          - type: "action"
+            pattern: "mai|no|quante|racconta"
+        transitions:
+          - condition: "default"
+            target_stage: "storia_zara"
+
+      storia_zara:
+        title: "La Prima Volta che Zara disse Sì"
+        narrative_prompt: |
+          Una volta sola. Tre anni fa. Un guerriero di una tribù alleata —
+          bello, coraggioso, sicuro di sé. Zara aveva abbassato la guardia.
+          Il guerriero era stato scelto dal padre come futuro compagno per
+          ragioni politiche, non perché lei lo avesse scelto.
+          La notte in cui aveva smesso di resistere, il guerriero aveva riso
+          con i suoi compagni e descritto l'incontro ad alta voce.
+          Zara lo aveva sentito.
+          Da allora, nessuno la tocca. Nessuno la avvicina.
+          Maka ti guarda: "Non difende un trono, giovane. Difende se stessa."
+        on_enter:
+          - action: "set_flag"
+            target: "zara_backstory_known"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Zara: 12
+      flags:
+        maka_zara_secret_told: true

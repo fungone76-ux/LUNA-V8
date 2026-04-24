@@ -11,6 +11,7 @@ Improvements over V4:
 from __future__ import annotations
 
 import logging
+import random
 import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
@@ -147,6 +148,17 @@ class ConditionEvaluator:
             player_input = gs.flags.get("_last_player_input", "")
             return bool(player_input and _re.search(pattern, player_input, _re.IGNORECASE))
 
+        if t == "days_since_flag":
+            flag_name = c.flag or c.target
+            if not flag_name:
+                return False
+            ts = gs.flags.get(f"_flag_ts_{flag_name}")
+            if ts is None:
+                return False
+            turns_elapsed = gs.turn_count - int(ts)
+            days_elapsed = turns_elapsed / 4  # 4 time phases = 1 game day
+            return self._compare(days_elapsed, c.operator, self._int(c.value))
+
         logger.warning("Unknown condition type: %s", t)
         return False
 
@@ -258,8 +270,10 @@ class QuestEngine:
         char   = action.character if hasattr(action, "character") else action.get("character")
 
         if act == "set_flag":
-            game_state.flags[key or str(target)] = value if value is not None else True
-            logger.debug("[QuestAction] set_flag %s = %s", key, value)
+            flag_key = key or str(target)
+            game_state.flags[flag_key] = value if value is not None else True
+            game_state.flags[f"_flag_ts_{flag_key}"] = game_state.turn_count
+            logger.debug("[QuestAction] set_flag %s = %s", flag_key, value)
 
         elif act == "add_flag":
             existing = game_state.flags.get(key, [])
@@ -268,10 +282,11 @@ class QuestEngine:
             game_state.flags[key] = existing
 
         elif act == "set_location":
-            if target and target in (getattr(engine, "world", None) and engine.world.locations or {}):
-                game_state.current_location = target
-                logger.info("[QuestAction] set_location → %s", target)
-                return [f"[Scene moves to: {target}]"]
+            destination = target or value  # accept both keys
+            if destination:
+                game_state.current_location = str(destination)
+                logger.info("[QuestAction] set_location → %s", destination)
+                return [f"[Scene moves to: {destination}]"]
 
         elif act == "set_outfit":
             companion = char or game_state.active_companion
@@ -315,6 +330,19 @@ class QuestEngine:
             game_state.affinity[companion] = max(0, min(100, current + delta))
             logger.info("[QuestAction] change_affinity %s %+d", companion, delta)
 
+        elif act == "set_affinity":
+            # Set affinity to an absolute value, ignoring current level
+            companion_raw = char or game_state.active_companion
+            companion = companion_raw
+            if engine:
+                companions = getattr(getattr(engine, "world", None), "companions", {})
+                lower = companion_raw.lower().strip()
+                companion = next((k for k in companions if k.lower() == lower), companion_raw)
+            new_val = max(0, min(100, int(value))) if value is not None else 0
+            old_val = game_state.affinity.get(companion, 0)
+            game_state.affinity[companion] = new_val
+            logger.info("[QuestAction] set_affinity %s: %d → %d", companion, old_val, new_val)
+
         elif act == "start_quest":
             qid = key or str(value)
             quest_def = self.world.quests.get(qid)
@@ -337,6 +365,7 @@ class QuestEngine:
 
         elif act == "clear_secondary_npc":
             game_state.flags.pop("_secondary_npc", None)
+            game_state.flags.pop("_active_npc_speaker", None)
             game_state.flags["_scene_mode"] = "single_char"
             logger.info("[QuestAction] clear_secondary_npc")
 
@@ -390,9 +419,15 @@ class QuestEngine:
         # 3. Check new activations (sorted by priority)
         eligible = self._find_eligible_quests(game_state, user_input)
         for quest_def in eligible:
-            result = self._activate_quest(quest_def, game_state)
-            if result:
-                new_activations.append(result)
+            if quest_def.background:
+                self._queue_background_quest(quest_def, game_state)
+            else:
+                result = self._activate_quest(quest_def, game_state)
+                if result:
+                    new_activations.append(result)
+
+        # 3b. Surface a background quest if the player explicitly engages
+        self._check_background_engagement(user_input, game_state, new_activations)
 
         # 4. Build narrative context + companion situation override
         narrative_ctx, situation_override = self._build_context(game_state)
@@ -449,6 +484,12 @@ class QuestEngine:
             companion self-aware of their quest-driven role (e.g. gym substitute).
             Only the first active quest with companion_situation wins.
         """
+        active = game_state.active_companion
+        current_time = (
+            game_state.time_of_day.value
+            if hasattr(game_state.time_of_day, "value")
+            else str(game_state.time_of_day)
+        )
         parts: List[str] = []
         situation_override = ""
         for quest_id in game_state.active_quests:
@@ -456,9 +497,17 @@ class QuestEngine:
             quest_def = self.world.quests.get(quest_id)
             if not instance or not quest_def:
                 continue
+            # Skip companion-specific quests when the companion is not active
+            if quest_def.character and quest_def.character != active:
+                continue
             stage_id = instance.current_stage_id or quest_def.start_stage
             stage = quest_def.stages.get(stage_id)
             if not stage:
+                continue
+            # Do not inject off-context quest instructions into the LLM prompt.
+            if stage.location and game_state.current_location != stage.location:
+                continue
+            if stage.time and current_time not in stage.time:
                 continue
             if stage.narrative_prompt:
                 parts.append(f"[Quest: {quest_def.title}] {stage.narrative_prompt}")
@@ -489,11 +538,14 @@ class QuestEngine:
     def _find_eligible_quests(
         self, game_state: GameState, user_input: str
     ) -> List[QuestDefinition]:
-        """Find quests eligible for activation, sorted by priority."""
-        # One quest at a time: don't activate new quests while one is active
-        if game_state.active_quests:
-            return []
+        """Find quests eligible for activation, sorted by priority.
 
+        Background quests (background=True) bypass the one-at-a-time limit and
+        are returned even when active_quests is non-empty — they will be queued
+        silently instead of being activated immediately.
+        """
+        has_active = bool(game_state.active_quests)
+        bg_pending: list = game_state.flags.get("_bg_pending", [])
         eligible = []
         active_mutex_groups = self._get_active_mutex_groups(game_state)
 
@@ -503,17 +555,136 @@ class QuestEngine:
 
             if status not in (QuestStatus.NOT_STARTED,):
                 continue
+            # Skip if already queued in background pending list
+            if quest_id in bg_pending:
+                continue
             if quest_def.activation_type == "manual":
+                continue
+            # Foreground quests: one at a time.  Background quests: always eligible.
+            if has_active and not quest_def.background:
                 continue
             if quest_def.mutex_group and quest_def.mutex_group in active_mutex_groups:
                 continue
             if not self._required_quests_done(quest_def, game_state):
                 continue
-            if self._evaluator.evaluate_all(quest_def.activation_conditions, game_state, user_input):
-                eligible.append(quest_def)
+
+            # Cooldown check (applies to all activation types for background quests)
+            cooldown_key = f"_cooldown_{quest_id}"
+            if game_state.flags.get(cooldown_key, 0) > game_state.turn_count:
+                continue
+
+            # Dispatcher per activation_type
+            if quest_def.activation_type == "event":
+                if quest_def.trigger_event and not game_state.flags.get(quest_def.trigger_event):
+                    continue
+                if not self._evaluator.evaluate_all(quest_def.activation_conditions, game_state, user_input):
+                    continue
+
+            elif quest_def.activation_type == "random":
+                if quest_def.allowed_times:
+                    current_time = game_state.time_of_day.value if hasattr(game_state.time_of_day, "value") else str(game_state.time_of_day)
+                    if current_time not in quest_def.allowed_times:
+                        continue
+                if quest_def.probability > 0 and random.random() >= quest_def.probability:
+                    continue
+                if not self._evaluator.evaluate_all(quest_def.activation_conditions, game_state, user_input):
+                    continue
+
+            elif quest_def.activation_type in ("time_since_flag", "location_pass",
+                                               "companion_initiative", "auto", "trigger", "choice"):
+                if quest_def.allowed_times:
+                    current_time = game_state.time_of_day.value if hasattr(game_state.time_of_day, "value") else str(game_state.time_of_day)
+                    if current_time not in quest_def.allowed_times:
+                        continue
+                if quest_def.probability > 0 and random.random() >= quest_def.probability:
+                    continue
+                if not self._evaluator.evaluate_all(quest_def.activation_conditions, game_state, user_input):
+                    continue
+
+            else:
+                if not self._evaluator.evaluate_all(quest_def.activation_conditions, game_state, user_input):
+                    continue
+
+            # Foreground quests: don't activate if start stage requires a location
+            # the player isn't at yet.  Background quests: queue regardless of location
+            # (engagement check will happen at the right moment).
+            if not quest_def.background:
+                start_stage = quest_def.stages.get(quest_def.start_stage)
+                if start_stage and start_stage.location:
+                    if game_state.current_location != start_stage.location:
+                        continue
+
+            eligible.append(quest_def)
 
         eligible.sort(key=lambda q: q.priority)
         return eligible
+
+    # -------------------------------------------------------------------------
+    # Background quest helpers
+    # -------------------------------------------------------------------------
+
+    def _queue_background_quest(
+        self, quest_def: QuestDefinition, game_state: GameState
+    ) -> None:
+        """Add a background quest to the pending engagement queue (silently)."""
+        bg_pending: list = list(game_state.flags.get("_bg_pending", []))
+        if quest_def.id in bg_pending:
+            return
+        bg_pending.append(quest_def.id)
+        game_state.flags["_bg_pending"] = bg_pending
+        # Preemptively set cooldown so conditions can't re-queue immediately
+        if quest_def.cooldown_turns > 0:
+            game_state.flags[f"_cooldown_{quest_def.id}"] = (
+                game_state.turn_count + quest_def.cooldown_turns
+            )
+        logger.info("[QuestEngine] Background quest '%s' queued (silent)", quest_def.id)
+
+    def _check_background_engagement(
+        self,
+        user_input: str,
+        game_state: GameState,
+        new_activations: List[QuestActivationResult],
+    ) -> None:
+        """Surface a background quest when the player explicitly engages."""
+        if not user_input:
+            return
+        bg_pending: list = game_state.flags.get("_bg_pending", [])
+        if not bg_pending:
+            return
+        # Only surface one quest per turn; don't interrupt an active quest
+        if game_state.active_quests:
+            return
+
+        for quest_id in list(bg_pending):
+            quest_def = self.world.quests.get(quest_id)
+            if not quest_def or not quest_def.engage_pattern:
+                continue
+
+            # Surface background quests only when their start stage is context-valid.
+            start_stage = quest_def.stages.get(quest_def.start_stage)
+            if start_stage:
+                if start_stage.location and game_state.current_location != start_stage.location:
+                    continue
+                if start_stage.time:
+                    current_time = (
+                        game_state.time_of_day.value
+                        if hasattr(game_state.time_of_day, "value")
+                        else str(game_state.time_of_day)
+                    )
+                    if current_time not in start_stage.time:
+                        continue
+
+            if re.search(quest_def.engage_pattern, user_input, re.IGNORECASE):
+                game_state.flags["_bg_pending"] = [
+                    q for q in bg_pending if q != quest_id
+                ]
+                result = self._activate_quest(quest_def, game_state)
+                if result:
+                    new_activations.append(result)
+                logger.info(
+                    "[QuestEngine] Background quest '%s' surfaced by player input", quest_id
+                )
+                break  # one at a time
 
     def _activate_quest(
         self, quest_def: QuestDefinition, game_state: GameState
@@ -550,6 +721,8 @@ class QuestEngine:
             start_stage = quest_def.stages.get(quest_def.start_stage)
             if start_stage and start_stage.on_enter:
                 self.execute_actions(start_stage.on_enter, game_state, self._engine)
+            if start_stage and start_stage.auto_open:
+                game_state.flags["_quest_auto_open"] = True
             return QuestActivationResult(
                 quest_id=quest_id,
                 title=quest_def.title,
@@ -584,6 +757,28 @@ class QuestEngine:
             logger.info("Quest '%s' stage '%s' fail conditions met", quest_id, stage_id)
             return self._fail_quest(quest_id, instance, quest_def, stage_id, game_state)
 
+        # Location-based exits bypass the location gate: if the exit condition IS
+        # a location check, the player has already moved there — evaluate first.
+        has_location_exit = stage.exit_conditions and any(
+            getattr(c, "type", "") == "location" for c in stage.exit_conditions
+        )
+        if has_location_exit:
+            if self._evaluator.evaluate_all(stage.exit_conditions, game_state, user_input):
+                return self._advance_stage(quest_id, instance, quest_def, stage_id, game_state)
+            return None
+
+        # Gate: don't advance if stage location/time constraints are not met
+        if stage.location and game_state.current_location != stage.location:
+            return None
+        if stage.time:
+            current_time = (
+                game_state.time_of_day.value
+                if hasattr(game_state.time_of_day, "value")
+                else str(game_state.time_of_day)
+            )
+            if current_time not in stage.time:
+                return None
+
         # Check exit conditions
         if self._evaluator.evaluate_all(stage.exit_conditions, game_state, user_input):
             return self._advance_stage(quest_id, instance, quest_def, stage_id, game_state)
@@ -604,17 +799,42 @@ class QuestEngine:
 
         if current_idx == -1 or current_idx >= len(stages) - 1:
             # Complete quest
-            instance.status = QuestStatus.COMPLETED
-            instance.completed_at = game_state.turn_count
             if quest_id in game_state.active_quests:
                 game_state.active_quests.remove(quest_id)
-            if quest_id not in game_state.completed_quests:
-                game_state.completed_quests.append(quest_id)
             self._apply_rewards(quest_def, game_state)
             if quest_def.on_complete:
                 self.execute_actions(quest_def.on_complete, game_state, self._engine)
                 logger.info("[QuestEngine] on_complete for '%s': %d actions", quest_id, len(quest_def.on_complete))
-            logger.info("Quest '%s' completed", quest_id)
+            if quest_def.on_complete_memory:
+                mem = quest_def.on_complete_memory
+                flags_to_record = mem.get("flags_to_record") or []
+                if isinstance(flags_to_record, list):
+                    for flag_key in flags_to_record:
+                        game_state.flags[str(flag_key)] = True
+                elif isinstance(flags_to_record, dict):
+                    for flag_key, flag_val in flags_to_record.items():
+                        game_state.flags[flag_key] = flag_val
+                character = mem.get("character", "")
+                entry = mem.get("entry", "")
+                if character and entry:
+                    game_state.flags[f"_pending_npc_memory_{character}"] = {
+                        "entry": entry,
+                        "emotional_impact": mem.get("emotional_impact", "neutral"),
+                    }
+                    logger.info("[QuestEngine] on_complete_memory queued for '%s'", character)
+            if quest_def.once:
+                instance.status = QuestStatus.COMPLETED
+                instance.completed_at = game_state.turn_count
+                if quest_id not in game_state.completed_quests:
+                    game_state.completed_quests.append(quest_id)
+            else:
+                # Repeatable: reset to NOT_STARTED, apply cooldown
+                instance.status = QuestStatus.NOT_STARTED
+                instance.current_stage_id = None
+                instance.completed_at = None
+                if quest_def.cooldown_turns > 0:
+                    game_state.flags[f"_cooldown_{quest_id}"] = game_state.turn_count + quest_def.cooldown_turns
+            logger.info("Quest '%s' completed (once=%s)", quest_id, quest_def.once)
             return QuestUpdateResult(
                 quest_id=quest_id,
                 quest_completed=True,
@@ -632,8 +852,10 @@ class QuestEngine:
                 action_hints = self.execute_actions(
                     next_stage.on_enter, game_state, self._engine
                 )
-                logger.info("[QuestEngine] on_enter for stage '%s': %d actions", 
+                logger.info("[QuestEngine] on_enter for stage '%s': %d actions",
                             next_stage_id, len(next_stage.on_enter))
+            if next_stage and next_stage.auto_open:
+                game_state.flags["_quest_auto_open"] = True
             return QuestUpdateResult(
                 quest_id=quest_id,
                 stage_changed=True,

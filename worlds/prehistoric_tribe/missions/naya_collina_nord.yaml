@@ -1,0 +1,181 @@
+# ============================================================
+# MISSION - Naya: La Collina a Nord
+# Missione sul passato della madre e la notte di guardia
+# Prerequisito: naya_prova_selva completata + naya_night_ritual_known
+# ============================================================
+
+quests:
+  naya_collina_nord:
+    meta:
+      title: "Le Colline a Nord"
+      description: "Seguire Naya nella sua notte solitaria alle colline dove è morta sua madre"
+      character: "Naya"
+      hidden: true
+      priority: 7
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "affinity"
+          target: "Naya"
+          operator: "gte"
+          value: 50
+        - type: "flag"
+          target: "naya_night_ritual_known"
+          value: true
+        - type: "flag"
+          target: "prova_selva_passata"
+          value: true
+
+    stages:
+      seguire:
+        title: "Seguire Naya nel Buio"
+        narrative_prompt: |
+          Notte. Naya lascia il villaggio senza fare rumore.
+          Sai dove va — Orla te l'ha detto.
+          La decisione è tua: la segui o la lasci andare sola come ha sempre fatto?
+          Se la segui, lo fa sapendo che potrebbe sentirti arrivare.
+          Naya sente sempre tutto.
+        exit_conditions:
+          - type: "action"
+            pattern: "segui|vado|la seguo|sì"
+        transitions:
+          - condition: "default"
+            target_stage: "scoperta"
+
+      scoperta:
+        title: "Ti Ha Sentito"
+        narrative_prompt: |
+          Naturalmente ti ha sentito. È Naya — sente i predatori prima che ululino.
+          Si volta sulla roccia più alta, lancia in pugno, espressione che di solito
+          significa "torna al villaggio".
+          Ma non dice "torna al villaggio".
+          Ti guarda un lungo momento. Poi si sposta di mezzo passo sulla roccia —
+          abbastanza spazio perché ci siano in due.
+          Non è un invito esplicito. Ma è tutto quello che Naya sa fare di invito esplicito.
+        exit_conditions:
+          - type: "action"
+            pattern: "siedi|mi siedo|sì|resto|affianco"
+        transitions:
+          - condition: "default"
+            target_stage: "notte_insieme"
+
+      notte_insieme:
+        title: "La Notte in Guardia"
+        narrative_prompt: |
+          State seduti sulla roccia. Il villaggio si vede lontano, fuochi piccoli come braci.
+          Al nord, le colline dove Naya non ha mai trovato risposta.
+          Non parla per un pezzo. Poi, senza guardare: "Anche lei veniva qui.
+          Non a guardia. A pensare. Diceva che le colline ascoltano."
+          Pausa. "Non ascoltano. Ho aspettato vent'anni. Sono solo colline."
+          Silenzio. "Ma vengo lo stesso."
+          È la cosa più lunga che abbia mai detto in una volta sola su sua madre.
+        on_enter:
+          - action: "set_flag"
+            target: "naya_shared_vigil"
+            value: true
+          - action: "set_emotional_state"
+            character: "Naya"
+            value: "impressed"
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 4
+        transitions:
+          - condition: "default"
+            target_stage: "alba"
+
+      alba:
+        title: "L'Alba delle Colline"
+        narrative_prompt: |
+          Il sole sorge sulle colline a nord. Naya lo guarda con un'espressione
+          che non le hai mai visto prima — non è durezza, non è sfida.
+          È qualcosa di più semplice che non sa ancora come si chiama.
+          Si alza. "Non dirlo in giro", dice. Il solito tono. Ma aggiunge,
+          quasi tra sé: "Anche tu sai stare in silenzio. Non è poco."
+          Per Naya, è quasi una dichiarazione.
+        on_enter:
+          - action: "change_affinity"
+            character: "Naya"
+            value: 20
+          - action: "set_flag"
+            target: "naya_vigil_complete"
+            value: true
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Naya: 25
+      flags:
+        naya_north_hills_complete: true
+
+  naya_sfida_rena:
+    meta:
+      title: "Il Problema di Rena"
+      description: "Rena, la fan di Naya, è diventata un problema — gelosia esplicita"
+      character: "Naya"
+      hidden: true
+      priority: 5
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "affinity"
+          target: "Naya"
+          operator: "gte"
+          value: 60
+        - type: "flag"
+          target: "naya_vigil_complete"
+          value: true
+
+    stages:
+      rena_blocca:
+        title: "Rena ti Blocca"
+        narrative_prompt: |
+          Rena — la giovane cacciatrice che segue Naya ovunque — ti blocca
+          la strada con un'espressione che ha imparato da Naya
+          ma non le sta altrettanto bene.
+          "Stai prendendo troppo spazio nel tempo di Naya."
+          Non è una domanda. È una valutazione.
+          "Naya non ha bisogno di distrazione. Naya ha bisogno di qualcuno
+          che la segua. Io la seguo. Tu cosa fai?"
+        exit_conditions:
+          - type: "action"
+            pattern: "rispondo|parla|cosa|perché|rena|spiego"
+        transitions:
+          - condition: "default"
+            target_stage: "naya_interviene"
+
+      naya_interviene:
+        title: "Naya Interviene"
+        narrative_prompt: |
+          Naya compare dal nulla — o forse era già lì ad ascoltare.
+          Guarda Rena. La guarda un lungo secondo. Poi: "Rena."
+          Solo il nome, con quel tono. Rena si irrigidisce.
+          "Il forestiero non è una distrazione. È una prova."
+          Guarda te. "Come tutte le prove, passa o fallisce da solo."
+          Rena ammutolisce. Naya non spiega oltre — non è nel suo stile.
+          Ma ha detto la cosa importante: la tua presenza è legittima.
+          Per lei.
+        on_enter:
+          - action: "set_flag"
+            target: "rena_conflict_resolved"
+            value: true
+          - action: "change_affinity"
+            character: "Naya"
+            value: 8
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Naya: 10
+      flags:
+        naya_rena_arc_complete: true

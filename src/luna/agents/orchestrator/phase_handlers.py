@@ -104,104 +104,6 @@ class PhaseHandlersMixin:
             except Exception as e:
                 logger.warning("[Orchestrator] Situational intervention failed: %s", e)
 
-        # ── Step 0.6: NPC Goal Evaluator ──────────────────────────────────────
-        # Evaluate NPC goals and generate action hints for the UI widget
-        if self.engine.npc_goal_evaluator:
-            try:
-                # Check for completed goals first
-                completed = self.engine.npc_goal_evaluator.check_completions(game_state)
-                for npc_id in completed:
-                    logger.info("[Orchestrator] NPC goal completed: %s", npc_id)
-
-                # Evaluate new goals (max 1 hint per turn)
-                # Block if a MultiNPC sequence is already running
-                if game_state.flags.get("_multi_npc_in_progress"):
-                    goal_hint = None
-                else:
-                    goal_hint = self.engine.npc_goal_evaluator.evaluate(game_state)
-                if goal_hint:
-                    logger.info(
-                        "[Orchestrator] NPC Goal: %s (%s, urgency=%.1f)",
-                        goal_hint.npc_display_name,
-                        goal_hint.initiative_style,
-                        goal_hint.urgency,
-                    )
-                    ctx.npc_goal_hint = goal_hint
-
-                    # Add to active actions set
-                    if goal_hint.npc_id not in game_state.active_npc_actions:
-                        game_state.active_npc_actions.add(goal_hint.npc_id)
-
-                    # INVECE DI METTERE IN CODA PER IL TURNO AUTONOMO,
-                    # INVIAMO UN MESSAGGIO ASINCRONO (Metodo 2: Comunicazione Asincrona)
-                    # Stili che generano messaggi: friendly (Luna/Stella → SMS),
-                    # phone_message, message, official_summons (Preside → nota formale)
-                    # secret_keeper: pull-only, non genera messaggi autonomi
-                    _MSG_STYLES = ('official_summons', 'message', 'friendly', 'phone_message')
-                    if goal_hint.initiative_style in _MSG_STYLES:
-                        # Se il giocatore è già nella stessa location dell'NPC →
-                        # il goal viene gestito organicamente dalla scena, non serve messaggio
-                        npc_loc = game_state.npc_locations.get(goal_hint.npc_id)
-                        player_loc = game_state.current_location
-                        already_present = (npc_loc and npc_loc == player_loc)
-
-                        if not already_present:
-                            try:
-                                from luna.systems.npc_message_system import NpcMessage
-
-                                # Canale e formato dipendono dallo stile
-                                if goal_hint.initiative_style == 'official_summons':
-                                    channel = "official"
-                                    icon = "📄"
-                                    label = f"CONVOCAZIONE — {goal_hint.npc_display_name}"
-                                elif goal_hint.initiative_style in ('friendly', 'phone_message'):
-                                    channel = "sms"
-                                    icon = "📱"
-                                    label = goal_hint.npc_display_name
-                                else:
-                                    channel = "sms"
-                                    icon = "📱"
-                                    label = goal_hint.npc_display_name
-
-                                msg = NpcMessage(
-                                    sender_id=goal_hint.npc_id,
-                                    text=goal_hint.goal_text,
-                                    turn_received=game_state.turn_count,
-                                    is_read=False,
-                                    urgency=goal_hint.urgency,
-                                    channel=channel,
-                                    valid_until_turn=(
-                                        game_state.turn_count + 15
-                                        if channel == "official"
-                                        else game_state.turn_count + 20
-                                    ),
-                                )
-                                # Invia alla UI tramite display_manager
-                                dm = getattr(self.engine, 'display_manager', None)
-                                if dm and hasattr(dm, '_display_npc_message'):
-                                    dm._display_npc_message(msg)
-                                elif getattr(self.engine, '_ui_intermediate_message_callback', None):
-                                    import asyncio
-                                    asyncio.ensure_future(
-                                        self.engine._ui_intermediate_message_callback(
-                                            f"{icon} {label}: {goal_hint.goal_text}",
-                                            "System", game_state.turn_count, "", []
-                                        )
-                                    )
-                                logger.info(
-                                    "[MessageSystem] Delivered %s msg from %s",
-                                    channel, goal_hint.npc_id
-                                )
-                            except Exception as e:
-                                logger.error("[MessageSystem] Failed to deliver: %s", e)
-                        else:
-                            logger.debug(
-                                "[MessageSystem] %s already present with player — "
-                                "goal handled organically", goal_hint.npc_id
-                            )
-            except Exception as e:
-                logger.warning("[Orchestrator] NPC Goal Evaluator failed: %s", e)
-
         # ── Step 0.7: InitiativeAgent ─────────────────────────────────────────
         if self._initiative_agent:
             try:
@@ -274,7 +176,7 @@ class PhaseHandlersMixin:
             ctx.directive_summary = ctx.directive.to_summary()
 
         # ── Step 2.7: TensionTracker tick ─────────────────────────────────────
-        if self.engine.tension_tracker:
+        if self.engine.tension_tracker and not game_state.active_quests:
             try:
                 triggered_events = self.engine.tension_tracker.tick(
                     game_state, game_state.turn_count
@@ -331,7 +233,7 @@ class PhaseHandlersMixin:
 
         # ── Step 0.4: PresenceTracker ─────────────────────────────────────────
         present_npcs: list = []
-        if self.engine.multi_npc_manager:
+        if self.engine.multi_npc_manager and not game_state.active_quests:
             try:
                 present_npcs = self.engine.multi_npc_manager.get_present_npcs(
                     game_state.active_companion, game_state
@@ -383,37 +285,16 @@ class PhaseHandlersMixin:
         if ctx.gm_agenda_context:
             ctx.context["gm_agenda_context"] = ctx.gm_agenda_context
 
-        # Inject NPC secret hint — if an NPC has a pending secret and player is there
-        if getattr(ctx, "npc_goal_hint", None):
-            h = ctx.npc_goal_hint
-            if h.initiative_style == "secret_keeper" and h.secret_subject:
-                ctx.context["npc_secret_hint"] = (
-                    f"NOTA NARRATORE: {h.npc_display_name} ha un segreto da rivelare. "
-                    f"Tema: {h.secret_subject}. "
-                    f"Se il giocatore chiede o l'occasione si presenta, "
-                    f"inventa un segreto specifico, esplicito e molto compromettente "
-                    f"coerente con il tema. Stile adult hard, nessuna censura."
-                )
-            elif h.initiative_style in ("friendly", "authority"):
-                ctx.context["npc_secret_hint"] = (
-                    f"NOTA NARRATORE: {h.npc_display_name} vuole {h.goal_text}."
-                )
-
         # ── Inject active authority scene context ─────────────────────────────
-        # After an authority NPC initiative turn OR a normal turn with the NPC,
-        # the narrative engine must know the NPC was/is present.
-        # Context persists until 2 turns after the NPC leaves active_npc_actions.
         active_auth = getattr(self.engine, '_active_authority_scene', None)
         if active_auth:
-            npc_id       = active_auth["npc_id"]
-            expires_at   = active_auth.get("expires_at_turn", 0)
-            still_active = npc_id in game_state.active_npc_actions
+            npc_id     = active_auth["npc_id"]
+            expires_at = active_auth.get("expires_at_turn", 0)
+            still_active = game_state.turn_count <= expires_at
 
-            if still_active or game_state.turn_count <= expires_at:
+            if still_active:
                 presence = (
-                    "È FISICAMENTE PRESENTE nella stanza"
-                    if still_active
-                    else "ERA PRESENTE poco fa e ha appena lasciato la stanza"
+                    "ERA PRESENTE poco fa e ha appena lasciato la stanza"
                 )
                 loc_desc = active_auth.get("npc_location_desc", "")
                 ctx.context["active_authority_scene"] = (
@@ -452,6 +333,8 @@ class PhaseHandlersMixin:
         ctx.multi_npc = await self._run_multi_npc(ctx)
 
         # ── Step 6: NarrativeEngine LLM call ─────────────────────────────────
+        if game_state.flags.pop("_quest_auto_open", False):
+            ctx.text = "[Scene begins. The companion speaks first, unprompted, setting the scene and mood.]"
         if not ctx.multi_npc.skip_standard_llm:
             ctx.narrative = await self._narrative.generate(
                 user_input=ctx.text,
@@ -699,9 +582,6 @@ class PhaseHandlersMixin:
             multi_npc_sequence=multi_npc_data,
             multi_npc_image_paths=multi_npc_image_paths,
             was_interrupted=was_interrupted,
-            npc_action=self.engine.npc_goal_evaluator.create_npc_action(ctx.npc_goal_hint)
-                if getattr(ctx, "npc_goal_hint", None) and self.engine.npc_goal_evaluator
-                else None,
         )
 
         # ── GlobalEvent payload ───────────────────────────────────────────────

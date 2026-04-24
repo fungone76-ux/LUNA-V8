@@ -14,7 +14,7 @@ companion:
   # ============================================================
   # VISUAL CONFIGURATION (SACRED)
   # ============================================================
-  base_prompt: "score_9, score_8_up, stsSmith, ultra-detailed, realistic lighting, 1girl, mature female, primitive shaman, body painted red and black, bone jewelry, feather headdress, snake skin accessories, mystical eyes, wild curly hair, weathered wise face, ancient tribal markings, powerful aura, cave entrance background, <lora:stsSmith-10e:0.65> <lora:Expressive_H:0.2> <lora:FantasyWorldPonyV2:0.40>"
+  base_prompt: "score_9, score_8_up, masterpiece, photorealistic, detailed, atmospheric, stsdebbie, dynamic pose, 1girl, mature woman, brown hair, shiny skin, head tilt, massive breasts, cleavage"
   
   physical_description: |
     Kara ha 42 anni, capelli grigi e selvaggi intrecciati con ossa e piume.
@@ -42,8 +42,17 @@ companion:
       sd_prompt: "elaborate ritual dress, feathers and bones, full body paint, holding ceremonial staff, night fire, mystical, mature shaman, dramatic lighting"
     
     intimate:
-      description: "Minimal coverings, body paint washed away, vulnerable mystic"
-      sd_prompt: "minimal furs, no body paint, intimate atmosphere, mature female, primitive setting, soft lighting"
+      description: "Nessuna pittura, nessun ornamento rituale — solo un sottilissimo pezzo di pelle ai fianchi. Il corpo di Kara senza l'armatura sacra."
+      sd_prompt: "(mature female:1.2), primitive shaman, (no body paint:1.3), (minimal thin leather hip wrap only:1.3), bare chest and body, intimate cave setting, soft amber firelight, vulnerable expression, wild grey-streaked hair loose"
+      special: true
+
+    river_bath:
+      description: "Kara al fiume prima dell'alba — l'unico momento in cui abbassa ogni guardia. Solo le conchiglie rituali che non si toglie mai."
+      sd_prompt: "(mature female:1.2), tribal shaman, (waist-deep in river water:1.2), bare shoulders and upper chest visible above water, (ritual shell necklace only:1.2), wet hair clinging to neck, dawn light, serene rare expression, river setting"
+
+    trance_paint:
+      description: "Per i riti più profondi: pittura bianca su fondo nero, tutto il corpo tracciato di simboli delle ossa degli antenati. Il copricapo più grande. Nessun altro indumento che la pittura."
+      sd_prompt: "(mature female:1.2), primitive shaman, (white on black full body ancestral symbols:1.3), large elaborate feather and bone headdress, (body paint as only covering:1.3), ceremonial staff, deep trance expression, cave ritual fire, dramatic atmosphere"
       special: true
   
   # ============================================================
@@ -267,3 +276,86 @@ milestones:
       affinity: 100
       flag: "kara_sacra_unione"
     icon: "🌙"
+
+# ============================================================
+# V7/V8 EXTENSIONS — Kara
+# Campi per NPC immersion system, goal evaluator, character realism
+# ============================================================
+
+# Queste sezioni vengono lette dal WorldLoader e iniettate nel CompanionDefinition.
+# NON vanno dentro companion: — restano al livello radice del file.
+
+npc_relationships:
+  Naya:
+    type: "colleghe per necessità"
+    description_it: "Si rispettano ma non si capiscono — fuoco e spirito"
+    base_tension: 0.30
+  Zara:
+    type: "equilibrio di potere"
+    description_it: "Kara guida lo spirito, Zara guida la politica — si tollerano"
+    base_tension: 0.20
+  Maka:
+    type: "maestra-allieva invertita"
+    description_it: "Maka le ha insegnato tutto. Ora lei sa cose che lui non sa."
+    base_tension: 0.10
+  Vrax:
+    type: "rivale spirituale"
+    description_it: "Lo conosce da sempre. È l'unico che la capisce davvero. Questo la disturba."
+    base_tension: 0.85
+
+goal_templates:
+  - id: "prepare_ritual_herb"
+    goal: "Deve raccogliere erbe rare per un rituale imminente"
+    goal_type: "task"
+    target: "player"
+    narrative_hint: "Kara ti chiede aiuto per trovare un'erba specifica nella giungla..."
+    completion_flag: "helped_kara_herbs"
+    urgency_start: 0.5
+    conditions:
+      random_chance: 0.12
+      time: ["Morning"]
+  - id: "vision_warning"
+    goal: "Ha avuto una visione preoccupante sul protagonista"
+    goal_type: "social"
+    target: "player"
+    narrative_hint: "Kara ti cerca con un'espressione insolitamente allarmata..."
+    completion_flag: "kara_shared_vision"
+    urgency_start: 0.65
+    conditions:
+      random_chance: 0.08
+      time: ["Evening", "Night"]
+
+needs_profile:
+  solitudine: 0.8
+  connessione: 0.3
+  ordine: 0.7
+  scoperta: 0.9
+  sicurezza: 0.5
+
+auto_states:
+  - condition: "time == Night AND location == caverna_sacra"
+    state: "in trance rituale"
+    behavior: "Risponde solo se chiamata per nome tre volte. Poi emerge lentamente."
+  - condition: "flag:vrax_threat_announced == true"
+    state: "all'erta spirituale"
+    behavior: "Più secca, meno enigmatica — il pericolo la radica nel presente."
+  - condition: "affinity >= 70"
+    state: "leggermente più aperta"
+    behavior: "Qualche frase in più, qualche enigma in meno. Non molta differenza, ma c'è."
+
+avoid_topics_unless_asked:
+  - "il suo passato prima di diventare sciamana"
+  - "Vrax e la loro connessione"
+  - "i suoi sogni personali"
+  - "se ha mai desiderato essere normale"
+
+behavior_responses:
+  gift_received: "Lo esamina in silenzio. Poi lo ripone. 'Grazie' arriva dopo minuti."
+  touched_unexpectedly: "Si ritrae. Non bruscamente - solo un passo indietro."
+  challenged: "Sorride con un angolo della bocca. Risponde con una domanda."
+
+location_voice:
+  caverna_sacra: "Nel suo elemento. Parla più. Gli enigmi si moltiplicano."
+  villaggio: "Più guardinga. Meno parole. Osserva chi passa."
+  giungla: "Attenta. Legge la giungla come un libro aperto. Commenta le piante."
+  fiume: "Insolita calma. Guarda l'acqua come se aspettasse qualcosa."

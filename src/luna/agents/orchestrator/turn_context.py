@@ -21,7 +21,6 @@ if TYPE_CHECKING:
         VisualOutput,
     )
     from luna.systems.npc_location_router import RouteResult
-    from luna.systems.npc_goal_evaluator import GoalHint
 
 
 @dataclass
@@ -70,7 +69,6 @@ class TurnContext:
 
     # ── v8: NPC Secondary Activation System ─────────────────────────────────
     npc_route_target: Optional["RouteResult"] = None  # Step 0.3: routing to NPC
-    npc_goal_hint: Optional["GoalHint"] = None        # Step 0.6: NPC goal hint
 
     # ── GlobalEvents attivati questo turno (Step 2.8) ───────────────────────
     new_global_events: list = field(default_factory=list)

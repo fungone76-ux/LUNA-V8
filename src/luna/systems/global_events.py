@@ -280,6 +280,19 @@ class GlobalEventManager:
         
         # SCHEDULED trigger
         elif trigger_type == 'scheduled':
+            # Time-of-day scheduled: fire when the current time matches allowed_times
+            if allowed_times:
+                current_time = getattr(game_state, 'time_of_day', None)
+                if hasattr(current_time, 'value'):
+                    current_time = current_time.value
+                current_time_str = str(current_time)
+                time_match = any(
+                    str(t).lower() == current_time_str.lower()
+                    for t in allowed_times
+                )
+                if time_match:
+                    return True
+            # Turn-based scheduled: fire at or after a specific turn
             for condition in trigger_conditions:
                 if isinstance(condition, dict) and 'turn' in condition:
                     target_turn = condition['turn']

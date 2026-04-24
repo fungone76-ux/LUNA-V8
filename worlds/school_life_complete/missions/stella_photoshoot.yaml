@@ -22,7 +22,7 @@ stella_photoshoot:
   stages:
     the_ask:
       title: "Il Consiglio"
-      location: "school_hallway"
+      location: "school_corridor"
       time: ["Morning", "Afternoon"]
       companion_situation: >
         Stella intercepts the player in the hallway between classes.
@@ -48,14 +48,16 @@ stella_photoshoot:
           key: "stella_asked_for_advice"
           value: true
       exit_conditions:
-        - type: "player_action"
-          pattern: "photo|shoot|show me|let me see|try it on|provalo|mostrami|fotografo|fotografa|scatta|vieni"
+        - type: "turn_count"
+          operator: "gte"
+          value: 1
       transitions:
         - condition: "default"
           target_stage: "the_shoot"
 
     the_shoot:
       title: "Dietro l'Obiettivo"
+      auto_open: true
       location: "school_gym"
       time: ["Afternoon", "Evening"]
       companion_situation: >
@@ -121,8 +123,6 @@ stella_photoshoot:
           target_stage: "_complete"
 
   rewards:
-    affinity:
-      Stella: 20
     flags:
       stella_photoshoot_done: true
       stella_physically_aware: true
@@ -130,6 +130,14 @@ stella_photoshoot:
   on_complete:
     actions:
       - action: "time_advance"
+      - action: "change_affinity"
+        character: "Stella"
+        value: 15
+
+      - action: "change_affinity"
+        character: "Stella"
+        value: 15
+
     memory:
       character: "Stella"
       entry: >

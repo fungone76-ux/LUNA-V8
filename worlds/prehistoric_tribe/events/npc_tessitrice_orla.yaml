@@ -1,0 +1,190 @@
+# ============================================================
+# EVENTS - Orla la Tessitrice
+# Fonte di pettegolezzi e informazioni sulle tre protagoniste
+# ============================================================
+
+quests:
+  orla_gossip_naya:
+    meta:
+      title: "Cosa Fa Naya di Notte"
+      description: "Orla sa dove va Naya quando sparisce — e perché"
+      character: "tessitrice_orla"
+      hidden: true
+      priority: 4
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "turn_count"
+          operator: "gte"
+          value: 5
+      probability: 0.65
+
+    stages:
+      filo:
+        title: "Un Filo che Porta Lontano"
+        narrative_prompt: |
+          Orla tesse senza alzare gli occhi ma parla come se stesse continuando
+          una conversazione interrotta. "Hai notato che Naya sparisce dopo il tramonto?
+          Ogni tre o quattro notti. Nessuno le chiede dove va.
+          Nessuno osa."
+          Sorride al telaio. "Io so dove va. Ma le belle cose si raccontano piano."
+        exit_conditions:
+          - type: "action"
+            pattern: "dove|dimmi|sì|racconta|cosa"
+        transitions:
+          - condition: "default"
+            target_stage: "rivelazione_naya"
+
+      rivelazione_naya:
+        title: "La Collina a Nord"
+        narrative_prompt: |
+          "Va alle colline a nord. Dove sua madre non è tornata."
+          Orla finalmente alza gli occhi. "Ci va con la sua lancia migliore.
+          Quella che usa solo nelle prove. Si siede sulla roccia più alta
+          e aspetta fino all'alba. Non so cosa aspetta. Forse che qualcosa
+          risponda. Forse che il silenzio smetta di fare male."
+          Pausa. "Se ci vai anche tu, per questa informazione, non da me che te l'ho detto."
+        on_enter:
+          - action: "set_flag"
+            target: "naya_night_ritual_known"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Naya: 5
+      flags:
+        orla_naya_told: true
+
+  orla_gossip_kara:
+    meta:
+      title: "La Pozione che Kara Non Vuole Finire"
+      description: "Orla ha notato qualcosa di strano nei rituali di Kara"
+      character: "tessitrice_orla"
+      hidden: true
+      priority: 4
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "flag"
+          target: "orla_naya_told"
+          value: true
+        - type: "affinity"
+          target: "Kara"
+          operator: "gte"
+          value: 25
+
+    stages:
+      osservazione:
+        title: "Occhi Ovunque"
+        narrative_prompt: |
+          Orla questa volta non aspetta che tu venga da lei.
+          Ti intercetta vicino al fuoco con due ciotole di brodo caldo
+          e un'espressione che non ha ancora deciso se è preoccupata o curiosa.
+          "Kara ha smesso di fare una delle sue pozioni. Quella che prepara
+          ogni luna nuova, da vent'anni. Ho notato. Nessun altro ha notato."
+        exit_conditions:
+          - type: "action"
+            pattern: "quale|cosa|perché|dimmi"
+        transitions:
+          - condition: "default"
+            target_stage: "dettaglio_kara"
+
+      dettaglio_kara:
+        title: "La Pozione dell'Oblio"
+        narrative_prompt: |
+          "La pozione dell'oblio. La fa le sciamane che non vogliono ricordare
+          i sogni dei morti. La prepara ogni luna nuova, la beve, non sogna."
+          Orla tace un momento. "Questo mese non l'ha fatta. Significa che
+          ha deciso di ricordare. O che qualcosa l'ha distratta abbastanza
+          da dimenticare di dimenticare."
+          Bevono il brodo in silenzio. "Forse sei tu, la distrazione.
+          Non so se sia bene o male per lei."
+        on_enter:
+          - action: "set_flag"
+            target: "kara_forgetting_potion_stopped"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Kara: 8
+      flags:
+        orla_kara_told: true
+
+  orla_gossip_zara:
+    meta:
+      title: "La Notte che Zara Pianse"
+      description: "Orla ha sentito Zara piangere — e sa perché"
+      character: "tessitrice_orla"
+      hidden: true
+      priority: 5
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "flag"
+          target: "orla_kara_told"
+          value: true
+        - type: "affinity"
+          target: "Zara"
+          operator: "gte"
+          value: 30
+
+    stages:
+      confidenza:
+        title: "Una Cosa Che Orla Non Racconta a Tutti"
+        narrative_prompt: |
+          Orla ti aspetta di sera, con il telaio già riposto.
+          "Questa non la racconto in giro. Te la dico perché mi sembra
+          che tu la capisca. Zara piange. Non spesso. Ma quando lo fa,
+          non vuole che nessuno la senta."
+          Guarda intorno. "Io la sento. La tenda della tessitrice è vicina."
+        exit_conditions:
+          - type: "action"
+            pattern: "quando|cosa|perché|dimmi"
+        transitions:
+          - condition: "default"
+            target_stage: "notte_zara"
+
+      notte_zara:
+        title: "Cosa Piange Zara"
+        narrative_prompt: |
+          "Piange di notte quando suo padre accetta doni da altri capi
+          per lei. Come si compra un animale da soma. Lei lo sa — si tratta
+          di alleanze, lo capisce, forse lo approva anche. Ma piange lo stesso."
+          Orla si alza. "Non è arrabbiata con suo padre. È arrabbiata
+          con il mondo dove questo ha senso. E non sa come cambiarlo
+          da dentro una corona."
+          Si volta verso casa. "Questo te l'ho detto. Il resto è tuo."
+        on_enter:
+          - action: "set_flag"
+            target: "zara_night_tears_known"
+            value: true
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 1
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Zara: 10
+      flags:
+        orla_zara_told: true

@@ -161,14 +161,14 @@ companion:
       activity: "Pulizie aule dopo le lezioni"
     
     Evening:
-      preferred_location: "school_storage"
-      outfit: "cleaning_uniform"
-      activity: "Inventario e pulizia deposito"
-    
+      preferred_location: "town_center"
+      outfit: "casual"
+      activity: "Fa spese in centro, compra cibo per cena"
+
     Night:
       preferred_location: "maria_home"
       outfit: "home"
-      activity: "Riposo a casa"
+      activity: "Cena e riposa a casa, guarda la TV"
 
 # ============================================================
 # QUESTS - MARIA
@@ -493,18 +493,6 @@ goal_templates:
     conditions:
       off_screen: "preside"
 
-  - id: "cook_dinner_invitation"
-    goal: "Vuole invitarti a cena a casa sua"
-    goal_type: "proposal"
-    target: "player"
-    urgency_start: 0.3
-    growth_rate: 0.03
-    context: "Non cucina mai per qualcuno, sarebbe la prima volta dopo anni"
-    conditions:
-      time: "Evening"
-      affinity: ">45"
-      need_intimacy: ">0.5"
-
 # ============================================================
 # v7 — NEEDS PROFILE
 # ============================================================
@@ -562,6 +550,18 @@ auto_states:
     priority: 30
     conditions:
       affinity_gte: 66
+  - state: grateful
+    priority: 18
+    conditions:
+      affinity_lt: 31
+      flag: "maria_home_visited"
+
+  - state: devoted
+    priority: 28
+    conditions:
+      affinity_lt: 66
+      flag: "maria_devoted"
+
 
 avoid_topics_unless_asked:
   - "età"

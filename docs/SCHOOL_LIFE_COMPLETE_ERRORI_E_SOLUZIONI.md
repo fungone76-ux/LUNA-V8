@@ -3,6 +3,7 @@
 ## Obiettivo
 Questo documento riassume gli errori emersi durante la verifica di `school_life_complete` e propone fix concreti, ordinati per priorita'.
 
+
 ## Stato rapido
 - Verifica statica + runtime effettuata su loader world, quest engine e global events.
 - Test rapidi passati: `tests/test_quest_coherence.py`, `tests/test_core_systems.py::TestWorldTimeNormalization`.

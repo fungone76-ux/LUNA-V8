@@ -242,13 +242,15 @@ class WorldSimulator:
         rest_need    = mind.needs.get("rest", 0.0)
         intimacy_need = mind.needs.get("intimacy", 0.0)
 
+        npc_id_norm = npc_id.lower().strip()
+
         # Determina nuovo stato in base al need dominante
         new_state = None
-        if social_need > 0.75 and npc_id in ("luna", "stella", "maria"):
+        if social_need > 0.75 and npc_id_norm in ("luna", "stella", "maria"):
             new_state = "lonely"
         elif rest_need > 0.80:
             new_state = "tired"
-        elif intimacy_need > 0.75 and npc_id in ("luna", "maria"):
+        elif intimacy_need > 0.75 and npc_id_norm in ("luna", "maria"):
             new_state = "vulnerable"
 
         if new_state and new_state != current_state:
@@ -279,7 +281,9 @@ class WorldSimulator:
             else str(game_state.time_of_day)
         )
 
-        if npc_id == "luna":
+        npc_id_norm = npc_id.lower().strip()
+
+        if npc_id_norm == "luna":
             activity_map = {
                 "Morning":   "stava preparando la lezione",
                 "Afternoon": "correggeva compiti dei suoi studenti",
@@ -292,7 +296,7 @@ class WorldSimulator:
                 importance = 0.6 if time_str == "Evening" else 0.25
                 mind.add_off_screen(activity, turn, importance=importance)
 
-        elif npc_id == "stella":
+        elif npc_id_norm == "stella":
             activity_map = {
                 "Morning":   "era già in classe, in anticipo per una volta",
                 "Afternoon": "stava studiando in biblioteca con le cuffie",
@@ -303,7 +307,7 @@ class WorldSimulator:
             if activity:
                 mind.add_off_screen(activity, turn, importance=0.2)
 
-        elif npc_id == "maria":
+        elif npc_id_norm == "maria":
             area_map = {
                 "Morning":   "puliva l'atrio e i corridoi del piano terra",
                 "Afternoon": "riordinava le aule dopo le lezioni",

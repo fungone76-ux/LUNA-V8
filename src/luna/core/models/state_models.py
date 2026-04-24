@@ -232,10 +232,6 @@ class GameState(LunaBaseModel):
     failed_quests: List[str] = Field(default_factory=list)
     quest_flags: Dict[str, Any] = Field(default_factory=dict)
 
-    # NPC secondary actions (managed by NpcGoalEvaluator)
-    active_npc_actions: Set[str] = Field(default_factory=set)
-    # NPC ids with pending actions in NpcActionsWidget
-
     # General flags
     flags: Dict[str, Any] = Field(default_factory=dict)
 

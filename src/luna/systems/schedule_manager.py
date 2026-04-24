@@ -13,7 +13,7 @@ from __future__ import annotations
 import logging
 logger = logging.getLogger(__name__)
 
-from typing import Optional, Dict, List, Set, Tuple
+from typing import Any, Optional, Dict, List, Set, Tuple
 from dataclasses import dataclass, field
 
 from luna.core.models import TimeOfDay, GameState
@@ -73,14 +73,96 @@ class ScheduleManager:
         
         Priority:
         1. Load from world.npc_schedules if available
-        2. Create default schedules for all companions
+        2. Fill from companion.schedule definitions
+        3. Create default schedules for all companions (fallback)
         """
         if self.world and self.world.npc_schedules:
-            # Load from world definition
+            # Load explicit world schedules first
             self._load_from_world()
-        else:
-            # Create generic default schedules
+
+        if self.world and self.world.companions:
+            # Fill missing entries from companion YAML schedule blocks
+            self._load_from_companion_definitions()
+
+        if not self._schedules:
+            # Last-resort generic fallback
             self._create_default_schedules()
+
+    def _parse_time_key(self, value: Any) -> Optional[TimeOfDay]:
+        """Parse arbitrary time keys to TimeOfDay (enum/string tolerant)."""
+        if isinstance(value, TimeOfDay):
+            return value
+        if value is None:
+            return None
+        normalized = str(value).strip().lower()
+        mapping = {
+            "morning": TimeOfDay.MORNING,
+            "afternoon": TimeOfDay.AFTERNOON,
+            "evening": TimeOfDay.EVENING,
+            "night": TimeOfDay.NIGHT,
+        }
+        if normalized in mapping:
+            return mapping[normalized]
+        for tod in TimeOfDay:
+            if str(getattr(tod, "value", tod)).strip().lower() == normalized:
+                return tod
+        return None
+
+    def _load_from_companion_definitions(self) -> None:
+        """Load schedules from companion.schedule when available.
+
+        Only fills NPCs not already loaded from world.npc_schedules.
+        """
+        for npc_name, companion in self.world.companions.items():
+            if npc_name in self._schedules:
+                continue
+            if getattr(companion, "is_temporary", False) or npc_name == "_solo_":
+                continue
+
+            raw_schedule = getattr(companion, "schedule", None) or {}
+            if not raw_schedule or not isinstance(raw_schedule, dict):
+                continue
+
+            schedules: Dict[TimeOfDay, ScheduleEntry] = {}
+            for time_key, entry_data in raw_schedule.items():
+                tod = self._parse_time_key(time_key)
+                if not tod:
+                    logger.warning(
+                        "[ScheduleManager] Invalid companion schedule time '%s' for %s",
+                        time_key, npc_name,
+                    )
+                    continue
+
+                if isinstance(entry_data, dict):
+                    location = entry_data.get("location", "unknown")
+                    activity = entry_data.get("activity", "")
+                    outfit = entry_data.get("outfit", "default")
+                    urgency = entry_data.get("urgency", "medium")
+                    available = entry_data.get("available", True)
+                else:
+                    location = getattr(entry_data, "location", "unknown")
+                    activity = getattr(entry_data, "activity", "")
+                    outfit = getattr(entry_data, "outfit", "default")
+                    urgency = getattr(entry_data, "urgency", "medium")
+                    available = getattr(entry_data, "available", True)
+
+                schedules[tod] = ScheduleEntry(
+                    location=location,
+                    activity=activity,
+                    outfit=outfit,
+                    urgency=urgency,
+                    available=available,
+                )
+
+            if schedules:
+                self._schedules[npc_name] = NPCSchedule(
+                    npc_name=npc_name,
+                    schedules=schedules,
+                )
+                logger.debug(
+                    "[ScheduleManager] Loaded schedule for %s from companion definition",
+                    npc_name,
+                )
     
     def _load_from_world(self) -> None:
         """Load schedules from world.npc_schedules."""

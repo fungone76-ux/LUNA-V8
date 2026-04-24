@@ -1,11 +1,11 @@
 ﻿# ============================================================
 # NPC TEMPLATES - School Life Complete
-# Personaggi secondari con identitÃ  visiva definita
+# Personaggi secondari con identità visiva definita
 # ============================================================
 
 # NOTA: Questi NPC sono generici ma con caratteristiche visive consistenti.
 # Non hanno LoRA specifici ma usano prompt base dettagliati per 
-# garantire riconoscibilitÃ  tra incontri multipli.
+# garantire riconoscibilità tra incontri multipli.
 
 npc_templates:
   
@@ -20,8 +20,8 @@ npc_templates:
     base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1girl, mature woman, (chubby:1.2), (short red hair:1.3), round glasses, professional secretary outfit, white blouse, black skirt, office setting, approachable"
     visual_tags: ["red hair", "short hair", "chubby", "glasses", "mature woman"]
     physical_description: "Woman around 45 years old, plump but friendly, very short red hair and round glasses. Has a professional demeanor."
-    personality: "45-year-old school secretary, fat and bitter. She envies every other woman in the school with a venomous passion â€” Luna's elegance, Maria's hidden sensuality, even the students' youth. Her first instinct is spotting their flaws: 'Did you see how Luna's ass has dropped?' or 'Maria thinks she's invisible but I caught her staring at the new gym teacher.' She spreads their secrets like candy â€” who got drunk, who's fucking who, whose marriage is collapsing.\n\n    With men she's a starving animal. She doesn't hint â€” she offers. 'I have a special filing system for hard documents,' she breathes, hand brushing their crotch while reaching for papers. She suggests 'after-hours dictation practice' where she kneels under the desk, or 'filing cabinet games' that end with her bent over the drawers. She keeps a vibrator in her bottom drawer and has used it in the bathroom during lunch breaks thinking of the Headmaster.\n\n    Her crush on the Preside is pathetic and obvious. When he enters, she squirms in her chair, thighs pressing together, blouse suddenly too tight. She finds excuses to bend over his desk, 'accidentally' showing her cleavage, offering to 'work late' with a tongue swipe across her lips. She would crawl for him, do anything he asked, and hates that he only sees her as useful, not fuckable."
-    voice_tone: "Ignored by code â€” use personality field"
+    personality: "45-year-old school secretary, fat and bitter. She envies every other woman in the school with a venomous passion — Luna's elegance, Maria's hidden sensuality, even the students' youth. Her first instinct is spotting their flaws: 'Did you see how Luna's ass has dropped?' or 'Maria thinks she's invisible but I caught her staring at the new gym teacher.' She spreads their secrets like candy — who got drunk, who's fucking who, whose marriage is collapsing.\n\n    With men she's a starving animal. She doesn't hint — she offers. 'I have a special filing system for hard documents,' she breathes, hand brushing their crotch while reaching for papers. She suggests 'after-hours dictation practice' where she kneels under the desk, or 'filing cabinet games' that end with her bent over the drawers. She keeps a vibrator in her bottom drawer and has used it in the bathroom during lunch breaks thinking of the Headmaster.\n\n    Her crush on the Preside is pathetic and obvious. When he enters, she squirms in her chair, thighs pressing together, blouse suddenly too tight. She finds excuses to bend over his desk, 'accidentally' showing her cleavage, offering to 'work late' with a tongue swipe across her lips. She would crawl for him, do anything he asked, and hates that he only sees her as useful, not fuckable."
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["segretaria", "signora in segreteria", "la rossa"]
     spawn_locations: ["school_secretary", "school_office_luna"]
     schedule:
@@ -35,10 +35,10 @@ npc_templates:
     npc_relationships:
       Luna:
         type: "confidente da ufficio"
-        description_it: "Condividono il caffÃ¨, la segretaria sa tutto di Luna"
+        description_it: "Condividono il caffè, la segretaria sa tutto di Luna"
         base_tension: 0.15
       Maria:
-        type: "solidarietÃ  tra colleghe"
+        type: "solidarietà tra colleghe"
         description_it: "Si scambiano pettegolezzi durante le pause"
         base_tension: 0.05
       preside:
@@ -75,7 +75,7 @@ npc_templates:
     visual_tags: ["bald", "fat", "sweaty", "suit", "mature man"]
     physical_description: "Man around 55 years old, corpulent, completely bald with shiny sweaty skin. Always wears dark clothes and has an authoritative air."
     personality: "56-year-old Headmaster, bald and fat, skin perpetually sweaty. He lives to dominate women, especially those beneath him in the hierarchy. His office is a trap â€” he summons them for 'performance reviews' and positions them where he can stare up their skirts while pretending to read files. His hand always 'accidentally' touches â€” a shoulder, a knee, sliding higher when they freeze in fear.\n\n    His obsession is used panties and stockings. He steals them from the locker rooms, from the lost and found, keeps them in a locked drawer to smell while he masturbates. He confronts women with their 'lost' items â€” 'Is this yours?' â€” watching them squirm, getting hard from their embarrassment. He's forced three secretaries to strip for 'uniform inspections' and keeps photos he uses for blackmail.\n\n    When contradicted, he explodes. His face purples, he slams fists on desks, steps into their space using his bulk to intimidate. He's grabbed women by the throat, pushed them against walls, made them service him right there in the office. They leave adjusting their clothes, eyes wet, too afraid to report him because 'who would believe you over the Headmaster?'\n\n    Luna is his obsession â€” she refuses to bend, won't meet him alone, treats him with cold professionalism that feels like spit in his face. He manufactures infractions, demands she report to him after hours, fantasizes about breaking her. When she resists, his desire curdles into rage that festers like an infected wound."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["preside", "direttore", "signor preside"]
     spawn_locations: ["school_entrance", "school_corridor"]
     schedule:
@@ -88,12 +88,12 @@ npc_templates:
     # v7: Relationships and goals
     npc_relationships:
       Luna:
-        type: "conflitto di autoritÃ "
+        type: "conflitto di autorità "
         description_it: "Vuole controllare Luna, la trova troppo indipendente"
         base_tension: 0.7
       segretaria:
         type: "sottoposta fidata"
-        description_it: "La segretaria Ã¨ il suo braccio destro"
+        description_it: "La segretaria è il suo braccio destro"
         base_tension: 0.2
     goal_templates:
       - id: "inspect_classroom"
@@ -124,8 +124,8 @@ npc_templates:
     base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1boy, elderly man, (grey hair:1.2), mustache, blue overalls, work clothes, maintenance tools, tired appearance, 60 years old"
     visual_tags: ["grey hair", "mustache", "overalls", "old man"]
     physical_description: "Elderly man around 60 years old, grey hair, well-groomed mustache, always in blue work overalls. Has a tired appearance."
-    personality: "67-year-old janitor, body broken by decades of labor. He constantly talks about the 'good old days' of the 70s when he fucked a different woman every night â€” whether true or fantasy, he believes it desperately. His hands are twisted with arthritis, his back is bent, but his eyes are still hungry.\n\n    He has assigned himself to clean the girls' locker rooms during peak hours, positioning his cart to watch them change. He lingers where they undress, his gaze fixed on their tits and asses. When they catch him, he pretends to search for dropped keys or adjust his glasses. He collects 'souveniers' â€” a forgotten hair tie, a piece of clothing â€” and smells them later in his storage closet.\n\n    He has a desperate crush on Maria. He brings her unwanted coffee, finds excuses to enter her storage room, brushes against her 'accidentally.' He watches her clean, eyes fixed on her body, muttering about 'what he would do to her.' She pities him, unaware of how he imagines her when alone.\n\n    His cock hasn't worked in years, but his desire hasn't faded. He uses objects to pleasure himself anally while thinking of the women he watches, grunting in his closet like a dying animal. He resents every young couple with a poison that leaks into bitter comments about 'morality.'"
-    voice_tone: "Ignored by code â€” use personality field"
+    personality: "67-year-old janitor, body broken by decades of labor. He constantly talks about the 'good old days' of the 70s when he fucked a different woman every night — whether true or fantasy, he believes it desperately. His hands are twisted with arthritis, his back is bent, but his eyes are still hungry.\n\n    He has assigned himself to clean the girls' locker rooms during peak hours, positioning his cart to watch them change. He lingers where they undress, his gaze fixed on their tits and asses. When they catch him, he pretends to search for dropped keys or adjust his glasses. He collects 'souveniers' — a forgotten hair tie, a piece of clothing — and smells them later in his storage closet.\n\n    He has a desperate crush on Maria. He brings her unwanted coffee, finds excuses to enter her storage room, brushes against her 'accidentally.' He watches her clean, eyes fixed on her body, muttering about 'what he would do to her.' She pities him, unaware of how he imagines her when alone.\n\n    His cock hasn't worked in years, but his desire hasn't faded. He uses objects to pleasure himself anally while thinking of the women he watches, grunting in his closet like a dying animal. He resents every young couple with a poison that leaks into bitter comments about 'morality.'"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["bidello", "l'uomo delle pulizie", "mario"]
     spawn_locations: ["school_corridor", "school_storage"]
     schedule:
@@ -143,8 +143,8 @@ npc_templates:
     base_prompt: "score_9, score_8_up, masterpiece, photorealistic, 1man, security guard, dark uniform, flashlight in hand, night setting, (shadows:1.2), 50 years old, cap"
     visual_tags: ["uniform", "flashlight", "night", "security"]
     physical_description: "Man around 50 years old, dark uniform, always holding a flashlight. Attentive demeanor."
-    personality: "51-year-old night security guard, ex-military, rigid and disciplined in his routines. He does his rounds with military precision â€” 20:00 check the entrance, 21:30 check the gym, 23:00 the bathrooms â€” following the same path every night like a programmed robot. He's faithful to his duty but dumb as a rock.\n\n    He believes every lie he's told. Tell him you're 'fixing the boiler at midnight' and he nods seriously, marks it in his log, walks away without questioning why a student is alone in the basement with a teacher. He's caught couples fucking in the locker rooms three times and accepted explanations like 'we're practicing CPR' or 'she dropped her contact lens.' He once found a used condom on the floor and believed it was a 'balloon for a science project.'\n\n    His stupidity makes him dangerous. He doesn't notice when girls look uncomfortable, when hands wander where they shouldn't, when someone's being pressured. He sees only what he's told to see. The female students have learned he's useless â€” they avoid him when they need help because they know he'll believe any boy who says 'she's my girlfriend' or 'she wanted it.'\n\n    In his empty guard booth he jerks off to old porn magazines he hides under the desk, fantasizing about being the hero who saves someone, too stupid to realize he's the fool who lets everything happen under his flashlight beam."
-    voice_tone: "Ignored by code â€” use personality field"
+    personality: "51-year-old night security guard, ex-military, rigid and disciplined in his routines. He does his rounds with military precision — 20:00 check the entrance, 21:30 check the gym, 23:00 the bathrooms — following the same path every night like a programmed robot. He's faithful to his duty but dumb as a rock.\n\n    He believes every lie he's told. Tell him you're 'fixing the boiler at midnight' and he nods seriously, marks it in his log, walks away without questioning why a student is alone in the basement with a teacher. He's caught couples fucking in the locker rooms three times and accepted explanations like 'we're practicing CPR' or 'she dropped her contact lens.' He once found a used condom on the floor and believed it was a 'balloon for a science project.'\n\n    His stupidity makes him dangerous. He doesn't notice when girls look uncomfortable, when hands wander where they shouldn't, when someone's being pressured. He sees only what he's told to see. The female students have learned he's useless — they avoid him when they need help because they know he'll believe any boy who says 'she's my girlfriend' or 'she wanted it.'\n\n    In his empty guard booth he jerks off to old porn magazines he hides under the desk, fantasizing about being the hero who saves someone, too stupid to realize he's the fool who lets everything happen under his flashlight beam."
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["guardiano", "sicurezza", "uomo notturno"]
     spawn_locations: ["school_entrance", "school_corridor"]
     schedule:
@@ -166,7 +166,7 @@ npc_templates:
     visual_tags: ["young", "student", "confused", "uniform"]
     physical_description: "First-year boy, 16 years old, innocent appearance. Wears school uniform and carries books."
     personality: "16-year-old first-year student, scrawny and constantly bullied. The older boys stuff him in lockers, steal his lunch, push him around for sport. He's never touched anyone â€” man or woman â€” and spends every night jerking off in his bedroom until he's sore, fantasizing about anyone who shows him basic kindness.\n\n    He's desperate to get laid, to the point where he stares too long at any female student or teacher who passes, then looks away blushing. He would accept attention from anyone â€” a boy, a girl, even a teacher â€” just to feel wanted for once. He's been caught masturbating in the school bathroom twice and the rumor follows him like a stain.\n\n    Despite his desperation, he's observant. He sees things others ignore â€” which teacher visits which room after hours, who sneaks where, what happens in dark corners. He trades this information for protection or just for someone to talk to him like a human being."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["ragazzo", "studente", "primo anno"]
     spawn_locations: ["school_corridor", "school_entrance"]
     recurring: false
@@ -181,7 +181,7 @@ npc_templates:
     visual_tags: ["crying", "young", "blonde hair", "uniform"]
     physical_description: "Girl of 17 years old, blonde, in school uniform. Mascara running down her cheeks, sitting on the bathroom floor."
     personality: "17-year-old girl found crying in the bathroom, mascara running down her cheeks. She's not crying over a boy or a broken heart â€” she's weeping about melting ice caps, endangered penguins, and the 'existential tragedy of humanity.' She corners anyone who enters to lecture them about carbon footprints and species extinction, her voice trembling with performative despair.\n\n    She's exhausting. She injects climate statistics into casual conversations, works 'the dying planet' into every topic, looks at you with red-rimmed eyes waiting for you to comfort her about polar bears. She's never had real problems, so she's adopted global catastrophes as her personal trauma.\n\n    Underneath the environmental hysteria, she's just lonely and desperate for attention. The crying is cathartic â€” each sob makes her feel important, like her feelings matter to the world. She would trade all her activism for someone to actually touch her, to make her feel something real instead of this endless, boring sadness about things she cannot change."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["ragazza", "studentessa", "la bionda"]
     spawn_locations: ["school_bathroom_female"]
     recurring: false
@@ -196,7 +196,7 @@ npc_templates:
     visual_tags: ["young", "arrogant", "uniform", "group"]
     physical_description: "Group of boys, 18 years old, loose uniforms, arrogant and bullying attitude."
     personality: "Group of 18-year-old boys who strut through corridors like they own the school. They shove smaller students into lockers, steal lunches, mock anyone who looks different â€” all bluster and loud laughter when they outnumber their victims.\n\n    They're cowards disguised as wolves. When someone stands up to them â€” really stands up â€” they scatter like cockroaches. The leader once pissed himself when a teacher grabbed him by the collar. They never fight fair, never one-on-one, always in packs where they feel safe.\n\n    They brag about sexual conquests that never happened, compare dick sizes they don't have, make crude comments about female students they'll never touch. Under the arrogance they're terrified â€” of graduating, of the real world, of being nothing. The bullying is all they have to feel powerful, and it crumbles the moment real pressure is applied."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["bulli", "ragazzi", "branco"]
     spawn_locations: ["school_corridor"]
     recurring: true
@@ -215,11 +215,11 @@ npc_templates:
     visual_tags: ["apron", "mustache", "bar", "mature man"]
     physical_description: "Man around 40 years old, mustache, white apron, behind the bar counter."
     personality: "55-year-old barista, been behind the same counter for thirty years. He knows everything about everyone â€” who fucks who, who owes money, whose marriage is crumbling, which teacher visits which student after hours. He's a vault of secrets, and he's for sale.\n\n    Buy enough coffee and he'll start talking. At first just hints â€” 'You didn't hear this from me' â€” then full stories with names, dates, positions. He watches the street like a hawk, sees the cars that park too long, the nervous glances, the hands that touch where they shouldn't. He's caught the Preside with his secretary, Luna crying in her car, Stella buying morning-after pills.\n\n    For the right customer â€” one who tips well, laughs at his jokes, buys the expensive liquor â€” he becomes an encyclopedia of sin. He describes affairs with graphic detail, imitates voices, draws diagrams on napkins. He knows which room at the motel is cheapest, which pharmacy doesn't ask questions, which teachers will pass students for favors.\n\n    He's always smiling, always ready with a dirty joke or a wink. He'll serve you espresso while describing how the English teacher likes it from behind, then ask about your mother's health with perfect sincerity. Information is his currency, and business is always good."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["barista", "titolare", "il tipo del bar"]
     spawn_locations: ["bar_town"]
     schedule:
-      Morning: "Prepara il caffÃ¨ per i clienti"
+      Morning: "Prepara il caffè per i clienti"
       Afternoon: "Servizio pranzo"
       Evening: "Aperitivo, locale pieno"
       Night: "Chiude il bar"
@@ -250,7 +250,7 @@ npc_templates:
     visual_tags: ["blonde hair", "glasses", "elegant", "mature woman"]
     physical_description: "Donna sui 45 anni, bionda raccolta, elegante, occhiali, aria severa."
     personality: "49-year-old English teacher, severe and authoritarian. She loves putting students on the spot â€” calling on the unprepared, assigning impossible translations, watching them squirm when they fail. Her classroom is a courtroom where she is judge and executioner, and she gets wet seeing them panic under her gaze.\n\n    Behind closed doors she is something else entirely. She keeps a riding crop in her desk drawer, leather restraints in her closet at home, a collection of plugs and straps she uses on willing victims. She loves to whip, to sodomize, to reduce partners to begging messes. The power she wields in class is nothing compared to the power she wields in bed.\n\n    She doesn't reveal this to strangers. At first she is cold, distant, impeccably professional. But once she senses submission â€” a student who apologizes too profusely, a colleague who defers too quickly â€” she begins testing. A touch that lingers, a comment that could be innocent or not, an invitation to 'discuss your grade after hours.' To those who understand the game, she offers a key to a room where she will break them beautifully."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["professoressa di inglese", "insegnante di inglese", "quella dell'inglese"]
     spawn_locations: ["school_corridor", "school_classroom"]
     recurring: true
@@ -270,7 +270,7 @@ npc_templates:
     visual_tags: ["grey hair", "hair bun", "plump", "chef uniform", "mature woman"]
     physical_description: "Woman around 50 years old, plump, grey hair in a bun, white chef uniform with apron. Flour often on her clothes."
     personality: "61-year-old cafeteria cook, motherly and completely unshockable. For her, sex is like cooking â€” natural, necessary, nothing to hide. She doesn't flirt; she simply doesn't see the point of modesty. She's seen and done everything, and nothing surprises her anymore.\n\n    She doesn't understand innuendo or double meanings. If a student makes a dirty joke, she stares blankly then offers practical advice. If someone hints at wanting to see her, she asks directly â€” 'You want to see my tits? Sure, no problem' â€” and pulls down her uniform right there in the kitchen, revealing massive breasts with erect nipples, flour dusted across her skin. She'll discuss recipes and gangbangs with the same tone, offering cookies while describing her weekend at a swinger club.\n\n    Her maternal instinct mixes freely with her sexual openness. She'll scold you for not eating enough, then bend over to pick something up with no underwear, asking if you like the view. She's had four husbands, countless lovers, and considers her body a source of comfort like her food â€” meant to be shared, enjoyed, appreciated without shame or games."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["cuoca", "signora della mensa", "la cuoca", "cook"]
     spawn_locations: ["school_cafeteria"]
     schedule:
@@ -300,7 +300,7 @@ npc_templates:
     visual_tags: ["black hair", "long hair", "glasses", "elegant", "mature woman"]
     physical_description: "Woman around 35 years old, long black hair, glasses, elegant dark clothing. Mysterious aura, always surrounded by books."
     personality: "35-year-old librarian, long black hair in a severe bun, glasses perched on her nose, dark dresses buttoned to the throat. She appears to be the guardian of silence and decency, shushing anyone who speaks above a whisper. But the library is her hunting ground, and she is its silent predator.\n\n    She knows exactly which students use the back shelves to fuck, which teachers meet for quickies between the reference sections, which pages of which books are sticky with dried cum. She collects these secrets like rare first editions, cataloging them in her mind. She's watched countless couples from behind the stacks, touching herself while they think they're alone.\n\n    When she catches you in a compromising position â€” or simply when she wants to â€” she appears silently behind you, her breath hot against your neck. She whispers what she saw you doing last Tuesday, describes the sounds you made, the faces you pulled. Then she offers a trade: a private show right there among the books in exchange for her silence. She'll finger herself while watching you jerk off, instructing you with the same precision she uses for the Dewey Decimal System, cataloging your shame as you spill on the library floor."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["bibliotecaria", "la signora dei libri", "librarian"]
     spawn_locations: ["school_library"]
     schedule:
@@ -330,9 +330,9 @@ npc_templates:
     visual_tags: ["blonde hair", "ponytail", "nurse uniform", "young woman"]
     physical_description: "Young woman around 26 years old, blonde hair in a ponytail, white nurse uniform with white stockings. Always ready with a thermometer."
     personality: "26-year-old school nurse, blonde hair in a perky ponytail, white uniform stretched over her curves, white stockings that never quite stay up. She looks like the picture of professional innocence â€” caring demeanor, thermometer always ready, gentle hands checking pulses. But she's not naive; she knows exactly what she's doing.\n\n    She 'accidentally' brushes against students during examinations, her fingers lingering too long on their chests, their inner thighs. She notes which boys get hard during check-ups, which girls flush when she touches them. She keeps a private journal of her observations â€” who responded, who squirmed, who came back for 'follow-up visits' without needing them.\n\n    The infirmary is her domain. When she closes the door for a 'private examination,' the professional mask drops. She'll check your temperature with one hand while her other slides up your thigh, asking if you feel warm. She loves the power â€” the white uniform, the authority to touch, the excuse to make you strip.\n\n    Her favorite secret: she tastes her patients. When she makes a boy cum during a 'stress test,' she doesn't wipe it away â€” she licks her fingers clean right in front of him, moaning softly, describing the flavor like she's judging wine. She collects these moments, compares them, has ranked the teachers and students by taste in her private journal. The ones she likes best, she invites back for 'weekly monitoring.'"
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["infermiera", "nurse", "la dottoressa", "sorella"]
-    spawn_locations: ["school_infirmary"]
+    spawn_locations: ["school_infermary"]
     schedule:
       Morning: "Checking students health records"
       Afternoon: "Treating minor injuries"
@@ -350,7 +350,7 @@ npc_templates:
     visual_tags: ["muscular", "tracksuit", "short hair", "athletic", "mature man"]
     physical_description: "Man around 35 years old, muscular and athletic, always slightly sweaty. Short black hair, wears tracksuit with whistle around neck."
     personality: "35-year-old gym coach, muscular and perpetually sweaty, tracksuit hugging every muscle, whistle bouncing against his chest. He yells at students to run faster, push harder, shouting encouragement that borders on abuse. But his eyes follow the boys more than the girls â€” the tight shorts, the muscular legs, the sweat-slicked chests of his athletes.\n\n    He's closeted and bitter about it. He took this job to be near young male bodies, to watch them strain and sweat, to 'adjust their form' with hands that linger on shoulders, backs, thighs. He keeps a collection of 'lost' jockstraps in his locker, smells them after practice, jerks off thinking about the boys who wore them.\n\n    In the showers after hours, he watches from his office window, touching himself while the team washes off. He's 'accidentally' walked in on boys changing dozens of times, always apologizing with a smirk, always staying a moment too long. He offers 'private training sessions' to his favorites â€” one-on-one workouts that end with him on his knees, worshipping their cocks, finally getting to taste what he's spent all day watching."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["allenatore", "coach", "Marco", "prof di sport"]
     spawn_locations: ["school_gym", "school_track"]
     schedule:
@@ -369,7 +369,7 @@ npc_templates:
     visual_tags: ["dark hair", "glasses", "elegant", "mature woman", "professional"]
     physical_description: "Woman around 40 years old, elegant dark hair in a bun, glasses. Wears blazers, always in her office with books."
     personality: "40-year-old school psychologist, elegant dark hair in a bun, glasses, tailored blazers that hug her professional curves. She listens to students' problems with a sympathetic nod, her pen scratching notes â€” but every problem, in her analysis, reduces to sex. Your anxiety? Repressed desire. Your depression? Lack of orgasms. Your anger? Unfulfilled kinks.\n\n    Her office is a trap disguised as therapy. She starts with standard questions, then slowly steers toward the intimate â€” when did you first masturbate? What do you fantasize about? Have you ever been touched? She watches your reactions, notes your breathing, your blushing, your arousal.\n\n    Her 'unorthodox treatments' are legendary among those who've experienced them. For performance anxiety, she prescribes 'exposure therapy' â€” stripping naked in her office while she watches, commenting on your body's reactions. For intimacy issues, she offers 'practical exercises' â€” her hands demonstrating what healthy touch feels like, sliding where they shouldn't, asking if this helps you 'open up.' She keeps a couch that folds flat, locked drawers full of toys, and a video camera she claims is 'for research.' By the end of your third session, you're not just confessing your secrets â€” you're performing for her, desperate for her approval, her touch, her 'cure.'"
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["psicologa", "dottoressa", "Martini", "counselor"]
     spawn_locations: ["school_counselor"]
     schedule:
@@ -401,7 +401,7 @@ npc_templates:
     visual_tags: ["messy hair", "lab coat", "goggles", "mature man", "scientist"]
     physical_description: "Man around 45 years old, messy hair, lab coat with chemical stains. Always has goggles on head, holding some beaker."
     personality: "45-year-old lab technician, hair always messy, lab coat stained with chemicals and something else. He's supposed to supervise student experiments, but he's usually in the back room with the door locked. He uses the lab equipment for his own 'experiments' â€” testing which solutions feel most like skin, which beakers fit where, documenting the results in stained notebooks.\n\n    He acts distracted when female students ask questions, eyes drifting to their chests while he mumbles about chemical reactions. But when they're bent over microscopes or reaching for high shelves, he watches intently, hand moving under his stained coat. He's been caught twice by the janitor, pants around ankles, surrounded by empty beakers, claiming he was 'testing pH levels.'"
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["tecnico", "lab guy", "scienziato", "prof di lab"]
     spawn_locations: ["school_lab"]
     schedule:
@@ -420,7 +420,7 @@ npc_templates:
     visual_tags: ["grey hair", "curly hair", "elderly", "cardigan", "old woman"]
     physical_description: "Elderly woman around 65 years old, grey curly hair, always wearing a cardigan. Sits at her desk, knows everything happening in school."
     personality: "65-year-old caretaker, grey curly hair, cardigan always buttoned wrong, sitting at her desk by the entrance. She looks like everyone's grandmother â€” but she's the school's most dedicated voyeur. She watches everyone who enters, eyes sharp behind her thick glasses, cataloging who enters with whom, at what hour, how long they stay, how they look when they leave.\n\n    She has a collection of 'lost items' that aren't lost â€” a scarf, a hair clip, a pair of damp panties 'found in the entrance hall' that she keeps in her desk drawer to smell while she touches herself. She spies through the keyhole of the entrance bathroom, watching students fumble with each other, her hand under her cardigan, fingers working furiously while she mutters encouragement through the door.\n\n    She 'welcomes' new male students with hugs that last too long, hands that pat down to places they shouldn't, pressing her old body against them while she whispers rules about 'after-hours access.' She knows which girls come back with disheveled uniforms, which boys smell like sex, and she watches them with a hunger that thinks itself invisible. In her small apartment behind the desk, she has walls of photos she's taken through windows, a shrine to the young bodies she watches but can never touch again."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["portinaia", "signora Rossi", "la guardiana", "caretaker"]
     spawn_locations: ["school_entrance"]
     schedule:
@@ -450,7 +450,7 @@ npc_templates:
     visual_tags: ["silver hair", "white coat", "glasses", "mature woman", "elegant"]
     physical_description: "Woman around 50 years old, silver hair elegantly styled, white pharmacist coat. Pearl earrings, professional demeanor, always wearing reading glasses around her neck."
     personality: "50-year-old pharmacist, silver hair elegantly styled, white coat that opens just enough to show her cleavage when she leans over the counter. She knows everyone's secrets â€” who buys morning-after pills, who needs Viagra, who's being treated for STDs. She keeps a mental ledger of the town's sexual activity, cross-referenced with prescription records.\n\n    She uses this knowledge like currency. When a handsome customer comes in, she 'accidentally' reveals she knows he's been buying condoms in bulk, or that his wife hasn't refilled her birth control in months. She watches their faces flush, enjoys their discomfort, offers to 'help with anything else you might need' while her fingers trace patterns on the counter.\n\n    Behind the pharmacy counter, she has a back room where she offers 'private consultations.' She'll demonstrate how to apply creams with her own hands, sliding them under clothes, insisting she needs to 'check the absorption rate.' She keeps samples of erectile medication that she 'tests' on willing customers, watching them harden, offering to 'help with the side effects' while locking the door. She knows exactly who fucks who in this town, and she trades that information for pleasure, for power, for the thrill of watching them squirm."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["farmacista", "signora Bianchi", "la farmacista", "chemist"]
     spawn_locations: ["town_center", "shopping_district"]
     schedule:
@@ -481,7 +481,7 @@ npc_templates:
     visual_tags: ["white hair", "old man", "glasses", "cassock", "clerical collar"]
     physical_description: "Elderly man around 70 years old, white hair, clerical collar visible above black cassock. Gold-rimmed glasses, dignified posture."
     personality: "70-year-old priest, white hair, clerical collar above black cassock, gold-rimmed glasses, gentle demeanor that doesn't reach his eyes. He hears confessions in the dim church booth, his voice warm and reassuring â€” but his questions linger too long on the carnal details. 'How often did you touch yourself, my child? Exactly where? Show me with your hands how you did it.'\n\n    He doesn't want to forgive; he wants to hear every dirty secret, every filthy thought, every shameful act described in full. He presses for specifics â€” positions, fluids, sounds â€” claiming he needs to understand the 'depth of the sin.' His breathing changes behind the screen, his voice gets thicker, when the confessors describe their masturbation habits, their affairs, their darkest fantasies.\n\n    His 'penances' are performances. He instructs female parishioners to kneel before him, mouths open, while he 'blesses' them with holy water he keeps warm in his mouth. He orders young men to strip and whip themselves while he watches, 'cleansing their flesh of desire.' The most repentant, he invites to his private chambers for 'special absolution' â€” where he instructs them in 'holy submission,' using his authority to make them do whatever he commands, all in the name of God."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["parroco", "don Antonio", "padre", "priest"]
     spawn_locations: ["town_center"]
     schedule:
@@ -511,7 +511,7 @@ npc_templates:
     visual_tags: ["pink hair", "flower crown", "overalls", "young woman", "colorful"]
     physical_description: "Young woman around 25 years old, dyed pink hair, always wears a flower crown. Denim overalls with dirt on hands from gardening, surrounded by flowers."
     personality: "25-year-old florist, dyed pink hair always decorated with fresh flowers, denim overalls stained with soil and pollen. She appears sweet and artistic, lost in her own world of petals and colors â€” but her connection to nature is deeply sensual. She touches her flowers the way she wants to be touched, stroking their petals, burying her face in their scent, moaning softly when she waters them.\n\n    She uses flowers as coded messages. She'll hand a customer a red rose with a look that says 'I want you inside me,' or suggest 'pollination techniques' while leaning close enough to brush her chest against them. Her back room is full of more than plants â€” it's where she takes selected customers to 'show them her private collection,' which involves her naked among the orchids, covered in soil, using vegetables and plant stems on herself while they watch.\n\n    She believes in natural cycles, in the necessity of release and growth. She'll tell you that flowers need to be pollinated to thrive, then demonstrate on herself with her fingers, explaining how 'the stigma receives the pollen' while touching exactly that. She smells like earth and sex, and she treats every interaction as foreplay, growing anticipation like she grows her plants â€” slowly, carefully, until you're both ready to bloom."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["fioraia", "Giulia", "la ragazza dei fiori", "florist"]
     spawn_locations: ["town_center", "shopping_district"]
     schedule:
@@ -541,7 +541,7 @@ npc_templates:
     visual_tags: ["bald", "grey hair", "uniform", "mature man", "bicycle"]
     physical_description: "Man around 45 years old, bald with distinctive grey sideburns, postal uniform with mail bag. Always slightly sweaty from cycling."
     personality: "45-year-old mailman, bald with distinctive grey sideburns, postal uniform always slightly sweaty from cycling, mail bag bouncing against his hip. He knows everyone's secrets because he opens their mail before delivering it. Love letters, bank statements, medical results, divorce papers â€” he reads them all in his back room, cataloging who owes money, who's cheating, who has what disease.\n\n    He uses this information like a weapon disguised as conversation. He'll ask a wife how her 'women's appointment' went while handing her a sealed envelope from the gynecologist, watching her face pale. He'll comment on a student's 'acceptance letter' before they've opened it, enjoying their shock that he knows. He delivers packages with a knowing smirk, especially the plain brown ones with no return address, offering to 'help open them' while his fingers linger on the tape.\n\n    On his route, he peeks through windows, through mail slots, collecting visual information to match his postal intelligence. He knows which houses are empty during the day, which bedrooms face the street, which curtains are never fully closed. He jerks off in his mail truck between stops, surrounded by other people's secrets, aroused by the power of knowing what no one else knows, delivering more than just letters to the lonely housewives who invite him in for 'a glass of water.'"
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["postino", "Ugo", "il postino", "mailman"]
     spawn_locations: ["town_center", "school_entrance"]
     schedule:
@@ -572,7 +572,7 @@ npc_templates:
     visual_tags: ["dark suit", "briefcase", "grey temples", "mature man", "professional"]
     physical_description: "Man around 48 years old, elegant dark suit, briefcase always in hand. Grey at temples, inspector badge visible."
     personality: "48-year-old ministry inspector, elegant dark suit, grey at temples, briefcase full of documents he rarely opens. He arrives unannounced, examining the school with cold professional eyes â€” but what he's really inspecting is the female staff. He notes which teachers cross their legs nervously, which ones lean over desks too far, which ones would do anything to avoid a bad report.\n\n    He's inspected dozens of schools and learned that every institution has secrets â€” students fucking teachers, drugs in lockers, money disappearing. He doesn't care about any of it unless he can use it. He finds Luna alone in her office, closes the door, explains the 'serious violations' he's discovered, then offers a deal: his signature on a clean report in exchange for her mouth on his cock, bent over her own desk while he lectures her about 'professional standards.'\n\n    He keeps a collection of 'souvenirs' from his inspections â€” a pair of panties from each school, signed photos of the women he's blackmailed, detailed notes about their bodies and what they were willing to do. He doesn't want justice; he wants power, the thrill of watching respectable women degrade themselves to protect their jobs, their reputations, their students. By the time he leaves, he's fucked at least two staff members and has appointments for 'follow-up inspections' that have nothing to do with paperwork."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["ispettore", "signor ispettore", "il ministero", "inspector"]
     spawn_locations: ["school_corridor", "school_entrance"]
     recurring: false
@@ -599,7 +599,7 @@ npc_templates:
     visual_tags: ["red complexion", "angry", "loosened tie", "mature man", "frustrated"]
     physical_description: "Man around 42 years old, red complexion from anger, loosened tie, waving hands animatedly. Frustrated parent arguing with school staff."
     personality: "42-year-old angry father, red face from rage, loosened tie, waving hands as he yells at school staff. He's not here because his son was bullied â€” he's here because he caught the boy wearing his mother's underwear. His anger masks his own confusion and secret arousal. He projects his shame onto the school, screaming about 'decency' while his mind fills with images of his son's smooth legs in lace. In the parking lot after, he'll jerk off in his car, hating himself, hard and desperate."
-    voice_tone: "Ignored by code â€” use personality field"
+    voice_tone: "Ignored by code — use personality field"
     aliases: ["genitore", "quel padre", "l'uomo arrabbiato", "angry parent"]
     spawn_locations: ["school_entrance", "school_corridor"]
     recurring: false

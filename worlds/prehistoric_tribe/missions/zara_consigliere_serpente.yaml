@@ -1,0 +1,203 @@
+# ============================================================
+# MISSION - Zara: Il Consigliere Velenoso
+# Un anziano consigliere usa Zara come pedina — e lei lo sa
+# Prerequisito: zara_prova_sangue completata
+# ============================================================
+
+quests:
+  zara_consigliere_serpente:
+    meta:
+      title: "Il Consigliere Velenoso"
+      description: "Uno degli anziani consiglieri sta manipolando Zara — e vuole usare il protagonista contro di lei"
+      character: "Zara"
+      hidden: true
+      priority: 8
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "affinity"
+          target: "Zara"
+          operator: "gte"
+          value: 50
+        - type: "flag"
+          target: "prova_sangue_passata"
+          value: true
+
+    stages:
+      approccio_consigliere:
+        title: "Un Consiglio Non Richiesto"
+        narrative_prompt: |
+          Un anziano che non hai mai notato si avvicina — o forse lo hai notato
+          ma non abbastanza. Porta ornamenti del Consiglio, veste bene per la sua età,
+          sorriso che non raggiunge gli occhi.
+          "Giovane", dice, come se la parola significasse qualcosa di diverso
+          da giovane. "So che sei vicino alla Figlia del Capo. Anch'io lo sono.
+          Potremmo essere utili l'uno all'altro."
+          Pausa calcolata. "Ci sono cose su Zara che potresti voler sapere.
+          E cose su di te che potrei non dover dire al Capo."
+        exit_conditions:
+          - type: "action"
+            pattern: "parla|cosa|chi|perché|rifiuto|ascolto"
+        transitions:
+          - condition: "default"
+            target_stage: "proposta"
+
+      proposta:
+        title: "Cosa Vuole il Consigliere"
+        narrative_prompt: |
+          Il vecchio è preciso: vuole che tu riferisca le confidenze di Zara.
+          Tutto quello che ti dice di notte, tutto quello che mostra quando
+          pensa di non essere osservata. In cambio, lui coprirà le tue mosse
+          con il Capo, faciliterà le Prove, silenzierà Drek.
+          Non lo dice mai direttamente — usa sempre "sarebbe utile sapere"
+          e "mi piacerebbe capire meglio".
+          Ma è chiaro. Ti sta chiedendo di spiare Zara.
+          Cosa fai con questo?
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 2
+        transitions:
+          - condition: "default"
+            target_stage: "scelta_protagonista"
+
+      scelta_protagonista:
+        title: "La Tua Scelta"
+        narrative_prompt: |
+          Hai tre opzioni reali:
+          Accettare — e fingere di collaborare con il vecchio mentre decidi cosa fare.
+          Rifiutare — e rischiare che il consigliere diventi un nemico attivo.
+          Dire a Zara — e vedere come reagisce sapendo che c'è un serpente
+          nel suo stesso Consiglio.
+          Ogni scelta ha conseguenze. Alcune immediate, alcune lente.
+          Zara ha già detto, in un momento di guardia abbassata,
+          che non tollera chi la usa. Come ti comporti su questo?
+        exit_conditions:
+          - type: "action"
+            pattern: "dico|avviso|rifiuto|accetto|zara|fingo"
+        transitions:
+          - condition: "default"
+            target_stage: "conseguenza"
+
+      conseguenza:
+        title: "Le Conseguenze"
+        narrative_prompt: |
+          Se hai avvisato Zara: il suo sguardo cambia. Non immediatamente —
+          ci pensa. Poi manda a chiamare il consigliere. Quello che dice
+          in quella riunione non lo sai. Ma il vecchio non ti avvicina più.
+          E Zara ti guarda un po' diversamente. Non con gratitudine —
+          con valutazione nuova. "Hai scelto me sopra un vantaggio."
+          Lo dice come se non capisse ancora cosa significhi.
+          Se hai rifiutato senza dire: il consigliere ti ostacola in modo sottile.
+          Se hai accettato fingendo: hai comprato tempo ma creato una complicazione.
+        on_enter:
+          - action: "set_flag"
+            target: "consigliere_handled"
+            value: true
+          - action: "change_affinity"
+            character: "Zara"
+            value: 18
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 3
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Zara: 20
+      flags:
+        zara_advisor_arc_complete: true
+
+  zara_notte_privata:
+    meta:
+      title: "La Tenda senza Corona"
+      description: "Zara ti invita nella sua tenda privata — senza il ruolo di Figlia del Capo"
+      character: "Zara"
+      hidden: true
+      priority: 7
+
+    activation:
+      type: "auto"
+      conditions:
+        - type: "affinity"
+          target: "Zara"
+          operator: "gte"
+          value: 65
+        - type: "flag"
+          target: "zara_advisor_arc_complete"
+          value: true
+
+    stages:
+      invito_insolito:
+        title: "L'Invito Insolito"
+        narrative_prompt: |
+          Nessun servitore, nessun messaggero. Zara stessa.
+          Ti trova da sola, senza la tenda del Capo sullo sfondo,
+          senza gli ornamenti regali. La veste è più semplice del solito.
+          "Voglio parlarti. Non come Figlia del Capo."
+          Una pausa breve. "Come Zara."
+          Non spiega la differenza — ma è evidente che per lei è enorme.
+        exit_conditions:
+          - type: "action"
+            pattern: "sì|vengo|certo|parla|ascolto"
+        transitions:
+          - condition: "default"
+            target_stage: "tenda_privata"
+
+      tenda_privata:
+        title: "Dentro la Tenda Vera"
+        narrative_prompt: |
+          La tenda privata di Zara è diversa dalla sala del Capo.
+          Più piccola. Senza i teschi di bestia e i simboli di potere.
+          C'è un fuoco piccolo, due ciotole, qualcosa che odora di erbe.
+          Zara si siede sul pelo d'orso e per la prima volta non ha
+          la postura di chi regna. È solo una donna di 28 anni
+          che ha deciso di fidarsi.
+          "Quello che mi hai fatto con il consigliere...
+          nessuno l'aveva fatto prima. Nessuno aveva scelto me."
+          Pausa. "Voglio capire perché."
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 3
+        transitions:
+          - condition: "default"
+            target_stage: "vulnerabilita"
+
+      vulnerabilita:
+        title: "Zara senza Armatura"
+        narrative_prompt: |
+          La conversazione va in luoghi che Zara non ha mai condiviso con nessuno.
+          Il peso della corona di suo padre. L'incidente con il guerriero tre anni fa.
+          La stanchezza di essere sempre la pedina e mai la persona.
+          Non piange — non è da lei. Ma c'è qualcosa nella sua voce
+          che riconosci come la versione di Zara del pianto.
+          A un certo punto si ferma. "Basta così per stasera", dice.
+          Ma non ti dice di andartene. Ti guarda come se decidesse qualcosa.
+        on_enter:
+          - action: "change_affinity"
+            character: "Zara"
+            value: 20
+          - action: "set_flag"
+            target: "zara_private_night_shared"
+            value: true
+          - action: "set_emotional_state"
+            character: "Zara"
+            value: "seduced"
+        exit_conditions:
+          - type: "turn_count"
+            operator: "gte"
+            value: 3
+        transitions:
+          - condition: "default"
+            target_stage: "_complete"
+
+    rewards:
+      affinity:
+        Zara: 25
+      flags:
+        zara_private_night_complete: true

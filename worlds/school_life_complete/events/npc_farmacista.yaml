@@ -2,7 +2,7 @@
 # World: school_life_complete
 # Type: NPC secondary event — location_pass trigger
 # NPC: Farmacista Bianchi (50, silver hair, white coat, pearl earrings)
-# Activation: player enters town_center / pharmacy area
+# Activation: player enters park / pharmacy area
 
 npc_farmacista:
   meta:
@@ -14,7 +14,7 @@ npc_farmacista:
 
   activation:
     type: "location_pass"
-    location: "town_center"
+    location: "park"
     chance: 0.35
     cooldown_turns: 30
     once: false
@@ -23,7 +23,7 @@ npc_farmacista:
   stages:
     the_offer:
       title: "Il Prodotto"
-      location: "town_center"
+      location: "park"
       time: ["Morning", "Afternoon", "Evening"]
       companion_situation: >
         The player enters the pharmacy. The pharmacist is behind the counter,
@@ -52,7 +52,7 @@ npc_farmacista:
           character: "farmacista"
           value: "pharmacist_coat"
         - action: "set_location"
-          value: "town_center"
+          value: "park"
         - action: "set_flag"
           key: "farmacista_event_active"
           value: true
@@ -65,7 +65,7 @@ npc_farmacista:
 
     the_test:
       title: "Consultazione Privata"
-      location: "town_center"
+      location: "park"
       time: ["Morning", "Afternoon", "Evening"]
       companion_situation: >
         The back room is small, clean, clinical. An examination table

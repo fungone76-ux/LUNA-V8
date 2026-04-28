@@ -26,6 +26,37 @@ class IntentHandlersMixin:
     farewell, rest, combat, etc.
     """
 
+    def _quest_captures_input(self, game_state: GameState, raw_input: str) -> bool:
+        """Return True if any active quest stage has a player_action exit condition.
+
+        When True, FAREWELL/MOVEMENT must not short-circuit the pipeline —
+        the quest engine decides whether the condition is met. Pattern matching
+        is the quest engine's job, not ours: we only check if the quest CARES
+        about player dialogue at all."""
+        if not game_state.active_quests:
+            return False
+        qe = getattr(self.engine, "quest_engine", None)
+        if not qe:
+            return False
+        for quest_id in game_state.active_quests:
+            quest_def = qe.world.quests.get(quest_id)
+            instance = qe._instances.get(quest_id)
+            if not quest_def or not instance:
+                continue
+            stage_id = instance.current_stage_id or quest_def.start_stage
+            stage = quest_def.stages.get(stage_id)
+            if not stage or not stage.exit_conditions:
+                continue
+            for cond in stage.exit_conditions:
+                ctype = cond.type if hasattr(cond, "type") else cond.get("type", "")
+                if ctype == "player_action":
+                    logger.info(
+                        "[IntentHandler] Quest '%s' has player_action exit — skipping short-circuit",
+                        quest_id,
+                    )
+                    return True
+        return False
+
     async def _handle_special_intents(
         self, intent: Any, game_state: GameState, raw_input: str
     ) -> Optional[TurnResult]:
@@ -34,10 +65,14 @@ class IntentHandlersMixin:
             return await self._handle_event_choice(intent, game_state, raw_input)
 
         if intent.primary == IntentType.MOVEMENT:
-            return await self._handle_movement(intent, game_state, raw_input)
+            # If an active quest exit condition matches, let the quest engine handle it
+            if not self._quest_captures_input(game_state, raw_input):
+                return await self._handle_movement(intent, game_state, raw_input)
 
         if intent.primary == IntentType.FAREWELL:
-            return await self._handle_farewell(game_state, raw_input)
+            # If an active quest exit condition matches, let the quest engine handle it
+            if not self._quest_captures_input(game_state, raw_input):
+                return await self._handle_farewell(game_state, raw_input)
 
         if intent.primary == IntentType.REST:
             return await self._handle_rest(intent, game_state, raw_input)

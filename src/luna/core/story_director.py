@@ -93,9 +93,16 @@ class StoryDirector:
     def get_active_instruction(self, game_state: GameState) -> Optional[Tuple[StoryBeat, str]]:
         """Return (beat, instruction) if a beat should trigger this turn, else None."""
         candidates = []
+        active_lower = (game_state.active_companion or "").lower()
         for beat in self.arc.beats:
             if beat.once and beat.id in self._completed_beats:
                 continue
+            # Skip beats whose trigger only references other companions' affinity.
+            # Prevents "stella_servizio_fotografico" from firing while talking to Luna.
+            if active_lower and beat.trigger:
+                affinity_refs = re.findall(r'affinity_(\w+)', beat.trigger.lower())
+                if affinity_refs and all(ref != active_lower for ref in affinity_refs):
+                    continue
             if self._evaluator.evaluate(beat.trigger, game_state):
                 candidates.append(beat)
         if not candidates:

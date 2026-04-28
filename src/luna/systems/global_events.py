@@ -208,46 +208,66 @@ class GlobalEventManager:
             if force_random or random.random() < trigger_chance:
                 return True
         
-        # TIME_BASED trigger (check allowed_times)
-        elif trigger_type == 'time' or trigger_type == 'conditional':
+        # TIME_BASED trigger (check allowed_times, OR logic)
+        elif trigger_type == 'time':
             current_time = getattr(game_state, 'time_of_day', None)
             if hasattr(current_time, 'value'):
                 current_time = current_time.value
             current_time_str = str(current_time)
-            
-            # Check allowed_times list
+
             if allowed_times:
                 time_match = any(
-                    str(t).lower() == current_time_str.lower() 
+                    str(t).lower() == current_time_str.lower()
                     for t in allowed_times
                 )
                 if time_match and random.random() < trigger_chance:
                     return True
-            
-            # Check trigger conditions
+
             for condition in trigger_conditions:
-                if isinstance(condition, dict):
-                    # Handle time condition
-                    if 'time' in condition:
-                        req_time = condition['time']
-                        if str(req_time).lower() == current_time_str.lower():
-                            if random.random() < trigger_chance:
-                                return True
-                    # Handle location condition
-                    if 'location' in condition:
-                        req_loc = condition['location']
-                        current_loc = getattr(game_state, 'current_location', '')
-                        if req_loc and req_loc.lower() in str(current_loc).lower():
-                            if random.random() < trigger_chance:
-                                return True
-                    # Handle affinity condition
-                    if 'affinity' in condition:
-                        char = condition.get('target', condition.get('character'))
-                        threshold = condition.get('value', condition.get('threshold', 50))
-                        affinity = getattr(game_state, 'affinity', {})
-                        if char and affinity.get(char, 0) >= threshold:
-                            if random.random() < trigger_chance:
-                                return True
+                if isinstance(condition, dict) and 'time' in condition:
+                    req_time = condition['time']
+                    if str(req_time).lower() == current_time_str.lower():
+                        if random.random() < trigger_chance:
+                            return True
+
+        # CONDITIONAL trigger: ALL conditions must be satisfied (AND logic)
+        elif trigger_type == 'conditional':
+            current_time = getattr(game_state, 'time_of_day', None)
+            if hasattr(current_time, 'value'):
+                current_time = current_time.value
+            current_time_str = str(current_time)
+            current_loc = str(getattr(game_state, 'current_location', ''))
+            flags = getattr(game_state, 'flags', {})
+            affinity = getattr(game_state, 'affinity', {})
+
+            # Check top-level allowed_times (AND with conditions)
+            if allowed_times:
+                if not any(str(t).lower() == current_time_str.lower() for t in allowed_times):
+                    return False
+
+            # Every condition in the list must pass
+            for condition in trigger_conditions:
+                if not isinstance(condition, dict):
+                    continue
+                if 'time' in condition:
+                    if str(condition['time']).lower() != current_time_str.lower():
+                        return False
+                if 'location' in condition:
+                    req_loc = condition['location']
+                    if not (req_loc and req_loc.lower() in current_loc.lower()):
+                        return False
+                if 'flag' in condition:
+                    required_flag = condition['flag']
+                    if not (required_flag and flags.get(required_flag, False)):
+                        return False
+                if 'affinity' in condition:
+                    char = condition.get('target', condition.get('character'))
+                    threshold = condition.get('value', condition.get('threshold', 50))
+                    if not (char and affinity.get(char, 0) >= threshold):
+                        return False
+
+            # All conditions passed — apply chance roll
+            return random.random() < trigger_chance
         
         # LOCATION_BASED trigger
         elif trigger_type == 'location':

@@ -98,5 +98,15 @@ class TurnContext:
     # ── Flag per avanzamento fase manuale ────────────────────────────────────
     is_manual_phase_advance: bool = False
 
+    # ── Home scene (Step 0.35) ───────────────────────────────────────────────
+    home_invited: List[str] = field(default_factory=list)  # companion invitate questo turno
+    home_dismissed: Optional[str] = None                   # companion congedata questo turno
+    home_mode_secondary: List[str] = field(default_factory=list)  # per reazioni post-narrativa
+    home_scene_media_done: bool = False  # True quando le immagini sono già generate inline
+
+    # ── Mention reaction (Step 11.5) ────────────────────────────────────────
+    mention_reaction_npc: Optional[str] = None  # companion presente che verrà menzionato
+    mention_reaction_done: bool = False          # True → TurnResult.text/image soppressi
+
     # ── Infrastruttura ───────────────────────────────────────────────────────
     turn_logger: Optional[Any] = None

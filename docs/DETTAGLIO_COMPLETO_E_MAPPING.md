@@ -462,3 +462,33 @@ L'area piu sensibile per manutenzione futura e la **coerenza documentale** (stat
 
 (Nota: i file in appendice B sono la base narrativa/progettuale; la mappa A rappresenta lo stato implementativo letto nel codice.)
 
+## Appendice C - Evidenze verifica rapida (2026-04-24)
+
+### C.1 Verifica simboli core nel codice
+
+| File | Simbolo atteso | Esito |
+|---|---|---|
+| `src/luna/core/engine.py` | `async def initialize(self)` | OK (trovato) |
+| `src/luna/agents/orchestrator/orchestrator.py` | `class TurnOrchestrator` | OK (trovato) |
+| `src/luna/agents/orchestrator/orchestrator.py` | `async def execute(self, user_input: str)` | OK (trovato) |
+| `src/luna/ui/app.py` | `class ApplicationRunner` | OK (trovato) |
+| `src/luna/ui/app.py` | `async def run(self) -> int` | OK (trovato) |
+| `src/luna/agents/guardian.py` | `class StateGuardian` | OK (trovato) |
+| `src/luna/agents/guardian.py` | `def apply(` | OK (trovato) |
+
+### C.2 Smoke test rapido eseguito
+
+Comando eseguito:
+
+```powershell
+python -m pytest tests/test_core_systems.py tests/test_quest_coherence.py -q
+```
+
+Esito:
+- 86 test passati
+- 0 test falliti
+
+Nota tecnica:
+- I due failure precedenti su `TestGlobalEventTriggers` risultano risolti dopo l'aggiornamento di `worlds/school_life_complete/global_events.yaml`, con aggiunta esplicita di condizioni `flag` e `location` per:
+  - `luna_gym_substitute_event`
+  - `luna_private_lesson_event`

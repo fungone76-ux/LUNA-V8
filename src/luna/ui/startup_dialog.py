@@ -567,4 +567,5 @@ class StartupDialog(QDialog):
             "execution_mode": self.combo_mode.currentText(),
             "runpod_id": self.edit_runpod_id.text().strip(),
             "no_media": self.chk_no_media.isChecked(),
+            "enable_audio": self.chk_audio.isChecked(),
         }

@@ -112,6 +112,7 @@ class MainWindow(QMainWindow):
         world_id: str,
         companion: str,
         session_id: Optional[int] = None,
+        enable_audio: bool = True,
     ) -> None:
         """Initialize game engine and show opening scene."""
         self.lbl_status.setText("Initializing game...")
@@ -123,6 +124,9 @@ class MainWindow(QMainWindow):
                 await self.engine.load_session(session_id)
             else:
                 await self.engine.initialize()
+
+            if self.engine.media_pipeline is not None:
+                self.engine.media_pipeline.set_audio_enabled(enable_audio)
 
             if self.engine.event_manager:
                 self.engine.event_manager.on_event_changed = self.display_manager.on_event_changed
@@ -139,6 +143,9 @@ class MainWindow(QMainWindow):
                 )
                 self.engine.set_ui_image_callback(
                     self.event_handler.on_intermediate_image
+                )
+                self.engine.set_ui_image_progress_callback(
+                    self._on_image_progress
                 )
 
             self.display_manager.update_companion_list()
@@ -251,6 +258,10 @@ class MainWindow(QMainWindow):
     def on_intermediate_image(self, image_path: str) -> None:
         """Display intermediate image (delegated to EventHandler)."""
         self.event_handler.on_intermediate_image(image_path)
+
+    def _on_image_progress(self, percent: int) -> None:
+        """Update status bar with image generation progress percentage."""
+        self.lbl_status.setText(f"Image {percent}%")
 
     def _on_poker_window_closed(self) -> None:
         """Called when the PokerWindow is closed — clean up reference."""

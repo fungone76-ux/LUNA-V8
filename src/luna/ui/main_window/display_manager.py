@@ -155,9 +155,12 @@ class DisplayManager:
         characters_present = []
 
         current_location_id = game_state.current_location
+        departures = set(getattr(game_state, 'npc_departures', []))
         for companion_name in w.engine.world.companions.keys():
             companion_def = w.engine.world.companions.get(companion_name)
             if getattr(companion_def, 'is_temporary', False):
+                continue
+            if companion_name in departures:
                 continue
 
             npc_location = game_state.get_npc_location(companion_name)
@@ -592,6 +595,11 @@ class DisplayManager:
                 next_quest_title=nc.next_quest_title,
                 is_hidden=nc.is_hidden,
             )
+
+        # Ricalcola sempre "Personaggi presenti" dallo schedule/location reale.
+        # result.present_characters include sempre active_companion indipendentemente
+        # dalla location, causando falsi positivi nel widget.
+        self.update_location_widget()
 
 
     def _display_multi_npc_sequence(self, result: TurnResult) -> None:

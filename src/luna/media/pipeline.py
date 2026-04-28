@@ -62,7 +62,13 @@ class MediaPipeline:
         # Callbacks for async updates
         self._on_image_ready: Optional[Callable[[str], None]] = None
         self._on_audio_ready: Optional[Callable[[str], None]] = None
-    
+        self._progress_callback: Optional[Callable[[int], None]] = None
+
+    def set_progress_callback(
+        self, callback: Optional[Callable[[int], None]]
+    ) -> None:
+        self._progress_callback = callback
+
     def set_callbacks(
         self,
         on_image_ready: Optional[Callable[[str], None]] = None,
@@ -231,7 +237,7 @@ class MediaPipeline:
                     companion_name=turn.get("companion_name", "unknown"),
                     outfit=turn.get("outfit"),
                     base_prompt=turn.get("base_prompt"),
-                    secondary_characters=turn.get("characters"),  # For MultiCharacterBuilder
+                    secondary_characters=turn.get("characters"),
                 )
                 path = image_result[0] if isinstance(image_result, tuple) else image_result
                 
@@ -487,7 +493,8 @@ class MediaPipeline:
             prompt = ImagePrompt(positive=sd_positive, negative=neg, width=w, height=h)
             try:
                 path = await self._image_client.generate(
-                    prompt=prompt, character_name=companion_name, extra_loras=extra_loras
+                    prompt=prompt, character_name=companion_name, extra_loras=extra_loras,
+                    progress_callback=self._progress_callback,
                 )
                 if path and self._on_image_ready:
                     self._on_image_ready(str(path))
@@ -532,8 +539,9 @@ class MediaPipeline:
             path = await self._image_client.generate(
                 prompt=prompt,
                 character_name=companion_name,
+                progress_callback=self._progress_callback,
             )
-            
+
             # Notify callback
             if path and self._on_image_ready:
                 self._on_image_ready(str(path))

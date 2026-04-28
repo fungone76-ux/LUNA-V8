@@ -195,6 +195,23 @@ class ContextBuilderMixin:
         except Exception as e:
             logger.warning("[ContextBuilder] npc_presence_context failed: %s", e)
 
+        # Home scene context — injected when 2+ companions are at player_home
+        ctx["home_scene_context"] = ""
+        try:
+            home_mgr = getattr(self.engine, "home_guest_manager", None)
+            if home_mgr and home_mgr.has_guests():
+                guests = home_mgr.get_active_guests()
+                active = game_state.active_companion
+                all_present = [active] + [g for g in guests if g != active]
+                if len(all_present) >= 2:
+                    ctx["home_scene_context"] = self._build_home_scene_text(
+                        all_present, active, game_state
+                    )
+                    ctx["home_mode"] = True
+                    ctx["home_companions"] = all_present
+        except Exception as e:
+            logger.warning("[ContextBuilder] home_scene_context failed: %s", e)
+
         return ctx
 
     async def _enrich_context(
@@ -226,9 +243,15 @@ class ContextBuilderMixin:
         # StoryDirector
         if self.engine.story_director:
             try:
-                beat = self.engine.story_director.get_active_instruction(game_state)
-                if beat:
-                    ctx["story_context"] = beat[1] if isinstance(beat, tuple) else str(beat)
+                beat_result = self.engine.story_director.get_active_instruction(game_state)
+                if beat_result:
+                    beat_obj, instruction = beat_result if isinstance(beat_result, tuple) else (None, str(beat_result))
+                    ctx["story_context"] = instruction
+                    # Mark once-only beats as completed immediately so they don't
+                    # re-inject their required_elements on every subsequent turn.
+                    if beat_obj is not None and getattr(beat_obj, "once", False):
+                        self.engine.story_director.mark_completed(beat_obj, "auto-completed")
+                        self.engine.story_director.apply_consequences(beat_obj, game_state)
             except Exception as e:
                 logger.warning("[Orchestrator] StoryDirector failed: %s", e)
 
@@ -240,13 +263,19 @@ class ContextBuilderMixin:
                 # schedule-based activity so the NPC is self-aware of their current role.
                 if situation_override:
                     ctx["activity_context"] = situation_override
-                # Collect action hints from stage transitions
+                # Collect action hints from stage transitions; track completions for TurnResult
                 all_hints = []
                 for upd in stage_updates:
                     if upd.stage_changed:
                         logger.info("[QuestEngine] Stage change: %s → %s", upd.old_stage, upd.new_stage)
                     if getattr(upd, "action_hints", None):
                         all_hints.extend(upd.action_hints)
+                    if upd.quest_completed:
+                        completed_flag = game_state.flags.get("_quests_completed_this_turn", [])
+                        quest_def = self.engine.quest_engine.world.quests.get(upd.quest_id)
+                        title = quest_def.title if quest_def else upd.quest_id
+                        game_state.flags["_quests_completed_this_turn"] = completed_flag + [title]
+                        logger.info("[QuestEngine] Quest completed this turn: %s", upd.quest_id)
                 # Enrich with QuestDirector (impression variants + consequences)
                 if self._quest_director:
                     try:
@@ -432,6 +461,74 @@ class ContextBuilderMixin:
                 )
 
         return " ".join(parts) if parts else ""
+
+    # =========================================================================
+    # Home scene context helpers
+    # =========================================================================
+
+    def _build_home_scene_text(
+        self,
+        all_present: List[str],
+        active: str,
+        game_state: "GameState",
+    ) -> str:
+        lines = []
+        lines.append(f"PRESENT AT HOME: {', '.join(all_present)}")
+        lines.append("")
+        lines.append("PLAYER AFFINITY:")
+        for npc in all_present:
+            aff = game_state.affinity.get(npc, 0)
+            lines.append(f"  - {npc}: {aff}/100")
+        lines.append("")
+        npc_rels = []
+        for i, npc_a in enumerate(all_present):
+            for npc_b in all_present[i + 1:]:
+                rel = self._get_npc_relationship(npc_a, npc_b)
+                if rel:
+                    npc_rels.append(f"  - {npc_a} ↔ {npc_b}: {rel}")
+        if npc_rels:
+            lines.append("COMPANION RELATIONSHIPS:")
+            lines.extend(npc_rels)
+            lines.append("")
+        others = [n for n in all_present if n != active]
+        others_str = ", ".join(others) if others else ""
+        lines.append("STRICT RULE — ONE VOICE ONLY:")
+        lines.append(f"  - Write ONLY {active}'s dialogue and actions.")
+        if others_str:
+            lines.append(f"  - Do NOT write {others_str}'s lines, actions, or reactions.")
+            lines.append(f"  - {others_str} {'is' if len(others) == 1 else 'are'} physically present but will speak in a separate turn.")
+        lines.append("  - Never impersonate another companion inside this response.")
+        lines.append("")
+        lines.append("ADDRESSING:")
+        lines.append("  - Generic input → active companion responds only.")
+        lines.append("  - '[Name], ...' → that companion will respond in their own separate turn.")
+        lines.append("  - 'ragazze'/'tutte' → each companion responds in a SEPARATE call.")
+        return "\n".join(lines)
+
+    def _get_npc_relationship(self, npc_a: str, npc_b: str) -> str:
+        if not getattr(self.engine, "personality_engine", None):
+            return ""
+        try:
+            state_a = self.engine.personality_engine._ensure_state(npc_a)
+            links = state_a.npc_links.get(npc_b, {})
+            rapport = links.get("rapport", 0) if isinstance(links, dict) else 0
+            rel_type = links.get("relationship_type", "") if isinstance(links, dict) else ""
+            if rel_type:
+                # Strip event-specific nouns (photoshoot, camera, etc.) — keep only emotional tone.
+                # A long rel_type with prop names causes the LLM to invent scene objects.
+                words = rel_type.split()
+                if len(words) > 6:
+                    rel_type = " ".join(words[:6])
+                return rel_type
+            if rapport > 50:
+                return "friends, they trust each other"
+            elif rapport < -20:
+                return "rivals, evident tension"
+            elif rapport < 0:
+                return "coldness, silent competition"
+            return "acquaintances, neutral"
+        except Exception:
+            return ""
 
     # =========================================================================
     # Farewell generation

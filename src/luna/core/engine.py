@@ -19,6 +19,7 @@ from typing import Any, Dict, List, Optional
 
 from luna.core.models import GameState, TurnResult, WorldDefinition
 from luna.systems.gameplay_manager import GameplayManager
+from luna.systems.home_guest_manager import HOME_LOCATION
 
 from luna.core.config import get_settings
 from luna.core.database import get_db_manager, DatabaseManager
@@ -94,6 +95,9 @@ class GameEngine:
         self.presence_tracker         = None
         self.emotional_state_engine   = None
         self.character_voice_builder  = None
+
+        # Home guest system
+        self.home_guest_manager       = None
 
         # UI callbacks
         self._ui_time_change_cb: Optional[Callable] = None
@@ -260,11 +264,20 @@ class GameEngine:
     
     def set_ui_image_callback(self, callback: Callable) -> None:
         """Set callback for intermediate image display.
-        
+
         Args:
             callback: function(image_path: str)
         """
         self._ui_image_callback = callback
+
+    def set_ui_image_progress_callback(self, callback: Callable) -> None:
+        """Set callback for image generation progress updates.
+
+        Args:
+            callback: function(percent: int) called with 0-100
+        """
+        if self.media_pipeline:
+            self.media_pipeline.set_progress_callback(callback)
 
     def get_available_actions(self) -> List[Dict[str, Any]]:
         if not self.gameplay_manager:
@@ -438,6 +451,10 @@ class GameEngine:
         self.emotional_state_engine  = EmotionalStateEngine()
         self.character_voice_builder = CharacterVoiceBuilder()
 
+        # Home guest system
+        from luna.systems.home_guest_manager import HomeGuestManager
+        self.home_guest_manager = HomeGuestManager(world=self.world)
+
         # v8: NPC Secondary Activation System
         from luna.systems.npc_location_router import NpcLocationRouter
         self.npc_location_router  = NpcLocationRouter(world=self.world)
@@ -523,6 +540,13 @@ class GameEngine:
             logger.info("[Engine] InvitationManager state restored (%d pending)",
                         len(inv_state.get("pending", [])))
 
+        # Restore HomeGuestManager and re-pin active guests to player_home
+        if self.home_guest_manager:
+            self.home_guest_manager.load_from_flags(game_state.flags)
+            for npc_name in self.home_guest_manager.get_active_guests():
+                game_state.set_npc_location(npc_name, HOME_LOCATION)
+                logger.info("[Engine] HomeGuest %s re-pinned to %s", npc_name, HOME_LOCATION)
+
         self.state_memory = StateMemoryManager(
             db=self.db,
             session_id=game_state.session_id,
@@ -537,6 +561,7 @@ class GameEngine:
             tension_tracker=None,          # set after TensionTracker init below
             dynamic_event_manager=self.gameplay_manager.event_manager if self.gameplay_manager else None,
             invitation_manager=self.invitation_manager,
+            home_guest_manager=self.home_guest_manager,
         )
 
         self.situational_intervention = SituationalInterventionSystem(
@@ -749,6 +774,10 @@ class GameEngine:
 
                 for npc_name in list(state.npc_locations.keys()):
                     if staying and npc_name == active:
+                        continue
+                    # Home guests ignore schedule — they stay until explicitly dismissed
+                    if self.home_guest_manager and self.home_guest_manager.is_guest(npc_name):
+                        logger.debug("[PhaseChange] %s è ospite a casa, skip schedule update", npc_name)
                         continue
                     # Respect active invitation overrides — skip if TTL is still running
                     if npc_name in state.npc_location_expires:

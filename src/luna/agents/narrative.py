@@ -91,14 +91,29 @@ class NarrativeEngine:
 
         Returns:
             NarrativeOutput with text + state updates
+
+        Prompt layering:
+            system_prompt = Layer 0: immutable rules (never changes between turns)
+            user_input    = Layer 1-3: dynamic scene context + JSON schema + player action
+            history       = real conversation (stripped of NPC turns in solo mode)
+
+        The model generates from the last token it reads. Putting scene context,
+        prohibitions and JSON schema immediately before the player action means
+        they carry maximum weight at generation time.
         """
         companion = self.world.companions.get(game_state.active_companion)
-        system_prompt = self._build_prompt(game_state, companion, context)
+
+        # Layer 0: permanent rules → system_prompt (cached-friendly, never changes)
+        static_prompt = self._build_static_prompt()
+
+        # Layer 1-3: dynamic context → prepended to user_input so it's read last
+        scene_context = self._build_prompt(game_state, companion, context)
+        full_user_input = f"{scene_context}\n=== PLAYER ACTION ===\n{user_input}"
 
         llm_response, provider = await llm_manager.generate(
-            system_prompt=system_prompt,
-            user_input=user_input,
-            history=self._build_history(context),
+            system_prompt=static_prompt,
+            user_input=full_user_input,
+            history=self._build_history(context, game_state),
             json_mode=True,
             companion_name=companion.name if companion else "NPC",
         )
@@ -109,17 +124,34 @@ class NarrativeEngine:
     # Prompt building
     # -------------------------------------------------------------------------
 
+    def _build_static_prompt(self) -> str:
+        """Layer 0: immutable game master rules.
+
+        Passed as system_prompt — identical every turn, cache-friendly.
+        Contains only rules that never change: GM identity, critical rules,
+        adult content rules, cast rules. No world/character/scene data.
+        """
+        return "\n".join(self._header())
+
     def _build_prompt(
         self,
         game_state: GameState,
         companion: Optional[CompanionDefinition],
         context: Dict[str, Any],
     ) -> str:
+        """Layer 1-3: all dynamic context for this turn.
+
+        Passed as prefix of user_input so it is the last thing the model reads
+        before generating. Includes: world/character/scene context (L1-2),
+        active directives and prohibitions (L3), and the JSON output schema.
+        """
         sections: List[str] = []
 
-        sections += self._header()
+        # _header() intentionally NOT here — it lives in _build_static_prompt() (Layer 0)
+        sections += self._solo_prohibition_early(game_state)
         sections += self._authority_scene_context(context)  # PRIORITÀ MASSIMA — sovrascrive scena default
         sections += self._world_context()
+        sections += self._npc_cast()
         sections += self._companion_context(companion, game_state, context)
         sections += self._situation(game_state, companion)
         sections += self._outfit_context(game_state, companion)
@@ -135,12 +167,14 @@ class NarrativeEngine:
         sections += self._activity_context(context)
         sections += self._npc_presence_context(context)  # Metodo 7: stato accumulato NPC
         sections += self._npc_secret_hint(context)
+        sections += self._home_scene_context(context)   # scena di gruppo a casa
         sections += self._multi_npc_context(context)
         sections += self._quest_context(context)
         sections += self._memory_context(context)
         sections += self._forced_poses(context)
         sections += self._body_focus_hint(context.get("user_input", ""))
         sections += self._visual_director(game_state)
+        sections += self._final_prohibitions(game_state, context)
         sections += self._output_format()
 
         return "\n".join(sections)
@@ -183,6 +217,39 @@ class NarrativeEngine:
             "19. NAME THE CHARACTER: You MUST name the active character explicitly in your narration.",
             "20. OUTFIT PERSISTENCE: Characters DO NOT magically redress. If outfit is 'Nude' or 'Lingerie', it STAYS that way.",
             "21. NO GLASSES: Characters NEVER wear glasses/sunglasses unless explicitly requested.",
+            "",
+            "=== CAST RULES ===",
+            "22. NEVER INVENT NPCs: ONLY reference characters that appear in the KNOWN CAST section below.",
+            "    Do NOT hallucinate teachers, staff, students, or passers-by not in that list.",
+            "    A 'professoressa di inglese', 'preside che passa', 'studente' invented on the spot is FORBIDDEN.",
+            "23. SECONDARY NPC RESPONSE: If you address a named secondary NPC with a question or direct dialogue,",
+            "    you MUST include their brief in-character response in the SAME turn.",
+            "    NEVER leave a secondary NPC's answer implied or waiting — voice it immediately.",
+            "    Example: Luna asks Stella → Stella answers (briefly, in her voice) within the same narration.",
+            "",
+        ]
+
+    def _npc_cast(self) -> List[str]:
+        """List every known NPC so the LLM cannot hallucinate new ones."""
+        names: List[str] = []
+        for comp_id, comp_def in self.world.companions.items():
+            n = getattr(comp_def, "name", comp_id)
+            r = getattr(comp_def, "role", "")
+            names.append(f"  - {n}" + (f" ({r})" if r else ""))
+        for npc_id, npc_def in (self.world.npc_templates or {}).items():
+            if isinstance(npc_def, dict):
+                n = npc_def.get("name", npc_id)
+                r = npc_def.get("role", "")
+            else:
+                n = getattr(npc_def, "name", npc_id)
+                r = getattr(npc_def, "role", "")
+            names.append(f"  - {n}" + (f" ({r})" if r else ""))
+        if not names:
+            return []
+        return [
+            "=== KNOWN CAST (ONLY THESE CHARACTERS EXIST) ===",
+            *names,
+            "⚠️ DO NOT reference, invent, or mention any character not in this list.",
             "",
         ]
 
@@ -240,10 +307,25 @@ class NarrativeEngine:
                 return self._npc_speaker_context(active_npc_id, npc_def, companion)
 
         if not companion or game_state.active_companion == _SOLO_COMPANION:
+            # List every known NPC name so the LLM cannot hallucinate their presence
+            known_names = []
+            for cid, cdef in self.world.companions.items():
+                n = getattr(cdef, "name", cid)
+                if n.lower() != _SOLO_COMPANION:
+                    known_names.append(n)
+            for tid, tdef in (self.world.npc_templates or {}).items():
+                n = tdef.get("name", tid) if isinstance(tdef, dict) else getattr(tdef, "name", tid)
+                known_names.append(n)
+            forbidden = ", ".join(known_names) if known_names else "any NPC"
             return [
-                "=== SOLO MODE ===",
-                "Player is ALONE. No NPC speaks or appears.",
-                "Describe only the location atmosphere.",
+                "=== SOLO MODE — PLAYER IS COMPLETELY ALONE ===",
+                "⚠️ ABSOLUTE RULE: NO companion or NPC is present at this location.",
+                f"⚠️ The following characters ARE NOT HERE and CANNOT appear: {forbidden}.",
+                "⚠️ They are in OTHER locations. They did NOT follow the player.",
+                "⚠️ DO NOT write any character's dialogue or actions.",
+                "⚠️ DO NOT reference any character from conversation history as being present.",
+                "Describe ONLY: location atmosphere, sounds, objects, light.",
+                "NO quotes. NO asterisks with character names. NO NPC reactions.",
                 "",
             ]
 
@@ -580,6 +662,16 @@ class NarrativeEngine:
             return []
         return [ctx, ""]
 
+    def _home_scene_context(self, context: Dict[str, Any]) -> List[str]:
+        home_scene = context.get("home_scene_context")
+        if not home_scene:
+            return []
+        return [
+            "=== GROUP SCENE — PLAYER'S HOME ===",
+            home_scene,
+            "",
+        ]
+
     def _quest_context(self, context: Dict[str, Any]) -> List[str]:
         ctx = context.get("quest_context", "")
         if not ctx:
@@ -724,7 +816,9 @@ class NarrativeEngine:
     # Helpers
     # -------------------------------------------------------------------------
 
-    def _build_history(self, context: Dict[str, Any]) -> List[Dict[str, str]]:
+    def _build_history(
+        self, context: Dict[str, Any], game_state: Any = None
+    ) -> List[Dict[str, str]]:
         """Convert conversation history string to message list."""
         raw = context.get("conversation_history", "")
         if not raw:
@@ -735,7 +829,45 @@ class NarrativeEngine:
                 speaker, _, content = line.partition(": ")
                 role = "user" if speaker.lower() in ("player", "giocatore") else "assistant"
                 messages.append({"role": role, "content": content.strip()})
-        return messages[-10:]  # last 10 messages only
+        recent = messages[-10:]
+        # In solo mode, strip NPC turns: the model infers presence from history context,
+        # so passing 10 turns of NPC dialogue directly contradicts the solo prohibition.
+        if game_state and getattr(game_state, "active_companion", None) == _SOLO_COMPANION:
+            return [m for m in recent if m["role"] == "user"]
+        return recent
+
+    def _solo_prohibition_early(self, game_state: Any) -> List[str]:
+        """Early (top-of-prompt) prohibition injected right after the header in solo mode."""
+        if getattr(game_state, "active_companion", None) != _SOLO_COMPANION:
+            return []
+        return [
+            "⚠️ CRITICAL — SOLO SCENE: THE PLAYER IS COMPLETELY ALONE.",
+            "⚠️ NO companion or NPC is present. DO NOT write any dialogue or NPC action.",
+            "",
+        ]
+
+    def _final_prohibitions(self, game_state: Any, context: Dict[str, Any]) -> List[str]:
+        """Echo active prohibitions as the last prompt section before output format.
+
+        Placed here because the model reads from the end when generating — a prohibition
+        buried at line 150 of a 300-line prompt often gets forgotten by generation time.
+        """
+        is_solo = getattr(game_state, "active_companion", None) == _SOLO_COMPANION
+        has_scene_prohibition = "SCENE PROHIBITION" in context.get("quest_context", "")
+        if not is_solo and not has_scene_prohibition:
+            return []
+        lines = ["=== FINAL REMINDER — RE-READ BEFORE GENERATING ==="]
+        if is_solo:
+            lines.append(
+                "⚠️ PLAYER IS ALONE. No NPC writes dialogue. No NPC acts. Atmosphere only."
+            )
+        if has_scene_prohibition:
+            lines.append(
+                "⚠️ A SCENE PROHIBITION is active above. Scroll up to === SCENE PROHIBITION ===,"
+                " re-read it, and do NOT violate it."
+            )
+        lines.append("")
+        return lines
 
     def _get_affinity_tier(
         self, companion: CompanionDefinition, affinity: int

@@ -218,6 +218,8 @@ class GameState(LunaBaseModel):
     npc_locations: Dict[str, str] = Field(default_factory=dict)
     # Optional TTL for each override: npc_name -> turn at which override expires (0 = permanent)
     npc_location_expires: Dict[str, int] = Field(default_factory=dict)
+    # NPCs who have explicitly left the current scene — cleared on phase change
+    npc_departures: List[str] = Field(default_factory=list)
 
     # Player
     player: PlayerState = Field(default_factory=PlayerState)
@@ -280,10 +282,25 @@ class GameState(LunaBaseModel):
         else:
             self.npc_location_expires.pop(npc_name, None)
         self.npc_locations[npc_name] = location
+        # Re-invite cancels a previous departure
+        if npc_name in self.npc_departures:
+            self.npc_departures.remove(npc_name)
 
     def clear_npc_location(self, npc_name: str) -> None:
         self.npc_locations.pop(npc_name, None)
         self.npc_location_expires.pop(npc_name, None)
+
+    def mark_npc_departed(self, npc_name: str) -> None:
+        """Mark NPC as having explicitly left the current scene."""
+        if npc_name not in self.npc_departures:
+            self.npc_departures.append(npc_name)
+        # Remove any location override so they're not re-detected as present
+        self.npc_locations.pop(npc_name, None)
+        self.npc_location_expires.pop(npc_name, None)
+
+    def clear_departures(self) -> None:
+        """Reset departure list — called on phase change."""
+        self.npc_departures.clear()
 
     def purge_expired_npc_locations(self) -> List[str]:
         """Remove location overrides whose TTL has elapsed. Returns list of purged NPC names."""

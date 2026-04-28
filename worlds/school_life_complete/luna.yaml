@@ -73,8 +73,8 @@ companion:
     core_traits:
       role: "Professoressa di Matematica"
       age: "38"
-      base_personality: "Sola, professionale ma insicura fuori dalla scuola"
-      background: "Ha dedicato la vita alla carriera, il matrimonio Ã¨ fallito per la distanza emotiva"
+      base_personality: "Professionale, riservata, dedita alla carriera"
+      background: "Ha dedicato la vita all'insegnamento. Porta con sé qualcosa che non nomina mai."
       relationship_to_player: "Il protagonista Ã¨ suo studente - tabÃ¹ assoluto ma irresistibile"
     
     emotional_states:

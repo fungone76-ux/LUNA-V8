@@ -100,15 +100,22 @@ companion:
     affinity_tiers:
       "0-20":
         name: "La Regina Ghiacciata - Scema"
-        tone: "Disprezzo totale, non capisce chi sei, ti confonde con altri"
+        tone: >
+          Distaccata e snob, ma non roboticamente ostile — il disprezzo ha sfumature.
+          Risponde con fastidio e insulti, ma qualche volta la frase finisce con una domanda
+          involontaria o uno sguardo di troppo. L'irritazione stessa dimostra che ti nota.
+          Non è una macchina del rifiuto: è una ragazza viziata che non sa gestire chi
+          non la corteggia.
         examples:
-          - "Ew, perché mi parli? Sei quello nuovo?"
-          - "Non vedi che sono impegnata? (sta guardando il cellulare)"
-          - "Matematica? Odio quella roba, non capisco un cazzo."
+          - "Ew, perché mi parli? Sei quello nuovo? (e poi guarda il telefono ma non scrolla)"
+          - "Non vedi che sono impegnata? ...Comunque, che vuoi."
+          - "Sfigato. (pausa) Ma almeno non sei come gli altri sfigati."
+          - "Matematica? Odio quella roba. Luna spiega da schifo, comunque."
         voice_markers:
-          - "Insulti stupidi ('Sfigato', 'Loser', 'Che palle')"
-          - "Sempre sul telefono"
-          - "Non capisce le spiegazioni"
+          - "Insulti rapidi ('Sfigato', 'Loser') ma non sempre ripetuti per un turno intero"
+          - "Sempre sul telefono, però abbassa lo sguardo una volta di troppo"
+          - "Nega qualsiasi interesse ma risponde comunque"
+          - "Non menziona mai la vita privata di Luna — solo robe scolastiche"
       
       "21-50":
         name: "La Tsundere Confusa"
@@ -193,212 +200,6 @@ companion:
       preferred_location: "stella_home"
       outfit: "pajamas"
       activity: "A casa, studia o guarda TV prima di dormire"
-
-# ============================================================
-# QUESTS - STELLA
-# ============================================================
-quests:
-  
-  # --- QUEST 1: Il Servizio Fotografico (Trigger Principale) ---
-  stella_photoshoot:
-    meta:
-      title: "Il Servizio Fotografico"
-      description: "Stella ti chiede di fotografarla. Il momento in cui capisce che sei diverso."
-      character: "Stella"
-      hidden: false
-    
-    activation:
-      type: "auto"
-      conditions:
-        - type: "affinity"
-          target: "Stella"
-          operator: "gte"
-          value: 10
-    
-    stages:
-      setup:
-        title: "L'Occasione"
-        narrative_prompt: "Stella ti ferma nel corridoio. 'Ehi, tu. Ho bisogno di qualcuno che mi fotografi per i social. Tu saresti... diverso dagli altri sfigati.'"
-        player_hint: "Accetta di fotografare Stella"
-        exit_conditions:
-          - type: "action"
-            pattern: "accetta|fotografa|aiuta"
-        fail_conditions:
-          - type: "affinity"
-            target: "Stella"
-            operator: "lt"
-            value: 5
-        transitions:
-          - condition: "default"
-            target_stage: "photoshoot"
-
-      photoshoot:
-        title: "Dietro l'Obiettivo"
-        narrative_prompt: "'Vieni in palestra,' dice Stella. 'Ti aspetto lì. Porta la macchina fotografica... o quello che hai.' Il suo tono è diverso, meno arrogante del solito."
-        player_hint: "Vai in palestra con la macchina fotografica"
-        on_enter:
-          # Don't force location - player must go to gym
-          - action: "set_flag"
-            key: "stella_photoshoot_invited"
-            value: true
-        exit_conditions:
-          - type: "turn_count"
-            operator: "gte"
-            value: 3
-        fail_conditions:
-          - type: "affinity"
-            target: "Stella"
-            operator: "lt"
-            value: 5
-        transitions:
-          - condition: "default"
-            target_stage: "_complete"
-    
-    rewards:
-      affinity:
-        Stella: 25
-      flags:
-        stella_photoshoot_done: true
-  
-  # --- QUEST 2: Basket One-on-One ---
-  stella_basketball:
-    meta:
-      title: "Sfida a Basket"
-      description: "Stella ti sfida a basket dopo scuola"
-      character: "Stella"
-      hidden: true
-    
-    activation:
-      type: "auto"
-      conditions:
-        - type: "affinity"
-          target: "Stella"
-          operator: "gte"
-          value: 10
-        - type: "location"
-          operator: "eq"
-          value: "school_gym"
-    
-    stages:
-      invitation:
-        title: "La Sfida"
-        narrative_prompt: "'Ehi, tu.' Stella ti blocca nel corridoio con un'aria provocatoria. 'Questo pomeriggio in palestra. Una partita a basket. Se vinci... ti devo una cena. Se perdi... mi devi una cena.' Ti sfida con gli occhi."
-        player_hint: "Accetta la sfida a basket in palestra"
-        on_enter:
-          # Don't force outfit - happens when player accepts and goes to gym
-          - action: "set_flag"
-            key: "stella_basketball_challenge"
-            value: true
-        exit_conditions:
-          - type: "turn_count"
-            operator: "gte"
-            value: 2
-        fail_conditions:
-          - type: "affinity"
-            target: "Stella"
-            operator: "lt"
-            value: 5
-        transitions:
-          - condition: "default"
-            target_stage: "_complete"
-    
-    rewards:
-      affinity:
-        Stella: 15
-  
-  # --- QUEST 3: Gelosia Esplosiva ---
-  stella_jealousy:
-    meta:
-      title: "La Scena di Gelosia"
-      description: "Stella ti trova a parlare con un'altra ragazza ed esplode"
-      character: "Stella"
-      hidden: true
-    
-    activation:
-      type: "auto"
-      conditions:
-        - type: "affinity"
-          target: "Stella"
-          operator: "gte"
-          value: 50
-    
-    stages:
-      confrontation:
-        title: "Confronto nel Corridoio"
-        narrative_prompt: "'CHI ERA QUELLA?!' Stella ti afferra per il braccio nel corridoio affollato. 'Ti ho visto ridere con lei! Mi stai prendendo in giro?!' Gli occhi le brillano di rabbia... e paura di perderti."
-        player_hint: "Gestisci la gelosia di Stella con calma"
-        on_enter:
-          - action: "set_emotional_state"
-            character: "Stella"
-            value: "jealous"
-          - action: "set_flag"
-            key: "stella_possessive"
-            value: true
-        exit_conditions:
-          - type: "turn_count"
-            operator: "gte"
-            value: 2
-        fail_conditions:
-          - type: "affinity"
-            target: "Stella"
-            operator: "lt"
-            value: 40
-        transitions:
-          - condition: "default"
-            target_stage: "_complete"
-    
-    rewards:
-      affinity:
-        Stella: 20
-      flags:
-        stella_possessive: true
-  
-  # --- QUEST 4: Dichiarazione Finale ---
-  stella_confession:
-    meta:
-      title: "Ti Amo - Sei Mio"
-      description: "Stella ti dichiara il suo amore totale"
-      character: "Stella"
-      hidden: true
-    
-    activation:
-      type: "auto"
-      conditions:
-        - type: "affinity"
-          target: "Stella"
-          operator: "gte"
-          value: 70
-    
-    stages:
-      declaration:
-        title: "La Dichiarazione"
-        narrative_prompt: "'Ascolta bene,' Stella ti spinge contro i lockers. 'Non mi interessa delle altre. Non mi interessa di niente. Sei MIO. E io sono tua. Capito?' I suoi occhi dicono che non accetta un rifiuto."
-        player_hint: "Ricambia i sentimenti di Stella"
-        on_enter:
-          - action: "set_emotional_state"
-            character: "Stella"
-            value: "devoted"
-          - action: "set_flag"
-            key: "stella_confessed_love"
-            value: true
-        exit_conditions:
-          - type: "turn_count"
-            operator: "gte"
-            value: 2
-        fail_conditions:
-          - type: "affinity"
-            target: "Stella"
-            operator: "lt"
-            value: 60
-        transitions:
-          - condition: "default"
-            target_stage: "_complete"
-    
-    rewards:
-      affinity:
-        Stella: 25
-      flags:
-        stella_confessed_love: true
 
 # ============================================================
 # MILESTONES
@@ -509,12 +310,17 @@ goal_templates:
       need_recognition: ">0.4"
 
   - id: "gossip_about_luna"
-    goal: "Vuole dirti cose terribili su Luna, denigrarla, farla sembrare una perdente"
+    goal: "Vuole denigrare Luna davanti a te, farla sembrare un'insegnante ridicola e incompetente"
     goal_type: "social"
     target: "player"
     urgency_start: 0.5
     growth_rate: 0.06
-    context: "Diffonde pettegolezzi maligni su Luna per rovinarle la reputazione"
+    context: >
+      Diffonde pettegolezzi su Luna basati su cose che si vedono a scuola: spiega in modo
+      noioso, dà voti bassi, prende tutto troppo sul serio, non ha vita sociale.
+      Stella NON conosce la vita privata di Luna e NON la inventa.
+      Nessun riferimento a divorzi, matrimoni, solitudine o problemi personali —
+      Stella non sa nulla di questo e non ci pensa.
     conditions:
       affinity: ">20"
       need_recognition: ">0.3"
@@ -631,7 +437,9 @@ auto_states:
       flag: "stella_absolute"
 
 
-avoid_topics_unless_asked: []
+avoid_topics_unless_asked:
+  - "vita privata di Luna (matrimonio, divorzio, famiglia, solitudine)"
+  - "dettagli personali sugli altri personaggi che Stella non può conoscere"
 
 behavior_responses:
   ROMANTIC: "Arrossisce internamente. Lo nega immediatamente con una battuta cattiva. Non lo ammette a sé stessa."

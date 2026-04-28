@@ -115,6 +115,7 @@ class ComfyUIClient:
         character_name: str = "",
         save_dir: Optional[Path] = None,
         extra_loras: Optional[List[str]] = None,
+        progress_callback: Optional[Any] = None,
     ) -> Optional[Path]:
         comfy_url = self.settings.comfy_url
         logger.debug(
@@ -150,7 +151,8 @@ class ComfyUIClient:
                 return None
 
             return await self._wait_and_download(
-                comfy_url, prompt_id, character_name, save_dir
+                comfy_url, prompt_id, character_name, save_dir,
+                progress_callback=progress_callback,
             )
 
         except Exception as e:
@@ -339,6 +341,7 @@ class ComfyUIClient:
         prompt_id: str,
         character: str,
         save_dir: Optional[Path],
+        progress_callback: Optional[Any] = None,
     ) -> Optional[Path]:
         max_wait      = 120
         poll_interval = 2
@@ -346,6 +349,9 @@ class ComfyUIClient:
         async with aiohttp.ClientSession(timeout=self.timeout) as session:
             for elapsed in range(0, max_wait, poll_interval):
                 await asyncio.sleep(poll_interval)
+                if progress_callback:
+                    pct = min(int(((elapsed + poll_interval) / max_wait) * 99), 99)
+                    progress_callback(pct)
                 try:
                     async with session.get(
                         f"{comfy_url}/history/{prompt_id}"

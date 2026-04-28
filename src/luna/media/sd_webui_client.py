@@ -7,10 +7,11 @@ from __future__ import annotations
 import logging
 logger = logging.getLogger(__name__)
 
+import asyncio
 import json
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 
 import aiohttp
 import aiofiles
@@ -35,6 +36,7 @@ class SDWebUIClient:
         prompt: ImagePrompt,
         character_name: str = "",
         save_dir: Optional[Path] = None,
+        progress_callback: Optional[Callable[[int], None]] = None,
     ) -> Optional[Path]:
         """Generate image using SD WebUI.
         
@@ -76,42 +78,74 @@ class SDWebUIClient:
             logger.debug(f"\n[SD WebUI] Generating {character_name}...")
             logger.debug(f"[SD WebUI] Size: {prompt.width}x{prompt.height}")
             logger.debug(f"[SD WebUI] Prompt: {prompt.positive}")
-            
-            async with aiohttp.ClientSession(timeout=self.timeout) as session:
-                # Generate image
-                async with session.post(
-                    f"{sd_url}/sdapi/v1/txt2img",
-                    json=payload
-                ) as resp:
-                    if resp.status != 200:
-                        error = await resp.text()
-                        logger.warning(f"[SD WebUI] Generation failed: {resp.status} - {error[:200]}")
-                        return None
-                    
-                    data = await resp.json()
-                    images = data.get("images", [])
-                    
-                    if not images:
-                        logger.debug("[SD WebUI] No images returned")
-                        return None
-                    
-                    # Save image
-                    import base64
-                    img_data = base64.b64decode(images[0])
-                    
-                    if save_dir is None:
-                        save_dir = Path("storage/images")
-                    save_dir = save_dir.resolve()  # Convert to absolute path
-                    save_dir.mkdir(parents=True, exist_ok=True)
-                    
-                    path = save_dir / f"{character_name}_{int(time.time())}.png"
-                    
-                    async with aiofiles.open(path, "wb") as f:
-                        await f.write(img_data)
-                    
-                    logger.debug(f"[SD WebUI] Saved: {path}")
-                    return path.resolve()  # Return absolute path
-                    
+
+            stop_progress = asyncio.Event()
+
+            async def _poll_progress() -> None:
+                async with aiohttp.ClientSession(
+                    timeout=aiohttp.ClientTimeout(total=5)
+                ) as prog_session:
+                    while not stop_progress.is_set():
+                        try:
+                            async with prog_session.get(
+                                f"{sd_url}/sdapi/v1/progress"
+                            ) as r:
+                                if r.status == 200:
+                                    data = await r.json()
+                                    pct = int(data.get("progress", 0) * 100)
+                                    progress_callback(pct)
+                        except Exception:
+                            pass
+                        await asyncio.sleep(0.5)
+
+            progress_task = None
+            if progress_callback:
+                progress_task = asyncio.create_task(_poll_progress())
+
+            try:
+                async with aiohttp.ClientSession(timeout=self.timeout) as session:
+                    # Generate image
+                    async with session.post(
+                        f"{sd_url}/sdapi/v1/txt2img",
+                        json=payload
+                    ) as resp:
+                        if resp.status != 200:
+                            error = await resp.text()
+                            logger.warning(f"[SD WebUI] Generation failed: {resp.status} - {error[:200]}")
+                            return None
+
+                        data = await resp.json()
+                        images = data.get("images", [])
+
+                        if not images:
+                            logger.debug("[SD WebUI] No images returned")
+                            return None
+
+                        import base64
+                        img_data = base64.b64decode(images[0])
+
+                if save_dir is None:
+                    save_dir = Path("storage/images")
+                save_dir = save_dir.resolve()
+                save_dir.mkdir(parents=True, exist_ok=True)
+
+                path = save_dir / f"{character_name}_{int(time.time())}.png"
+
+                async with aiofiles.open(path, "wb") as f:
+                    await f.write(img_data)
+
+                logger.debug(f"[SD WebUI] Saved: {path}")
+                return path.resolve()
+
+            finally:
+                stop_progress.set()
+                if progress_task:
+                    progress_task.cancel()
+                    try:
+                        await progress_task
+                    except asyncio.CancelledError:
+                        pass
+
         except Exception as e:
             logger.warning(f"[SD WebUI] Error: {e}")
             return None

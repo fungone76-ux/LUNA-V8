@@ -218,8 +218,9 @@ class MultiNPCManager:
                         # Use first spawn location as NPC's default location
                         npc_location = spawn_locs[0]
             
-            # NPC is present if at same location as player
-            if npc_location == player_location:
+            # NPC is present if at same location as player and hasn't explicitly departed
+            departed = getattr(game_state, "npc_departures", [])
+            if npc_location == player_location and npc_name not in departed:
                 present.append(npc_name)
                 logger.debug(f"[MultiNPC] {npc_name} is present at {player_location}")
         

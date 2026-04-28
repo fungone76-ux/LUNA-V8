@@ -117,6 +117,12 @@ class TurnResult:
     # v7.5: MultiNPC expanded - sequenza messaggi separati
     was_interrupted: bool = False  # True se l'utente ha interrotto la sequenza MultiNPC
 
+    # v8: Presence panel — tutti gli NPC fisicamente presenti nella location del player
+    present_characters: List[str] = field(default_factory=list)
+
+    # Home guest panel — companion attualmente ospitate a casa
+    home_guests: List[str] = field(default_factory=list)
+
 
 class IntentBundle(LunaBaseModel):
     """Classified player intent from IntentRouter."""

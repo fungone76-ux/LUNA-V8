@@ -39,6 +39,8 @@ luna_private_lesson:
         exploring further." She collects her books without waiting for a reply.
       player_hint: "Go to Luna's office in the afternoon"
       on_enter:
+        - action: "snapshot_affinity"
+          character: "Luna"
         - action: "set_outfit"
           character: "Luna"
           value: "teacher_suit"
@@ -118,7 +120,7 @@ luna_private_lesson:
   on_complete:
     actions:
       - action: "time_advance"
-      - action: "change_affinity"
+      - action: "restore_affinity_snapshot"
         character: "Luna"
         value: 20
     memory:

@@ -50,6 +50,7 @@ class StateMemoryManager:
         dynamic_event_manager: Optional[Any] = None,
         invitation_manager: Optional[Any] = None,
         npc_mind_manager: Optional[Any] = None,
+        home_guest_manager: Optional[Any] = None,
     ) -> None:
         self.db = db
         self.session_id = session_id
@@ -65,6 +66,7 @@ class StateMemoryManager:
         self.dynamic_event_manager = dynamic_event_manager
         self.invitation_manager = invitation_manager
         self.npc_mind_manager = npc_mind_manager
+        self.home_guest_manager = home_guest_manager
 
     def _prune_transient_flags(self, flags: dict) -> dict:
         """Remove transient per-turn flags before saving to DB."""
@@ -118,6 +120,13 @@ class StateMemoryManager:
                     state.flags["_invitation_state"] = self.invitation_manager.to_dict()
                 except Exception as e:
                     logger.warning("Could not serialize InvitationManager: %s", e)
+
+            if self.home_guest_manager:
+                try:
+                    state = self.state_manager.current
+                    self.home_guest_manager.save_to_flags(state.flags)
+                except Exception as e:
+                    logger.warning("Could not serialize HomeGuestManager: %s", e)
 
             # Prune transient per-turn flags before persisting
             state = self.state_manager.current

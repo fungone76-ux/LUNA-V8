@@ -115,6 +115,18 @@ class StateGuardian:
         if not narrative.affinity_change:
             return
 
+        # Se una quest attiva ha lock_affinity=True, i delta LLM vengono soppressi.
+        # Solo on_complete.change_affinity applicherà il bonus finale.
+        _locked_companions: set = set()
+        for quest_id in game_state.active_quests:
+            quest_def = self.world.quests.get(quest_id)
+            if quest_def and getattr(quest_def, "lock_affinity", False):
+                if quest_def.character:
+                    _locked_companions.add(quest_def.character.lower())
+                else:
+                    # Nessun companion specifico → blocca il companion attivo
+                    _locked_companions.add(game_state.active_companion.lower())
+
         for character, delta in narrative.affinity_change.items():
             # Resolve canonical ID (case-insensitive) to avoid "Luna" vs "luna" mismatches
             canonical = self._resolve_companion_id(character)
@@ -122,6 +134,11 @@ class StateGuardian:
                 logger.debug(
                     "[Guardian] Ignoring affinity for unknown character: %s", character
                 )
+                continue
+
+            # Skip if this companion's affinity is locked by an active quest
+            if canonical.lower() in _locked_companions:
+                logger.debug("[Guardian] Affinity locked for %s (active quest)", canonical)
                 continue
 
             # Clamp delta
@@ -296,6 +313,8 @@ class StateGuardian:
         if narrative.invite_accepted and allow_invite:
             game_state.companion_staying_with_player = True
             game_state.companion_invited_to_location = game_state.current_location
+            # Pin location override so presence detection finds them even off-schedule
+            game_state.set_npc_location(companion_name, game_state.current_location)
             logger.info("[Guardian] Companion %s accepted invitation", companion_name)
         elif narrative.invite_accepted and not allow_invite:
             logger.debug("[Guardian] Ignoring invite_accepted=True (no explicit invitation intent)")

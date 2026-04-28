@@ -1,3 +1,5 @@
+
+
 """Luna RPG v7 - Turn Orchestrator.
 
 Coordinates 6 agents for each game turn:
@@ -22,6 +24,11 @@ Step 12:  Build TurnResult
 The orchestrator owns the flow. Agents do not call each other.
 
 REFACTORED: Main class now inherits from mixins for better organization:
+- TurnPipelineMixin: 5 phase methods + _build_result (turn_pipeline.py)
+- AgendaHandlerMixin: _run_gm_agenda — Step 2.9 (agenda_handler.py)
+- SocialEngineMixin: _run_home_scene + _run_multi_npc — Step 5.5 (social_engine.py)
+- NarrativeProcessorMixin: _phase_narrative — Steps 5.5-7.5 (narrative_processor.py)
+- TimeManagerMixin: phase clock + execute_phase_advance (time_manager.py)
 - IntentHandlersMixin: All _handle_* methods
 - ContextBuilderMixin: _build_context, _enrich_context
 - SupportMethodsMixin: _generate_farewell, _generate_media, _minimal_narrative
@@ -47,7 +54,11 @@ from .intent_handlers import IntentHandlersMixin
 from .context_builder import ContextBuilderMixin
 from .support import SupportMethodsMixin
 from .state_manager import StateManagerMixin
-from .phase_handlers import PhaseHandlersMixin
+from .turn_pipeline import TurnPipelineMixin
+from .agenda_handler import AgendaHandlerMixin
+from .social_engine import SocialEngineMixin
+from .narrative_processor import NarrativeProcessorMixin
+from .time_manager import TimeManagerMixin
 from .turn_context import TurnContext
 
 if TYPE_CHECKING:
@@ -59,7 +70,11 @@ _SOLO_COMPANION = "_solo_"
 
 
 class TurnOrchestrator(
-    PhaseHandlersMixin,
+    TurnPipelineMixin,
+    AgendaHandlerMixin,
+    SocialEngineMixin,
+    NarrativeProcessorMixin,
+    TimeManagerMixin,
     IntentHandlersMixin,
     ContextBuilderMixin,
     SupportMethodsMixin,
@@ -72,8 +87,7 @@ class TurnOrchestrator(
 
     v7: Added WorldSimulator (step 2.5) and DirectorAgent (step 3).
 
-    REFACTORED: execute() è una pipeline di 5 fasi definite in phase_handlers.py.
-    I tre blocchi "mostro" (GM Agenda, MultiNPC, PhaseClock) sono helper privati.
+    REFACTORED: execute() è una pipeline di 5 fasi distribuite su 5 mixin specializzati.
     Lo stato del turno viaggia esplicito in TurnContext (turn_context.py).
     """
 
@@ -165,7 +179,7 @@ class TurnOrchestrator(
           _phase_finalize    → Steps 8, 9, 10
           _build_result      → Step 12
 
-        Tutta la logica delle fasi è in phase_handlers.py.
+        La logica delle fasi è distribuita in 5 mixin specializzati.
         Lo stato del turno viaggia in TurnContext (turn_context.py).
         """
         text = user_input.strip()

@@ -1,0 +1,56 @@
+fashion_show:
+  meta:
+    title: "Fashion Show"
+    description: "Luna and Stella take turns showing off outfits while the player votes. The game is playful and competitive."
+    character: "Luna"
+    hidden: true
+
+  activation:
+    type: "background"
+    once: false
+    cooldown_turns: 10
+    engage_pattern: "fashion|show|gioco|sfilata|vestit|outfit|chi veste|chi si veste|modella|sfila|indoss"
+    conditions:
+      - type: "affinity"
+        target: "Stella"
+        operator: "gte"
+        value: 15
+
+  stages:
+    start:
+      title: "The Game Begins"
+      companion_situation: >
+        The player just proposed a fashion show game. Both Luna and Stella are present.
+        The rules: each takes a turn wearing an outfit of their choice, the player rates it,
+        then they swap. It is light and playful but there is real competitive energy — especially
+        from Stella, who immediately assumes she will win. Luna is more measured but genuinely
+        interested. They react separately to the proposal, then ask who goes first.
+      narrative_prompt: >
+        The player proposed a fashion show — taking turns modeling outfits and getting rated.
+        Luna reacts first: she finds the idea amusing and maybe a little risky given Stella's presence,
+        but she accepts. Then Stella reacts — immediate confidence, zero doubt she will win.
+        End with both waiting for the player to decide who goes first.
+      player_hint: "Scegli chi inizia — Luna o Stella?"
+      on_enter:
+        - action: "set_npc_location"
+          character: "Stella"
+        - action: "set_secondary_npc"
+          character: "Stella"
+      exit_conditions:
+        - type: "player_action"
+          pattern: "."
+      transitions:
+        - condition: "default"
+          target_stage: "_complete"
+
+  on_complete:
+    actions: []
+
+  on_complete_memory:
+    character: "Luna"
+    entry: >
+      The player suggested a fashion show with Stella present. I said yes.
+      I am not sure if I wanted to win or just wanted him to keep looking.
+    emotional_impact: "amused_competitive"
+    flags_to_record:
+      - fashion_show_happened

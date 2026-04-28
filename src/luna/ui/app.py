@@ -229,16 +229,19 @@ class ApplicationRunner:
         
         # Initialize game before showing
         try:
+            enable_audio = self._selection.get("enable_audio", True)
             if self._selection["mode"] == "new":
                 await self.main_window.initialize_game(
                     world_id=self._selection["world_id"],
                     companion=self._selection["companion"],
+                    enable_audio=enable_audio,
                 )
             elif self._selection["mode"] == "load":
                 await self.main_window.initialize_game(
                     world_id=self._selection["world_id"] or "default",
                     companion=self._selection["companion"] or "Luna",
                     session_id=self._selection["session_id"],
+                    enable_audio=enable_audio,
                 )
         except Exception as e:
             logger.error(f"[App] Failed to initialize game: {e}")

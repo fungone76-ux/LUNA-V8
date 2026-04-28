@@ -1,0 +1,13 @@
+Il tuo file Markdown è pronto.
+[file-tag: code-generated-file-0-1777320487491658114]
+
+In questo documento troverai la guida tecnica per suddividere `phase_handlers.py` in cinque moduli specializzati, seguendo un'architettura a **Pipeline di Agenti**. 
+
+### Sintesi della scomposizione:
+* **`turn_pipeline.py`**: Orchestrazione ad alto livello (il "cervello").
+* **`agenda_handler.py`**: Gestione degli intenti e della logica del Game Master (Step 2.9).
+* **`social_engine.py`**: Gestione dedicata alle scene con più personaggi (Step 5.5).
+* **`narrative_processor.py`**: Comunicazione con l'LLM e pulizia del testo.
+* **`time_manager.py`**: Gestione deterministica dell'orologio e delle fasi di gioco.
+
+Questa struttura riduce drasticamente la complessità del singolo file e facilita il debug di ogni fase specifica del turno nel tuo progetto.

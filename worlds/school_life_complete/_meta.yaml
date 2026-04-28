@@ -133,7 +133,7 @@ narrative_arc:
     - id: "stella_servizio_fotografico"
       description: "Il servizio fotografico dove Stella capisce che sei diverso"
       trigger: "affinity_Stella >= 50"
-      required_elements: ["fotocamera", "sguardo", "cambiamento"]
+      required_elements: ["sguardo", "cambiamento"]
       tone: "tense_romantic"
       once: true
       consequence: "stella_flag_photoshoot = true"

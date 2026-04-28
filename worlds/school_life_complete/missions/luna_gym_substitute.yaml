@@ -119,7 +119,7 @@ luna_gym_substitute:
           value: true
       exit_conditions:
         - type: "player_action"
-          pattern: "goodbye|bye|I have to go|I should go|see you|good night|I'll leave|leaving"
+          pattern: "goodbye|bye|I have to go|I should go|see you|good night|I'll leave|leaving|arrivederci|ci vediamo|vado|me ne vado|ciao|devo andare|a domani|a dopo"
       transitions:
         - condition: "default"
           target_stage: "_complete"

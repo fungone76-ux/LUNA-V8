@@ -255,7 +255,7 @@ class WorldLoader:
                 merged["locations"].update(locs)
         if "time" in file_data:
             merged["time"].update(file_data["time"])
-        if "global_events" in file_data:
+        if "global_events" in file_data and file_data["global_events"]:
             merged["global_events"].update(file_data["global_events"])
         if "npc_templates" in file_data:
             merged["npc_templates"].update(file_data["npc_templates"])
@@ -681,6 +681,7 @@ class WorldLoader:
             probability=float(activation.get("chance", activation.get("probability", 0.0))),
             cooldown_turns=int(activation.get("cooldown_turns", 0)),
             allowed_times=[str(t) for t in activation.get("time", [])],
+            lock_affinity=bool(activation.get("lock_affinity", False)),
             background=bool(meta.get("background", False)),
             engage_pattern=(
                 (activation.get("engage_condition") or {}).get("pattern", "")

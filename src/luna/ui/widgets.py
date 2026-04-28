@@ -912,6 +912,15 @@ class LocationWidget(QGroupBox):
                 self.list_characters.addItem(f"👤 {char_name}")
         else:
             self.list_characters.addItem("(nessuno presente)")
+
+    def update_characters(self, characters: List[str]) -> None:
+        """Aggiorna solo la lista personaggi presenti (senza toccare nome/descrizione)."""
+        self.list_characters.clear()
+        if characters:
+            for char_name in characters:
+                self.list_characters.addItem(f"👤 {char_name}")
+        else:
+            self.list_characters.addItem("(nessuno presente)")
     
     def clear(self) -> None:
         """Clear location display."""

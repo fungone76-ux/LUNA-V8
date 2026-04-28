@@ -13,7 +13,7 @@ import logging
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
 from luna.core.models import GameState, QuestStatus
-from luna.systems.quest_engine import QuestEngine, QuestUpdateResult
+from luna.systems.quest_engine_base import QuestEngine, QuestUpdateResult
 
 from typing import NamedTuple
 
@@ -89,7 +89,27 @@ class SequentialQuestEngine(QuestEngine):
                 )
                 return self._fail_quest(quest_id, instance, quest_def, stage_id, game_state)
 
-        # 3. Location gate: block exit_conditions if player not at required location
+        # 3a. Location exits bypass the location gate: the exit condition IS the
+        # location check, so the player has already arrived — evaluate directly.
+        has_location_exit = stage.exit_conditions and any(
+            getattr(c, "type", "") == "location" for c in stage.exit_conditions
+        )
+        if has_location_exit:
+            if self._evaluator.evaluate_all(stage.exit_conditions, game_state, user_input):
+                return self._advance_stage(quest_id, instance, quest_def, stage_id, game_state)
+            return None
+
+        # 3b. Player-action exits bypass the location gate: the player may have
+        # already left the scene by the time we evaluate.
+        has_player_action_exit = stage.exit_conditions and any(
+            getattr(c, "type", "") == "player_action" for c in stage.exit_conditions
+        )
+        if has_player_action_exit:
+            if self._evaluator.evaluate_all(stage.exit_conditions, game_state, user_input):
+                return self._advance_stage(quest_id, instance, quest_def, stage_id, game_state)
+            return None
+
+        # 3c. Location gate: block exit_conditions if player not at required location
         if stage.location and game_state.current_location != stage.location:
             return None
 

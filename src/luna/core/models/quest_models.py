@@ -17,7 +17,7 @@ class QuestCondition(LunaBaseModel):
     type: Literal[
         "affinity", "location", "time", "flag", "turn_count",
         "inventory", "companion", "quest_status", "action", "player_action",
-        "days_since_flag"
+        "days_since_flag", "npc_at_location"
     ]
     target: Optional[str] = None
     operator: Literal["eq", "gt", "lt", "gte", "lte", "contains", "not_eq"] = "eq"
@@ -33,7 +33,9 @@ class QuestAction(LunaBaseModel):
         "set_location", "set_outfit", "set_flag", "add_flag",
         "change_affinity", "set_affinity", "increment_stat", "set_emotional_state",
         "set_time", "start_quest", "complete_quest", "fail_quest",
-        "time_advance", "set_secondary_npc", "clear_secondary_npc"
+        "time_advance", "set_secondary_npc", "clear_secondary_npc",
+        "snapshot_affinity", "restore_affinity_snapshot",
+        "write_memory", "switch_companion", "set_npc_location"
     ]
     character: Optional[str] = None
     target: Optional[str] = None
@@ -89,15 +91,22 @@ class QuestDefinition(LunaBaseModel):
     # Activation
     activation_type: Literal[
         "auto", "manual", "trigger", "choice",
-        "event", "random", "time_since_flag", "companion_initiative", "location_pass"
+        "event", "random", "time_since_flag", "companion_initiative", "location_pass",
+        "background"
     ] = "auto"
     activation_conditions: List[QuestCondition] = Field(default_factory=list)
     trigger_event: Optional[str] = None
+    trigger_location: Optional[str] = None   # location_pass: location richiesta
+    trigger_flag: Optional[str] = None       # time_since_flag: flag da osservare
+    trigger_days: int = Field(default=1, ge=0)  # time_since_flag: giorni minimi dal flag
     hidden: bool = False
     once: bool = True
     probability: float = Field(default=0.0, ge=0.0, le=1.0)
     cooldown_turns: int = Field(default=0, ge=0)
     allowed_times: List[str] = Field(default_factory=list)
+    # Se True, blocca i delta affinity dell'LLM durante la scena.
+    # Solo il bonus on_complete.change_affinity viene applicato.
+    lock_affinity: bool = False
 
     # V5: quest priority (lower = checked first when multiple eligible)
     priority: int = Field(default=5, ge=1, le=10)
